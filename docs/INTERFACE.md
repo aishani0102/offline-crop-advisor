@@ -17,6 +17,7 @@ The detection stage and the advisory stage only talk through this one JSON objec
   "severity_pct": 18.5,
   "severity_band": "moderate",
   "uncertain": false,
+  "quality": "ok",
   "language": "en"
 }
 ```
@@ -29,10 +30,12 @@ The detection stage and the advisory stage only talk through this one JSON objec
 - `severity_pct`: percentage of leaf area covered by lesions, from 0 to 100. `null` for healthy leaves, and `null` when no leaf could be found in the photo.
 - `severity_band`: `none` (healthy), `mild` (under 10), `moderate` (10 to 30), `severe` (over 30), `no_leaf` (the severity step found no leaf in the photo, so there is no severity estimate).
 - `uncertain`: `true` when confidence is below the threshold set in `configs/thresholds.json`. The advisory stage must then avoid naming a treatment and should suggest a retake or a visit to the KVK.
+- `quality`: photo check done before classifying. `ok`, `too_dark`, `too_blurry` or `no_leaf` (too few leaf coloured pixels). Anything other than `ok` also sets `uncertain` to `true`. For `no_leaf` the severity is skipped, so `severity_pct` is `null` and `severity_band` is `no_leaf`. Thresholds are in `configs/thresholds.json` under `quality_gate`, see `docs/results/quality_gate.md`.
 - `language`: `en` or `hi`.
 
 ## Rules for the advisory side
 
+- `too_dark` or `too_blurry`: ask for a retake in better light or held steady before saying anything about treatment.
 - `no_leaf` means the disease label may still be fine, but the advisory side must not say how bad it is. Ask for a closer photo of one leaf.
 - `severe` or `uncertain` always ends with a referral to the local KVK or the Kisan Call Centre (1800-180-1551).
 - Chemical names and doses come only from the knowledge base entry for that label. Never from the model.

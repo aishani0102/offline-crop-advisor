@@ -12,6 +12,7 @@ import json
 import sys
 from pathlib import Path
 
+import cv2
 import numpy as np
 import torch
 from PIL import Image, ImageOps
@@ -54,11 +55,34 @@ def load_photo(path):
     return im, full
 
 
+def photo_quality(small, gate):
+    """Cheap checks on the shorter-side-256 photo, run before classifying.
+
+    too_dark: mean grey level under min_brightness (0 to 255).
+    too_blurry: variance of the Laplacian under min_laplacian_var.
+    no_leaf: share of leaf coloured pixels (green, yellow or brown, HSV hue
+    10 to 90, sat >= 40, val >= 30) under min_leaf_share.
+    """
+    bgr = np.array(small)[:, :, ::-1].copy()
+    grey = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+    if grey.mean() < gate["min_brightness"]:
+        return "too_dark"
+    if cv2.Laplacian(grey, cv2.CV_64F).var() < gate["min_laplacian_var"]:
+        return "too_blurry"
+    hsv = cv2.cvtColor(cv2.GaussianBlur(bgr, (5, 5), 0), cv2.COLOR_BGR2HSV)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    leafy = (h >= 10) & (h <= 90) & (s >= 40) & (v >= 30)
+    if leafy.mean() < gate["min_leaf_share"]:
+        return "no_leaf"
+    return "ok"
+
+
 def predict(clf, image_path, crop, language="en", classes=None, thresholds=None):
     classes = classes or load_classes()
     thresholds = thresholds or load_thresholds()
     info = {c["label"]: c for c in classes}
     small, full = load_photo(image_path)
+    quality = photo_quality(small, thresholds["quality_gate"])
     logits = clf.logits(small)
     allowed = torch.tensor([info[lb]["crop"] == crop for lb in clf.labels])
     if not allowed.any():
@@ -71,7 +95,9 @@ def predict(clf, image_path, crop, language="en", classes=None, thresholds=None)
     conf = float(probs[top[0]])
     c = info[best]
 
-    if c["type"] == "healthy":
+    if quality == "no_leaf":
+        sev_pct, band = None, "no_leaf"
+    elif c["type"] == "healthy":
         sev_pct, band = None, "none"
     else:
         bgr = np.array(full)[:, :, ::-1].copy()
@@ -86,7 +112,8 @@ def predict(clf, image_path, crop, language="en", classes=None, thresholds=None)
         "top3": [{"label": clf.labels[i], "confidence": round(float(probs[i]), 4)} for i in top],
         "severity_pct": sev_pct,
         "severity_band": band,
-        "uncertain": conf < thresholds["uncertain_below_confidence"],
+        "uncertain": conf < thresholds["uncertain_below_confidence"] or quality != "ok",
+        "quality": quality,
         "language": language,
     }
 
