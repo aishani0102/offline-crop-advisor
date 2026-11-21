@@ -104,6 +104,7 @@ def main():
     ap.add_argument("--field-weight", type=float, default=2.0)
     ap.add_argument("--max-steps", type=int, default=0, help="cut each epoch short, for quick tests")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--resume", help="best.pt to start from; skips stage 1 and runs only stage 2")
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
@@ -132,6 +133,13 @@ def main():
         rng = random.Random(args.seed)
         train_rows = rng.sample(train_rows, min(args.limit, len(train_rows)))
         val_rows = rng.sample(val_rows, min(args.limit, len(val_rows)))
+    resume_ck = None
+    if args.resume:
+        resume_ck = torch.load(args.resume, map_location="cpu", weights_only=False)
+        if resume_ck["labels"] != labels:
+            raise SystemExit("--resume checkpoint has different labels from configs/classes.json")
+        args.arch, args.size = resume_ck["arch"], resume_ck["size"]
+        args.frozen_epochs = 0  # the head is already trained, go straight to stage 2
     if args.epochs:
         args.frozen_epochs = min(args.frozen_epochs, args.epochs)
         args.full_epochs = args.epochs - args.frozen_epochs
@@ -148,7 +156,12 @@ def main():
         ManifestDataset(val_rows, built, eval_transform(args.size)), batch_size=args.batch * 2,
         num_workers=args.workers, pin_memory=pin, persistent_workers=args.workers > 0)
 
-    model = build_model(args.arch, len(labels)).to(device)
+    model = build_model(args.arch, len(labels), pretrained=resume_ck is None)
+    if resume_ck is not None:
+        model.load_state_dict(resume_ck["state_dict"])
+        log(f"resumed from {args.resume} (epoch {resume_ck.get('epoch')}, "
+            f"val macro F1 {resume_ck.get('val_macro_f1')})")
+    model = model.to(device)
     loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
     scaler = torch.amp.GradScaler(enabled=amp)
 

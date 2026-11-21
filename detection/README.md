@@ -52,7 +52,9 @@ python -I detection/train.py --root <data_root> --out <data_root>/models/mnv3_la
 
 Options that matter: `--device cpu|cuda|auto`, `--batch-size`, `--num-workers`,
 `--epochs` (total), `--frozen-epochs` (head only), `--limit N` (tiny smoke test),
-`--no-amp`. Mixed precision is on by default on CUDA.
+`--no-amp`, `--resume <best.pt>` (load those weights and run only stage 2, for more
+fine tuning of a model we already have; arch and size come from the checkpoint).
+Mixed precision is on by default on CUDA.
 
 Writes `best.pt` (best validation macro F1), `temperature.json`, `train_log.txt`
 (seconds per step and per epoch) and `train_summary.json` (total time and history).
