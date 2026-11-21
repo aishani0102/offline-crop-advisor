@@ -20,7 +20,8 @@ from pathlib import Path
 
 from knowledge import REPO, check_case, load_classes, load_kb
 from run_advice import LlamaRunner, advise, peak_rss_mb
-from safety import check_output
+from prompt import clean_output
+from safety import check_output, safe_advice
 
 RESULTS = REPO / "docs" / "results"
 BAND_PCT = {"mild": 5.0, "moderate": 20.0, "severe": 45.0}
@@ -176,6 +177,8 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--max-new-tokens", type=int, default=200)
     ap.add_argument("--resume", action="store_true")
+    ap.add_argument("--summary-only", action="store_true",
+                    help="re-check the saved rows and rewrite the summary, run no new cases")
     ap.add_argument("--raw", default=str(RESULTS / "advisory_eval_raw.jsonl"))
     ap.add_argument("--md", default=str(RESULTS / "advisory_eval.md"))
     ap.add_argument("--load-note", default="nothing else heavy was running")
@@ -190,18 +193,32 @@ def main():
     raw_path = Path(args.raw)
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     done = {}
-    if args.resume and raw_path.exists():
+    if (args.resume or args.summary_only) and raw_path.exists():
         for line in raw_path.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
             done[r["id"]] = r
+        # Re-check saved model outputs with the current safety.py, so all rows
+        # are judged by the same rules even if the checks changed in between.
+        by_id = {case_id(c): c for c in cases}
+        for cid, r in done.items():
+            if r["mode"] == "llm" and cid in by_id:
+                c = by_id[cid]
+                advice, fails, fallback = safe_advice(clean_output(r["raw"]), c, kb,
+                                                      truncated=r["stats"].get("truncated", False))
+                r.update(advice=advice, fails=fails, fallback=fallback,
+                         final_ok=not check_output(advice, c, kb, limit_length=not fallback))
+        raw_path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in done.values()),
+                            encoding="utf-8")
     elif raw_path.exists():
         raw_path.unlink()
 
+    if args.summary_only:
+        cases = []
     runner = None
     meta = {"date": time.strftime("%Y-%m-%d"), "max_new_tokens": args.max_new_tokens,
             "machine": f"{platform.machine()}, {platform.system()} {platform.release()}, {platform.processor() or 'cpu'}",
             "model": "none (template only)", "load_note": args.load_note}
-    if not args.template_only:
+    if not args.template_only and not args.summary_only:
         runner = LlamaRunner(args.model, args.tokenizer)
         meta["model"] = Path(args.model).name
         meta["load_s"] = round(runner.load_s, 2)
