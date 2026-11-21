@@ -1,6 +1,15 @@
 package app.cropadvisor
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import java.io.File
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -47,24 +56,74 @@ class MainActivity : ComponentActivity() {
                 colorScheme = darkColorScheme(primary = Green, background = Black, surface = Charcoal),
                 shapes = SquareShapes,
             ) {
-                Column(
-                    Modifier.fillMaxSize().background(Black).padding(24.dp).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Button(
-                        onClick = { runLlmTest() },
-                        enabled = !busy,
-                        shape = square,
-                        colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Black),
-                    ) { Text("Run language model test") }
-                    Text(out, color = Color.White)
+                val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+                    if (ok) photoUri?.let { classifyUri(it) }
+                }
+                val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                    uri?.let { classifyUri(it) }
+                }
+                val d = diagnosis
+                val p = photo
+                if (d != null && p != null) {
+                    BackHandler { diagnosis = null }
+                    ResultScreen(p, d) { diagnosis = null }
+                } else {
+                    HomeScreen(
+                        crop, busy, onCrop = { crop = it },
+                        onCamera = { photoUri = newPhotoUri(); camera.launch(photoUri!!) },
+                        onGallery = {
+                            gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                    )
                 }
             }
         }
         // only on a fresh start, so a recreated activity does not run the test again
         if (savedInstanceState == null) {
+            // debug: classify a file from the app folder without tapping, for screenshots
+            intent.getStringExtra("classify")?.let { name ->
+                intent.getStringExtra("crop")?.let { crop = it }
+                classifyUri(android.net.Uri.fromFile(java.io.File(getExternalFilesDir(null), name)))
+            }
             if (intent.getBooleanExtra("llmtest", false)) runLlmTest()
             if (intent.getBooleanExtra("visiontest", false)) runVisionTest()
+        }
+    }
+
+    private var crop by mutableStateOf("tomato")
+    private var photo by mutableStateOf<Bitmap?>(null)
+    private var diagnosis by mutableStateOf<Diagnosis?>(null)
+    private var photoUri: Uri? = null
+    private var vision: Vision? = null
+
+    private fun newPhotoUri(): Uri {
+        val dir = File(cacheDir, "photos").apply { mkdirs() }
+        return FileProvider.getUriForFile(this, "app.cropadvisor.photos", File(dir, "leaf.jpg"))
+    }
+
+    // Decodes the photo upright and runs the leaf model off the main thread.
+    private fun classifyUri(uri: Uri) {
+        if (busy) return
+        busy = true
+        val chosen = crop
+        thread {
+            try {
+                val src = ImageDecoder.createSource(contentResolver, uri)
+                val bmp = ImageDecoder.decodeBitmap(src) { dec, info, _ ->
+                    dec.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                    // big camera photos are shrunk on decode, the model only needs 256 px
+                    val s = minOf(info.size.width, info.size.height)
+                    if (s > 1024) dec.setTargetSampleSize(s / 1024)
+                }
+                val v = vision ?: Vision(ModelFiles.find(this, "vision.pte")!!.path).also { vision = it }
+                val d = Diagnosis.from(chosen, v.classify(bmp))
+                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
+                runOnUiThread { photo = bmp; diagnosis = d }
+            } catch (e: Throwable) {
+                Perf.log(this, "classify_error=$e")
+            } finally {
+                runOnUiThread { busy = false }
+            }
         }
     }
 
