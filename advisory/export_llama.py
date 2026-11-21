@@ -7,7 +7,7 @@ Weights are never in the repo (Llama 3.2 licence). Two ways to get the model:
    executorch-community/Llama-3.2-1B-Instruct-SpinQuant_INT4_EO8-ET.
    We pin the commit and check SHA-256 of every file.
 
-     python advisory/export_llama.py download --out C:/Users/a_roy/aisoc_data/llama/spinquant
+     python advisory/export_llama.py download --out <data_root>/llama/spinquant
 
 2. export: build our own .pte from Meta's gated SpinQuant (or QLoRA)
    checkpoint with the ExecuTorch Llama export flow, with a shorter
@@ -15,7 +15,7 @@ Weights are never in the repo (Llama 3.2 licence). Two ways to get the model:
    login that has accepted the Llama 3.2 licence (huggingface-cli login).
    The script never reads or prints the token itself.
 
-     python advisory/export_llama.py export --variant spinquant --out C:/Users/a_roy/aisoc_data/llama/own_export
+     python advisory/export_llama.py export --variant spinquant --out <data_root>/llama/own_export
 
    The export flags are the ones in the ExecuTorch team's published recipe
    for this checkpoint, except --max_seq_length and --max_context_length.
