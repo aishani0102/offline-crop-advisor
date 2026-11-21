@@ -13,10 +13,12 @@ extracted with tar (libarchive), which does not execute anything.
 import argparse
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import time
 import urllib.request
+import zipfile
 from pathlib import Path
 
 UA = {"User-Agent": "crop-advisor-data-fetch/1.0"}
@@ -119,12 +121,26 @@ def md5_of(path):
 
 
 def extract(archive, dest):
-    """Extract with tar (bsdtar reads zip and rar). Skips if already done."""
+    """Extract an archive without running anything from it. Skips if done.
+
+    Zip files use Python's zipfile (it strips absolute paths and '..').
+    The Ethiopia rar needs bsdtar, which is the tar that ships with Windows,
+    or unar/unrar on Linux."""
     marker = dest / ".extracted"
     if marker.exists():
         return
     dest.mkdir(parents=True, exist_ok=True)
-    run(["tar", "-xf", str(archive), "-C", str(dest)])
+    if archive.suffix.lower() == ".zip":
+        with zipfile.ZipFile(archive) as z:
+            z.extractall(dest)
+    elif sys.platform == "win32":
+        run(["tar", "-xf", str(archive), "-C", str(dest)])
+    elif shutil.which("bsdtar"):
+        run(["bsdtar", "-xf", str(archive), "-C", str(dest)])
+    elif shutil.which("unar"):
+        run(["unar", "-q", "-o", str(dest), str(archive)])
+    else:
+        run(["unrar", "x", "-o+", str(archive), str(dest) + "/"])
     marker.write_text("ok\n")
 
 
@@ -133,9 +149,63 @@ def get_plantvillage(raw):
                  raw / "plantvillage", [f"raw/color/{d}" for d in PLANTVILLAGE_DIRS])
 
 
+def safe_name(name):
+    for ch in '?*:"<>|':
+        name = name.replace(ch, "_")
+    return name.rstrip(" .")
+
+
 def get_plantdoc(raw):
-    paths = [f"{split}/{d}" for split in ("train", "test") for d in PLANTDOC_DIRS]
-    sparse_clone("https://github.com/pratikkayal/PlantDoc-Dataset.git", raw / "plantdoc", paths)
+    """PlantDoc has file names with '?' in them (copied from web URLs), which
+    Windows cannot check out. So we clone without a working tree, fetch the
+    blobs for our folders with git backfill, and write them out ourselves with
+    safe names."""
+    dest = raw / "plantdoc"
+    out_root = dest / "files"
+    if (out_root / ".exported").exists():
+        return
+    if not (dest / ".git").exists():
+        run(["git", "clone", "--filter=blob:none", "--no-checkout", "--depth", "1",
+             "https://github.com/pratikkayal/PlantDoc-Dataset.git", str(dest)])
+    lines = ["/*", "!/*/"]
+    for split in ("train", "test"):
+        lines += [f"/{split}/", f"!/{split}/*/"] + [f"/{split}/{d}/" for d in PLANTDOC_DIRS]
+    (dest / ".git" / "info" / "sparse-checkout").write_text("\n".join(lines) + "\n")
+    run(["git", "config", "core.sparseCheckout", "true"], cwd=dest)
+    run(["git", "config", "core.sparseCheckoutCone", "true"], cwd=dest)
+    try:
+        run(["git", "backfill", "--sparse"], cwd=dest)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # older git (Colab) has no backfill, but Linux can check out the odd names fine
+        run(["git", "checkout"], cwd=dest)
+
+    paths = [f"{split}/{d}/" for split in ("train", "test") for d in PLANTDOC_DIRS]
+    ls = subprocess.run(["git", "ls-tree", "-r", "-z", "HEAD", "--", *paths], cwd=dest,
+                        capture_output=True, check=True).stdout.decode("utf-8")
+    entries = []
+    for rec in ls.split("\0"):
+        if not rec:
+            continue
+        meta, path = rec.split("\t", 1)
+        entries.append((meta.split()[2], path))
+    proc = subprocess.Popen(["git", "cat-file", "--batch"], cwd=dest,
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    for sha, path in entries:
+        # one at a time, so neither pipe fills up and blocks
+        proc.stdin.write((sha + "\n").encode())
+        proc.stdin.flush()
+        header = proc.stdout.readline().split()
+        size = int(header[2])
+        data = proc.stdout.read(size)
+        proc.stdout.read(1)  # trailing newline
+        split, cls, name = path.split("/", 2)
+        out = out_root / split / cls / safe_name(name)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(data)
+    proc.stdin.close()
+    proc.wait()
+    (out_root / ".exported").write_text(f"{len(entries)} files\n")
+    print(f"  plantdoc: wrote {len(entries)} files")
 
 
 def get_tomato_village(raw):
