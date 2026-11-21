@@ -53,8 +53,6 @@
     <string name="show_advice">ஆலோசனையைக் காட்டு</string>
     <string name="state">மாநிலம்</string>
     <string name="choose_state">மாநிலத்தைத் தேர்வு செய்</string>
-    <string name="theme">தோற்றம்</string>
-    <string name="theme_system">போன் போல</string>
     <string name="theme_light">வெளிர்</string>
     <string name="theme_dark">இருள்</string>
 </resources>

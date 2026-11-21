@@ -5,6 +5,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -100,7 +102,13 @@ fun Header(subtitle: String) {
     Column(
         Modifier.fillMaxWidth().background(P.header).statusBarsPadding().padding(horizontal = 24.dp, vertical = 28.dp),
     ) {
-        Text(stringResource(R.string.app_name), color = P.headerText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Text(
+                stringResource(R.string.app_name), color = P.headerText, fontSize = 22.sp, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
+            )
+            LocalThemeSwitch.current?.let { ThemeSlider(it) }
+        }
         Text(subtitle, color = P.headerText.copy(alpha = 0.85f), fontSize = 13.sp)
     }
 }
@@ -117,8 +125,8 @@ fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean 
 fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick, shape = RectangleShape, modifier = modifier.heightIn(min = 52.dp),
-        border = BorderStroke(1.dp, P.accent),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = P.accent),
+        border = BorderStroke(1.dp, P.outline),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = P.outlineText),
     ) { Text(text, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
 }
 
@@ -132,7 +140,6 @@ fun CropToggle(label: String, selected: Boolean, modifier: Modifier, onClick: ()
 fun HomeScreen(
     crop: String, busy: Boolean, officer: String, lang: String, onLang: (String) -> Unit, onOfficer: (String) -> Unit,
     state: String, onState: (String) -> Unit,
-    theme: String, onTheme: (String) -> Unit,
     onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().background(P.bg).verticalScroll(rememberScrollState())) {
@@ -155,11 +162,6 @@ fun HomeScreen(
             PrimaryButton(stringResource(if (busy) R.string.checking else R.string.take_photo), Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
             SecondaryButton(stringResource(R.string.gallery), Modifier.fillMaxWidth(), onClick = onGallery)
             Spacer(Modifier.height(12.dp))
-            Text(stringResource(R.string.theme), color = P.muted, fontSize = 13.sp)
-            OptionRow(
-                listOf("system" to R.string.theme_system, "light" to R.string.theme_light, "dark" to R.string.theme_dark), theme,
-            ) { onTheme(it ?: "system") }
-            Spacer(Modifier.height(4.dp))
             Text(stringResource(R.string.state), color = P.muted, fontSize = 13.sp)
             StatePicker(state, onState)
             Spacer(Modifier.height(4.dp))
@@ -171,7 +173,7 @@ fun HomeScreen(
                 ),
                 colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                     focusedTextColor = P.ink, unfocusedTextColor = P.ink,
-                    focusedBorderColor = P.accent, unfocusedBorderColor = P.track, cursorColor = P.accent,
+                    focusedBorderColor = P.accent, unfocusedBorderColor = P.surfaceBorder, cursorColor = P.accent,
                 ),
             )
         }
@@ -201,7 +203,7 @@ fun ResultScreen(
                 )
             } else {
                 Text(condName(d.label), color = P.ink, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
-                Text(stringResource(R.string.confidence, (d.confidence * 100).toInt()), color = P.accent, fontSize = 14.sp)
+                Text(stringResource(R.string.confidence, (d.confidence * 100).toInt()), color = P.accentText, fontSize = 14.sp)
                 when (d.band) {
                     "mild", "moderate", "severe" -> Text(
                         stringResource(R.string.spread, stringResource(bandRes(d.band))),

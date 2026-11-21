@@ -35,9 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlin.concurrent.thread
 
-val Black = Color(0xFF040404)
-val Charcoal = Color(0xFF1F1F1F)
-val Green = Color(0xFF00C896)
 
 // Square corners everywhere.
 private val square = RectangleShape
@@ -72,16 +69,21 @@ class MainActivity : ComponentActivity() {
         state = getSharedPreferences("settings", MODE_PRIVATE).getString("state", "") ?: ""
         theme = getSharedPreferences("settings", MODE_PRIVATE).getString("theme", "system") ?: "system"
         setContent {
-            // Light or dark: follows the phone unless the farmer picked one in settings.
+            // Light or dark: "system" until the farmer taps the switch in the banner.
             val dark = when (theme) {
                 "light" -> false
                 "dark" -> true
                 else -> androidx.compose.foundation.isSystemInDarkTheme()
             }
             val pal = if (dark) DarkPalette else LightPalette
-            androidx.compose.runtime.CompositionLocalProvider(LocalPalette provides pal) {
+            // Follows the phone until the switch in the banner is tapped, then the choice is kept.
+            val switch = ThemeSwitch(dark) {
+                theme = if (dark) "light" else "dark"
+                getSharedPreferences("settings", MODE_PRIVATE).edit().putString("theme", theme).apply()
+            }
+            androidx.compose.runtime.CompositionLocalProvider(LocalPalette provides pal, LocalThemeSwitch provides switch) {
             MaterialTheme(
-                colorScheme = if (dark) darkColorScheme(primary = Green, background = Black, surface = Charcoal)
+                colorScheme = if (dark) darkColorScheme(primary = pal.accent, background = pal.bg, surface = pal.surface)
                 else androidx.compose.material3.lightColorScheme(primary = pal.accent, background = pal.bg, surface = pal.surface),
                 shapes = SquareShapes,
             ) {
@@ -109,11 +111,6 @@ class MainActivity : ComponentActivity() {
                         onOfficer = {
                             officer = it.filter { ch -> ch.isDigit() || ch == '+' }
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
-                        },
-                        theme = theme,
-                        onTheme = {
-                            theme = it
-                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("theme", it).apply()
                         },
                         state = state,
                         onState = {

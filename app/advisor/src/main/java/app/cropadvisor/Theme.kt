@@ -13,19 +13,43 @@ class Palette(
     val muted: Color,       // labels and small notes
     val accent: Color,      // primary buttons, outlines, confidence text
     val onAccent: Color,    // text on a primary button
+    val accentText: Color,  // confidence and other highlighted text
+    val outline: Color,     // border of outlined buttons
+    val outlineText: Color, // text of outlined buttons
     val surface: Color,     // advice box and menus
     val surfaceBorder: Color,
     val track: Color,       // empty part of a score bar, idle text field border
     val barFill: Color,
     val header: Brush,
     val headerText: Color,
+    val sliderTrack: Color,  // Light / Dark slider in the banner
+    val sliderThumb: Color,
+    val sliderIcon: Color,   // icon on the thumb
+    val sliderIdle: Color,   // the other icon
     val dark: Boolean,
 )
 
+// Dark mode, forest greens only (no #00C896). Contrast on #0A120F:
+// #6C7D5E is about 4.2:1, too low for text, so text uses lighter tints of it:
+// #8A9A7C (about 6:1) for muted text and #A9B79C (about 9:1) for highlights.
+// Primary buttons: #6C7D5E with #0A120F text is also only 4.2:1, so the fill
+// is the #8A9A7C tint, which gives about 6:1 with #0A120F text.
+private val ChaosBlack = Color(0xFF0A120F)
+private val DeepSlate = Color(0xFF12271C)
+private val PalmGreen = Color(0xFF253E2D)
+private val Catachan = Color(0xFF425940)
+private val Emerald = Color(0xFF6C7D5E)
+private val EmeraldTint = Color(0xFF8A9A7C)
+private val EmeraldLight = Color(0xFFA9B79C)
+private val NearWhite = Color(0xFFEDF0E9)
+
 val DarkPalette = Palette(
-    bg = Black, ink = Color.White, muted = Color(0xFF9A9A9A), accent = Green, onAccent = Black,
-    surface = Charcoal, surfaceBorder = Color.Transparent, track = Charcoal, barFill = Green,
-    header = Brush.linearGradient(listOf(Black, Charcoal, Green)), headerText = Color.White, dark = true,
+    bg = ChaosBlack, ink = NearWhite, muted = EmeraldTint, accent = EmeraldTint, onAccent = ChaosBlack,
+    accentText = EmeraldLight, outline = Emerald, outlineText = NearWhite,
+    surface = DeepSlate, surfaceBorder = PalmGreen, track = PalmGreen, barFill = Emerald,
+    header = Brush.linearGradient(listOf(ChaosBlack, PalmGreen, Catachan)), headerText = NearWhite,
+    sliderTrack = DeepSlate, sliderThumb = Catachan, sliderIcon = NearWhite,
+    sliderIdle = EmeraldTint, dark = true,
 )
 
 // Light mode from the user's palette. Contrast on #DAD7CD: body #344E41 about 6.3:1,
@@ -39,11 +63,18 @@ private val Forest = Color(0xFF344E41)
 
 val LightPalette = Palette(
     bg = Paper, ink = Forest, muted = Hunter, accent = Hunter, onAccent = Paper,
+    accentText = Hunter, outline = Hunter, outlineText = Hunter,
     surface = Paper, surfaceBorder = Sage, track = Sage, barFill = Fern,
-    header = Brush.linearGradient(listOf(Forest, Fern, Sage)), headerText = Paper, dark = false,
+    header = Brush.linearGradient(listOf(Forest, Fern, Sage)), headerText = Paper, sliderTrack = Paper, sliderThumb = Sage, sliderIcon = Forest,
+    sliderIdle = Hunter, dark = false,
 )
 
 val LocalPalette = staticCompositionLocalOf { DarkPalette }
 
 val P: Palette
     @Composable @ReadOnlyComposable get() = LocalPalette.current
+
+// The Light / Dark switch in the banner. null means no switch (for example in tests).
+class ThemeSwitch(val dark: Boolean, val toggle: () -> Unit)
+
+val LocalThemeSwitch = staticCompositionLocalOf<ThemeSwitch?> { null }

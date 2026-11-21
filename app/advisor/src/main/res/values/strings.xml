@@ -54,8 +54,6 @@
     <string name="show_advice">Show advice</string>
     <string name="state">State</string>
     <string name="choose_state">Choose state</string>
-    <string name="theme">Appearance</string>
-    <string name="theme_system">System</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light mode</string>
+    <string name="theme_dark">Dark mode</string>
 </resources>
