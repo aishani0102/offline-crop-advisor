@@ -1,0 +1,768 @@
+{
+  "version": 1,
+  "helpline": "1800-180-1551",
+  "note": "Every fact, chemical and dose here comes from the sources listed in SOURCES.md. Chemicals are only listed where we read the dose in a source. Hindi text was written by the team and must be checked by a Hindi speaker before any demo (hindi_reviewed is false until then).",
+  "general_safety": {
+    "en": [
+      "Read the label on the pack before you mix anything, and use only the dose on the label or the dose your KVK gives you.",
+      "Wear gloves, a face mask and a cap while mixing and spraying. Cover your feet and hands.",
+      "Do not eat, drink, smoke or chew while mixing or spraying.",
+      "Do not spray on a hot sunny day, in strong wind, or just before rain. Do not spray against the wind.",
+      "Wash the sprayer and buckets with soap water after spraying. Keep people and animals out of the field just after spraying.",
+      "Do not mix different pesticides in one tank.",
+      "Keep the waiting period before harvest. Do not spray in the 7 days before harvest.",
+      "Crush empty containers and bury them away from water. Never reuse them."
+    ],
+    "hi": [
+      "कुछ भी घोलने से पहले पैकेट का लेबल पढ़ें, और केवल लेबल पर लिखी या KVK द्वारा बताई गई मात्रा ही इस्तेमाल करें।",
+      "घोल बनाते और छिड़काव करते समय दस्ताने, मास्क और टोपी पहनें। हाथ और पैर ढक कर रखें।",
+      "घोल बनाते या छिड़काव करते समय कुछ भी न खाएं, न पिएं, न धूम्रपान करें, न तंबाकू चबाएं।",
+      "तेज़ धूप, तेज़ हवा में या बारिश से ठीक पहले छिड़काव न करें। हवा की उल्टी दिशा में छिड़काव न करें।",
+      "छिड़काव के बाद स्प्रेयर और बाल्टी को साबुन के पानी से धोएं। छिड़काव के तुरंत बाद लोगों और पशुओं को खेत में न जाने दें।",
+      "अलग-अलग दवाइयां एक ही टंकी में न मिलाएं।",
+      "तुड़ाई से पहले प्रतीक्षा अवधि का पालन करें। तुड़ाई से 7 दिन पहले तक छिड़काव न करें।",
+      "खाली डिब्बों को कुचल कर पानी के स्रोत से दूर ज़मीन में गाड़ दें। उन्हें कभी दोबारा इस्तेमाल न करें।"
+    ],
+    "sources": ["niphm_tomato", "niphm_potato"]
+  },
+  "referral": {
+    "en": "Please show the plant to your nearest KVK (Krishi Vigyan Kendra) or call the Kisan Call Centre on 1800-180-1551 (free call).",
+    "hi": "कृपया पौधा अपने नज़दीकी कृषि विज्ञान केंद्र (KVK) में दिखाएं या किसान कॉल सेंटर 1800-180-1551 (मुफ़्त) पर फ़ोन करें।"
+  },
+  "uncertain": {
+    "en": "The app is not sure what this is. Please take another clear photo of a single leaf in daylight, or show the plant to your KVK before you spray anything.",
+    "hi": "ऐप को पक्का पता नहीं चल पाया कि यह क्या है। कृपया दिन की रोशनी में एक पत्ती की साफ़ फ़ोटो दोबारा लें, या कोई भी दवा छिड़कने से पहले पौधा अपने KVK में दिखाएं।"
+  },
+  "no_dose_text": {
+    "en": "Ask your KVK for the right product and dose.",
+    "hi": "सही दवा और मात्रा के लिए अपने KVK से पूछें।"
+  },
+  "entries": {
+    "potato_early_blight": {
+      "crop": "potato",
+      "condition": "Early blight",
+      "type": "disease",
+      "cause": "Fungus (Alternaria solani)",
+      "description": {
+        "en": "A fungal leaf disease of potato, found in both hills and plains. It is worse in dry, warm weather with rain now and then, and in weak or poorly manured crops.",
+        "hi": "आलू की पत्तियों का एक फफूंद रोग, जो पहाड़ और मैदान दोनों में होता है। यह सूखे, गर्म मौसम में बीच-बीच की बारिश में और कमज़ोर या कम खाद वाली फसल में ज़्यादा फैलता है।"
+      },
+      "recognise": {
+        "en": [
+          "Small dark spots first appear on the older, lower leaves.",
+          "Spots are brown to black, angular or oval, with rings inside like a target.",
+          "Many spots join and spread over the whole leaf."
+        ],
+        "hi": [
+          "पहले पुरानी, नीचे की पत्तियों पर छोटे काले धब्बे दिखते हैं।",
+          "धब्बे भूरे से काले, कोणीय या अंडाकार होते हैं, और उनके अंदर निशाने जैसे गोल छल्ले होते हैं।",
+          "कई धब्बे आपस में मिल कर पूरी पत्ती पर फैल जाते हैं।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Plant only disease-free seed tubers.",
+          "Collect and destroy infected plant debris. Spores left in the soil start the next infection.",
+          "Give the crop balanced manure and fertiliser. Weak crops get this disease more.",
+          "Grow tolerant varieties where possible, such as Kufri Sindhuri, Kufri Badshah, Kufri Chamatkar or Kufri Khyati."
+        ],
+        "hi": [
+          "केवल रोग-मुक्त बीज कंद ही लगाएं।",
+          "रोगी पौधों के अवशेष इकट्ठा करके नष्ट करें। मिट्टी में बचे बीजाणु अगला संक्रमण शुरू करते हैं।",
+          "फसल को संतुलित खाद और उर्वरक दें। कमज़ोर फसल में यह रोग ज़्यादा होता है।",
+          "जहां हो सके सहनशील किस्में लगाएं, जैसे कुफरी सिंदूरी, कुफरी बादशाह, कुफरी चमत्कार या कुफरी ख्याति।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Mancozeb",
+          "name_hi": "मैंकोज़ेब",
+          "product": "Mancozeb 75% WP",
+          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_potato"
+        },
+        {
+          "name": "Chlorothalonil",
+          "name_hi": "क्लोरोथालोनिल",
+          "product": "Chlorothalonil 75% WP",
+          "dose": {"en": "350 to 500 g in 240 to 320 litres of water per acre", "hi": "350 से 500 ग्राम, 240 से 320 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_potato"
+        },
+        {
+          "name": "Copper oxychloride",
+          "name_hi": "कॉपर ऑक्सीक्लोराइड",
+          "product": "Copper oxychloride 50% WP",
+          "dose": {"en": "1 kg in 300 to 400 litres of water per acre", "hi": "1 किलो, 300 से 400 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 6,
+          "source": "niphm_potato"
+        }
+      ],
+      "chemical_note": {
+        "en": "Use only one of these at a time, and only if the disease is spreading. Start early: TNAU advises spraying early and repeating every 15 to 20 days.",
+        "hi": "एक समय में इनमें से केवल एक दवा इस्तेमाल करें, और तभी जब रोग फैल रहा हो। जल्दी शुरू करें: TNAU के अनुसार जल्दी छिड़काव करें और हर 15 से 20 दिन में दोहराएं।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few spots. Pick off and destroy the spotted lower leaves and keep watching the crop every week.",
+          "hi": "सिर्फ़ कुछ धब्बे हैं। धब्बे वाली नीचे की पत्तियां तोड़ कर नष्ट करें और हर हफ़्ते फसल देखते रहें।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Remove badly spotted leaves and spray one of the listed fungicides at the label dose.",
+          "hi": "रोग फैल रहा है। ज़्यादा धब्बे वाली पत्तियां हटाएं और सूची में दी गई किसी एक फफूंदनाशक दवा का लेबल की मात्रा में छिड़काव करें।"
+        },
+        "severe": {
+          "en": "Much of the leaf area is affected. Spray soon and get advice from your KVK on the next steps.",
+          "hi": "पत्तियों का बड़ा हिस्सा प्रभावित है। जल्दी छिड़काव करें और आगे के लिए अपने KVK से सलाह लें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if spots keep spreading after a spray, or if tubers show sunken dark patches.",
+        "hi": "अगर छिड़काव के बाद भी धब्बे फैलते रहें, या कंदों पर धंसे हुए काले धब्बे दिखें, तो KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_potato_early_blight", "niphm_potato"],
+      "hindi_reviewed": false
+    },
+    "potato_healthy": {
+      "crop": "potato",
+      "condition": "Healthy",
+      "type": "healthy",
+      "cause": "None",
+      "description": {
+        "en": "The leaf looks healthy. No sign of early blight or late blight.",
+        "hi": "पत्ती स्वस्थ दिख रही है। अगेती झुलसा या पछेती झुलसा का कोई लक्षण नहीं है।"
+      },
+      "recognise": {"en": [], "hi": []},
+      "cultural_ipm": {
+        "en": [
+          "Check the crop once a week, early in the morning.",
+          "Use healthy, certified seed tubers and resistant or tolerant varieties.",
+          "Collect and destroy crop debris, avoid waterlogging, and use fertiliser in balanced amounts.",
+          "Do not spray when there is no disease. Natural enemies of pests do better without needless sprays.",
+          "Watch more closely in cool, cloudy, very humid weather with rain, because late blight spreads fast then."
+        ],
+        "hi": [
+          "हफ़्ते में एक बार, सुबह जल्दी फसल की जांच करें।",
+          "स्वस्थ, प्रमाणित बीज कंद और रोग-रोधी या सहनशील किस्में इस्तेमाल करें।",
+          "फसल के अवशेष इकट्ठा करके नष्ट करें, खेत में पानी न भरने दें, और उर्वरक संतुलित मात्रा में दें।",
+          "जब रोग न हो तो दवा न छिड़कें। बिना ज़रूरत छिड़काव न करने से कीटों के प्राकृतिक दुश्मन बचे रहते हैं।",
+          "ठंडे, बादल वाले, बहुत नमी और बारिश वाले मौसम में ज़्यादा ध्यान से देखें, क्योंकि तब पछेती झुलसा तेज़ी से फैलता है।"
+        ]
+      },
+      "chemicals": [],
+      "chemical_note": {"en": "No spray is needed for a healthy crop.", "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"},
+      "severity": {},
+      "call_kvk": {
+        "en": "Call the KVK if you see dark water-soaked patches or white growth under the leaves.",
+        "hi": "अगर पत्तियों पर गहरे, पानी से भीगे जैसे धब्बे या पत्तियों के नीचे सफ़ेद फफूंद दिखे, तो KVK से संपर्क करें।"
+      },
+      "sources": ["niphm_potato", "tnau_potato_late_blight"],
+      "hindi_reviewed": false
+    },
+    "potato_late_blight": {
+      "crop": "potato",
+      "condition": "Late blight",
+      "type": "disease",
+      "cause": "Phytophthora infestans (a water mould)",
+      "description": {
+        "en": "A fast-spreading disease of potato leaves, stems and tubers. It spreads in cool, cloudy, very humid weather with rain. Infected tubers carry it from one crop to the next.",
+        "hi": "आलू की पत्तियों, तनों और कंदों का तेज़ी से फैलने वाला रोग। यह ठंडे, बादल वाले, बहुत नमी और बारिश वाले मौसम में फैलता है। रोगी कंद इसे एक फसल से अगली फसल तक ले जाते हैं।"
+      },
+      "recognise": {
+        "en": [
+          "Water-soaked spots on leaves grow bigger, turn purple-brown and then black.",
+          "White growth appears on the underside of the leaves.",
+          "It spreads to stalks and stems. Stems can break and the plant falls over.",
+          "Tubers get purplish brown patches, and inside they show a rusty brown rot."
+        ],
+        "hi": [
+          "पत्तियों पर पानी से भीगे जैसे धब्बे बड़े होते हैं, बैंगनी-भूरे और फिर काले हो जाते हैं।",
+          "पत्तियों की निचली सतह पर सफ़ेद फफूंद दिखती है।",
+          "रोग डंठल और तनों तक फैलता है। तना टूट सकता है और पौधा गिर जाता है।",
+          "कंदों पर बैंगनी-भूरे धब्बे बनते हैं, और काटने पर अंदर जंग जैसा भूरा सड़न दिखता है।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Plant healthy seed tubers and never store visibly infected tubers.",
+          "Grow resistant varieties such as Kufri Naveen, Kufri Jeevan, Kufri Alankar, Kufri Khasi Garo, Kufri Moti or Kufri Girdhari. Short-duration varieties also help.",
+          "Keep the field well drained and avoid waterlogging.",
+          "Destroy the plant tops a few days before harvest, and avoid cutting or bruising tubers when you dig them."
+        ],
+        "hi": [
+          "स्वस्थ बीज कंद लगाएं और दिखने में रोगी कंदों को कभी भंडार में न रखें।",
+          "रोग-रोधी किस्में लगाएं, जैसे कुफरी नवीन, कुफरी जीवन, कुफरी अलंकार, कुफरी खासी गारो, कुफरी मोती या कुफरी गिरधारी। कम अवधि वाली किस्में भी मदद करती हैं।",
+          "खेत में पानी की अच्छी निकासी रखें और पानी भरने न दें।",
+          "खुदाई से कुछ दिन पहले पौधों का ऊपरी भाग नष्ट करें, और खुदाई के समय कंदों को कटने या चोट लगने से बचाएं।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Mancozeb",
+          "name_hi": "मैंकोज़ेब",
+          "product": "Mancozeb 75% WP",
+          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_potato"
+        },
+        {
+          "name": "Dimethomorph",
+          "name_hi": "डाइमेथोमॉर्फ",
+          "product": "Dimethomorph 50% WP",
+          "dose": {"en": "400 g in 300 litres of water per acre", "hi": "400 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_potato"
+        },
+        {
+          "name": "Cymoxanil + Mancozeb",
+          "name_hi": "साइमोक्सानिल + मैंकोज़ेब",
+          "product": "Cymoxanil 8% + Mancozeb 64% WP",
+          "dose": {"en": "600 to 800 g in 200 to 300 litres of water per acre", "hi": "600 से 800 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": null,
+          "source": "niphm_potato"
+        }
+      ],
+      "chemical_note": {
+        "en": "Spray before the disease spreads: TNAU advises a protective spray of mancozeb to stop the tubers getting infected. Use one product at a time.",
+        "hi": "रोग फैलने से पहले छिड़काव करें: TNAU के अनुसार कंदों को संक्रमण से बचाने के लिए मैंकोज़ेब का बचाव वाला छिड़काव करें। एक समय में एक ही दवा इस्तेमाल करें।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few spots, but this disease spreads very fast. Remove and destroy the spotted leaves now and spray to protect the rest of the crop.",
+          "hi": "अभी कुछ ही धब्बे हैं, लेकिन यह रोग बहुत तेज़ी से फैलता है। धब्बे वाली पत्तियां अभी हटा कर नष्ट करें और बाकी फसल को बचाने के लिए छिड़काव करें।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Spray one of the listed fungicides at the label dose without delay and check the crop every few days.",
+          "hi": "रोग फैल रहा है। बिना देर किए सूची में दी गई किसी एक फफूंदनाशक दवा का लेबल की मात्रा में छिड़काव करें और हर कुछ दिन में फसल देखें।"
+        },
+        "severe": {
+          "en": "A large part of the crop is affected and the tubers are at risk. Contact your KVK today.",
+          "hi": "फसल का बड़ा हिस्सा प्रभावित है और कंदों को खतरा है। आज ही अपने KVK से संपर्क करें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK at once if the disease is spreading over the field or reaching the tubers.",
+        "hi": "अगर रोग पूरे खेत में फैल रहा है या कंदों तक पहुंच रहा है, तो तुरंत KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_potato_late_blight", "niphm_potato"],
+      "hindi_reviewed": false
+    },
+    "tomato_early_blight": {
+      "crop": "tomato",
+      "condition": "Early blight",
+      "type": "disease",
+      "cause": "Fungus (Alternaria solani)",
+      "description": {
+        "en": "A common fungal disease of tomato leaves and fruit. It favours warm, humid, rainy weather (24 to 29 degrees C). It survives in crop debris and spreads by rain and wind.",
+        "hi": "टमाटर की पत्तियों और फलों का एक आम फफूंद रोग। यह गर्म, नमी वाले, बारिश के मौसम (24 से 29 डिग्री सेल्सियस) में बढ़ता है। यह फसल के अवशेषों में बचा रहता है और बारिश और हवा से फैलता है।"
+      },
+      "recognise": {
+        "en": [
+          "Brown spots with rings inside like a target, with a yellow edge around them.",
+          "Fruit gets infected near the stalk, and shows brown rings."
+        ],
+        "hi": [
+          "भूरे धब्बे जिनके अंदर निशाने जैसे गोल छल्ले हों और चारों तरफ़ पीला किनारा हो।",
+          "फल डंठल के पास से संक्रमित होता है और उस पर भूरे छल्ले दिखते हैं।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Remove and destroy crop debris, and rotate crops.",
+          "Treat seed with Trichoderma asperellum at 4 g per kg of seed.",
+          "Use resistant or tolerant varieties, and change the nursery bed location every season.",
+          "Remove weeds and self-grown tomato plants, and avoid planting overlapping tomato crops next to each other."
+        ],
+        "hi": [
+          "फसल के अवशेष हटा कर नष्ट करें, और फसल चक्र अपनाएं।",
+          "बीज को ट्राइकोडर्मा एस्पेरेलम (Trichoderma asperellum) से 4 ग्राम प्रति किलो बीज की दर से उपचारित करें।",
+          "रोग-रोधी या सहनशील किस्में लगाएं, और हर मौसम में नर्सरी की जगह बदलें।",
+          "खरपतवार और अपने आप उगे टमाटर के पौधे हटाएं, और पास-पास एक के बाद एक टमाटर की फसल न लगाएं।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Mancozeb",
+          "name_hi": "मैंकोज़ेब",
+          "product": "Mancozeb 75% WG",
+          "dose": {"en": "400 g in 200 litres of water per acre", "hi": "400 ग्राम, 200 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_tomato"
+        },
+        {
+          "name": "Azoxystrobin",
+          "name_hi": "एज़ोक्सीस्ट्रोबिन",
+          "product": "Azoxystrobin 23% SC",
+          "dose": {"en": "200 ml in 200 litres of water per acre", "hi": "200 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": null,
+          "source": "niphm_tomato"
+        },
+        {
+          "name": "Captan",
+          "name_hi": "कैप्टान",
+          "product": "Captan 50% WP",
+          "dose": {"en": "1000 g in 300 to 400 litres of water per acre", "hi": "1000 ग्राम, 300 से 400 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 6,
+          "source": "niphm_tomato"
+        }
+      ],
+      "chemical_note": {
+        "en": "Use only one of these at a time, and only if the spots are spreading.",
+        "hi": "एक समय में इनमें से केवल एक दवा इस्तेमाल करें, और तभी जब धब्बे फैल रहे हों।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few spots. Pick off and destroy the spotted leaves and keep watching every week.",
+          "hi": "सिर्फ़ कुछ धब्बे हैं। धब्बे वाली पत्तियां तोड़ कर नष्ट करें और हर हफ़्ते देखते रहें।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Remove spotted leaves and spray one of the listed fungicides at the label dose.",
+          "hi": "रोग फैल रहा है। धब्बे वाली पत्तियां हटाएं और सूची में दी गई किसी एक फफूंदनाशक दवा का लेबल की मात्रा में छिड़काव करें।"
+        },
+        "severe": {
+          "en": "Much of the plant is affected and fruit may be hit. Spray soon and get advice from your KVK.",
+          "hi": "पौधे का बड़ा हिस्सा प्रभावित है और फल भी खराब हो सकते हैं। जल्दी छिड़काव करें और अपने KVK से सलाह लें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if spots keep spreading after a spray or if many fruits rot.",
+        "hi": "अगर छिड़काव के बाद भी धब्बे फैलते रहें या कई फल सड़ने लगें, तो KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_tomato_early_blight", "niphm_tomato"],
+      "hindi_reviewed": false
+    },
+    "tomato_healthy": {
+      "crop": "tomato",
+      "condition": "Healthy",
+      "type": "healthy",
+      "cause": "None",
+      "description": {
+        "en": "The leaf looks healthy. No sign of the diseases or pests this app knows.",
+        "hi": "पत्ती स्वस्थ दिख रही है। इस ऐप को पता रोगों या कीटों का कोई लक्षण नहीं है।"
+      },
+      "recognise": {"en": [], "hi": []},
+      "cultural_ipm": {
+        "en": [
+          "Check the crop once a week, early in the morning, on both sides of the leaves.",
+          "Use resistant varieties and healthy seedlings. Raise the nursery under a fine net to keep whiteflies out.",
+          "Rotate crops and keep the field clean of crop debris and weeds.",
+          "Put up yellow sticky traps, 10 per acre, to catch whiteflies and leaf miner flies.",
+          "Do not spray when there is no problem. It also protects the natural enemies of pests."
+        ],
+        "hi": [
+          "हफ़्ते में एक बार, सुबह जल्दी, पत्तियों के दोनों तरफ़ फसल की जांच करें।",
+          "रोग-रोधी किस्में और स्वस्थ पौध इस्तेमाल करें। सफ़ेद मक्खी से बचाने के लिए नर्सरी बारीक जाली के नीचे तैयार करें।",
+          "फसल चक्र अपनाएं और खेत को फसल अवशेष और खरपतवार से साफ़ रखें।",
+          "सफ़ेद मक्खी और पत्ती सुरंगक मक्खी पकड़ने के लिए पीले चिपचिपे ट्रैप, 10 प्रति एकड़, लगाएं।",
+          "जब कोई समस्या न हो तो दवा न छिड़कें। इससे कीटों के प्राकृतिक दुश्मन भी बचे रहते हैं।"
+        ]
+      },
+      "chemicals": [],
+      "chemical_note": {"en": "No spray is needed for a healthy crop.", "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"},
+      "severity": {},
+      "call_kvk": {
+        "en": "Call the KVK if you see spots, curling leaves or tunnels in the leaves that you cannot explain.",
+        "hi": "अगर पत्तियों पर धब्बे, मुड़ी हुई पत्तियां या सुरंगें दिखें जिनका कारण समझ न आए, तो KVK से संपर्क करें।"
+      },
+      "sources": ["niphm_tomato"],
+      "hindi_reviewed": false
+    },
+    "tomato_late_blight": {
+      "crop": "tomato",
+      "condition": "Late blight",
+      "type": "disease",
+      "cause": "Phytophthora infestans (a water mould)",
+      "description": {
+        "en": "A fast-spreading disease of tomato leaves, stems and fruit. It favours cool nights, warm days and long wet spells from rain and fog. It survives in infected debris and spreads by wind.",
+        "hi": "टमाटर की पत्तियों, तनों और फलों का तेज़ी से फैलने वाला रोग। यह ठंडी रातों, गर्म दिनों और बारिश और कोहरे से लंबे समय तक रहने वाली नमी में बढ़ता है। यह रोगी अवशेषों में बचा रहता है और हवा से फैलता है।"
+      },
+      "recognise": {
+        "en": [
+          "Water-soaked black patches on leaves and stems.",
+          "The patches grow fast and the whole leaf dies.",
+          "White growth can be seen on the leaves.",
+          "Fruit gets dark brown patches, then goes soft and rots."
+        ],
+        "hi": [
+          "पत्तियों और तनों पर पानी से भीगे जैसे काले धब्बे।",
+          "धब्बे तेज़ी से बढ़ते हैं और पूरी पत्ती सूख जाती है।",
+          "पत्तियों पर सफ़ेद फफूंद दिख सकती है।",
+          "फलों पर गहरे भूरे धब्बे बनते हैं, फिर फल नरम होकर सड़ जाते हैं।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Keep the field well drained and give only light irrigation.",
+          "Rotate crops, keep the field clean and destroy other host plants nearby.",
+          "Apply Trichoderma asperellum to the soil at 1 kg per acre."
+        ],
+        "hi": [
+          "खेत में पानी की अच्छी निकासी रखें और केवल हल्की सिंचाई करें।",
+          "फसल चक्र अपनाएं, खेत साफ़ रखें और आस-पास के दूसरे रोग-वाहक पौधे नष्ट करें।",
+          "मिट्टी में ट्राइकोडर्मा एस्पेरेलम (Trichoderma asperellum) 1 किलो प्रति एकड़ डालें।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Mancozeb",
+          "name_hi": "मैंकोज़ेब",
+          "product": "Mancozeb 75% WP",
+          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_tomato"
+        },
+        {
+          "name": "Cymoxanil + Mancozeb",
+          "name_hi": "साइमोक्सानिल + मैंकोज़ेब",
+          "product": "Cymoxanil 8% + Mancozeb 64% WP",
+          "dose": {"en": "600 g in 200 to 300 litres of water per acre", "hi": "600 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": null,
+          "source": "niphm_tomato"
+        },
+        {
+          "name": "Cyazofamid",
+          "name_hi": "साइज़ोफ़ामिड",
+          "product": "Cyazofamid 34.5% SC",
+          "dose": {"en": "80 ml in 200 litres of water per acre", "hi": "80 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": null,
+          "source": "niphm_tomato"
+        }
+      ],
+      "chemical_note": {
+        "en": "This disease moves fast, so do not wait. Use one product at a time.",
+        "hi": "यह रोग तेज़ी से फैलता है, इसलिए इंतज़ार न करें। एक समय में एक ही दवा इस्तेमाल करें।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few patches, but this disease spreads very fast. Remove and destroy the affected leaves now and protect the rest of the crop.",
+          "hi": "अभी कुछ ही धब्बे हैं, लेकिन यह रोग बहुत तेज़ी से फैलता है। प्रभावित पत्तियां अभी हटा कर नष्ट करें और बाकी फसल को बचाएं।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Spray one of the listed fungicides at the label dose without delay.",
+          "hi": "रोग फैल रहा है। बिना देर किए सूची में दी गई किसी एक फफूंदनाशक दवा का लेबल की मात्रा में छिड़काव करें।"
+        },
+        "severe": {
+          "en": "Large parts of the plants are affected. Pull out and destroy badly hit plants and contact your KVK today.",
+          "hi": "पौधों के बड़े हिस्से प्रभावित हैं। बहुत ज़्यादा प्रभावित पौधे उखाड़ कर नष्ट करें और आज ही अपने KVK से संपर्क करें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK at once if the disease is spreading across the field.",
+        "hi": "अगर रोग पूरे खेत में फैल रहा है, तो तुरंत KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_tomato_late_blight", "niphm_tomato"],
+      "hindi_reviewed": false
+    },
+    "tomato_leaf_miner": {
+      "crop": "tomato",
+      "condition": "Leaf miner",
+      "type": "pest",
+      "cause": "Serpentine leaf miner fly (Liriomyza trifolii)",
+      "description": {
+        "en": "A small fly whose maggots eat tunnels inside tomato leaves. Badly mined leaves dry up and drop.",
+        "hi": "एक छोटी मक्खी जिसकी इल्लियां (मैगट) टमाटर की पत्तियों के अंदर सुरंग बना कर खाती हैं। ज़्यादा सुरंग वाली पत्तियां सूख कर गिर जाती हैं।"
+      },
+      "recognise": {
+        "en": [
+          "Winding, snake-like white tunnels in the leaves.",
+          "Tiny orange-yellow maggots inside the tunnels.",
+          "Leaves dry up and drop.",
+          "Adults are small pale yellow flies."
+        ],
+        "hi": [
+          "पत्तियों में सांप जैसी टेढ़ी-मेढ़ी सफ़ेद सुरंगें।",
+          "सुरंगों के अंदर बहुत छोटी नारंगी-पीली इल्लियां।",
+          "पत्तियां सूख कर गिर जाती हैं।",
+          "वयस्क छोटी हल्की पीली मक्खियां होती हैं।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Collect and destroy the mined leaves.",
+          "Put up yellow sticky traps, 10 per acre.",
+          "Do not give too much nitrogen fertiliser.",
+          "Grow beans as an intercrop with tomato. It reduces leaf miner attack.",
+          "Protect natural enemies such as small parasitic wasps, lacewings, lady beetles and spiders."
+        ],
+        "hi": [
+          "सुरंग वाली पत्तियां इकट्ठा करके नष्ट करें।",
+          "पीले चिपचिपे ट्रैप, 10 प्रति एकड़, लगाएं।",
+          "नाइट्रोजन उर्वरक ज़्यादा न दें।",
+          "टमाटर के साथ बीन्स (सेम) अंतरफसल के रूप में लगाएं। इससे पत्ती सुरंगक का हमला कम होता है।",
+          "प्राकृतिक दुश्मनों को बचाएं, जैसे छोटे परजीवी ततैये, लेसविंग, लेडी बीटल और मकड़ियां।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Neem seed kernel extract",
+          "name_hi": "नीम बीज गिरी अर्क",
+          "product": "Neem seed kernel extract (NSKE) 5%",
+          "dose": {"en": "spray as a 5% extract", "hi": "5% अर्क का छिड़काव"},
+          "waiting_days": null,
+          "source": "tnau_tomato_leaf_miner"
+        },
+        {
+          "name": "Cyantraniliprole",
+          "name_hi": "साइएन्ट्रानिलिप्रोल",
+          "product": "Cyantraniliprole 10.26 OD",
+          "dose": {"en": "1.8 ml per litre of water", "hi": "1.8 मिली प्रति लीटर पानी"},
+          "waiting_days": null,
+          "source": "tnau_tomato_leaf_miner"
+        }
+      ],
+      "chemical_note": {
+        "en": "Start with leaf removal, traps and neem. Use the insecticide only if the attack keeps growing.",
+        "hi": "पहले पत्तियां हटाएं, ट्रैप लगाएं और नीम का छिड़काव करें। कीटनाशक तभी इस्तेमाल करें जब हमला बढ़ता रहे।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few tunnels. Pick off the mined leaves and put up yellow sticky traps.",
+          "hi": "सिर्फ़ कुछ सुरंगें हैं। सुरंग वाली पत्तियां तोड़ दें और पीले चिपचिपे ट्रैप लगाएं।"
+        },
+        "moderate": {
+          "en": "Many leaves have tunnels. Remove them, use traps, and spray neem seed kernel extract 5%.",
+          "hi": "कई पत्तियों में सुरंगें हैं। उन्हें हटाएं, ट्रैप लगाएं, और नीम बीज गिरी अर्क 5% का छिड़काव करें।"
+        },
+        "severe": {
+          "en": "Most leaves are mined and drying. Get advice from your KVK before using an insecticide.",
+          "hi": "ज़्यादातर पत्तियों में सुरंगें हैं और वे सूख रही हैं। कीटनाशक इस्तेमाल करने से पहले अपने KVK से सलाह लें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if tunnels keep increasing after neem sprays, or if you also see holes in the fruits.",
+        "hi": "अगर नीम के छिड़काव के बाद भी सुरंगें बढ़ती रहें, या फलों में भी छेद दिखें, तो KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_tomato_leaf_miner", "niphm_tomato"],
+      "hindi_reviewed": false
+    },
+    "tomato_leaf_mold": {
+      "crop": "tomato",
+      "condition": "Leaf mold",
+      "type": "disease",
+      "cause": "Fungus (Passalora fulva, also called Cladosporium fulvum)",
+      "description": {
+        "en": "A fungal leaf disease that is worst in polyhouses, greenhouses and other very humid places. It grows when humidity is above about 85%. It survives on infected plant debris and spreads by wind and water splash.",
+        "hi": "पत्तियों का एक फफूंद रोग जो पॉलीहाउस, ग्रीनहाउस और बहुत नमी वाली जगहों में सबसे ज़्यादा होता है। यह तब बढ़ता है जब नमी लगभग 85% से ऊपर हो। यह रोगी पौधों के अवशेषों पर बचा रहता है और हवा और पानी के छींटों से फैलता है।"
+      },
+      "recognise": {
+        "en": [
+          "Lower leaves are attacked first, and it moves up the plant.",
+          "Yellow or light green patches on the upper side of the leaf.",
+          "A greyish-brown to olive-green mould on the lower side, under the patches.",
+          "Badly hit leaves turn brown and shrivel. Magnesium shortage can look similar."
+        ],
+        "hi": [
+          "पहले नीचे की पत्तियों पर हमला होता है, फिर रोग ऊपर की ओर बढ़ता है।",
+          "पत्ती की ऊपरी सतह पर पीले या हल्के हरे धब्बे।",
+          "उन्हीं धब्बों के नीचे पत्ती की निचली सतह पर भूरी-सलेटी से जैतूनी-हरी फफूंद।",
+          "ज़्यादा प्रभावित पत्तियां भूरी होकर सिकुड़ जाती हैं। मैग्नीशियम की कमी भी ऐसी ही दिख सकती है।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Give plenty of ventilation, especially in a polyhouse.",
+          "Avoid wetting the leaves when you water, most of all in the evening.",
+          "Trim some lower leaves after fruit set so air can move.",
+          "Remove and destroy diseased leaves and plants, and clean tools after use.",
+          "Use clean seed from a trusted source and rotate crops."
+        ],
+        "hi": [
+          "खासकर पॉलीहाउस में हवा का अच्छा आना-जाना रखें।",
+          "पानी देते समय पत्तियों को गीला न करें, खासकर शाम को।",
+          "फल लगने के बाद नीचे की कुछ पत्तियां काट दें ताकि हवा चल सके।",
+          "रोगी पत्तियां और पौधे हटा कर नष्ट करें, और इस्तेमाल के बाद औज़ार साफ़ करें।",
+          "भरोसेमंद जगह से साफ़ बीज लें और फसल चक्र अपनाएं।"
+        ]
+      },
+      "chemicals": [],
+      "chemical_note": {
+        "en": "We did not find a verified Indian fungicide and dose for leaf mold. Ask your KVK for the right product and dose.",
+        "hi": "पत्ती फफूंद के लिए हमें कोई प्रमाणित भारतीय दवा और मात्रा नहीं मिली। सही दवा और मात्रा के लिए अपने KVK से पूछें।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few patches. Remove those leaves and improve air flow around the plants.",
+          "hi": "सिर्फ़ कुछ धब्बे हैं। वे पत्तियां हटा दें और पौधों के आस-पास हवा का आना-जाना बढ़ाएं।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Remove affected leaves, cut down humidity, and ask your KVK which fungicide to use.",
+          "hi": "रोग फैल रहा है। प्रभावित पत्तियां हटाएं, नमी कम करें, और अपने KVK से पूछें कि कौन सी फफूंदनाशक दवा इस्तेमाल करें।"
+        },
+        "severe": {
+          "en": "Many leaves are affected and the plants are weak. Contact your KVK for advice.",
+          "hi": "कई पत्तियां प्रभावित हैं और पौधे कमज़ोर हैं। सलाह के लिए अपने KVK से संपर्क करें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if the mould keeps spreading after you improve ventilation.",
+        "hi": "अगर हवा का आना-जाना बढ़ाने के बाद भी फफूंद फैलती रहे, तो KVK से संपर्क करें।"
+      },
+      "sources": ["cornell_leaf_mold", "rhs_leaf_mould"],
+      "hindi_reviewed": false
+    },
+    "tomato_septoria_leaf_spot": {
+      "crop": "tomato",
+      "condition": "Septoria leaf spot",
+      "type": "disease",
+      "cause": "Fungus (Septoria lycopersici)",
+      "description": {
+        "en": "A fungal leaf spot disease of tomato that favours high humidity. It survives in crop debris and spreads by rain splash and wind. Bad attacks can strip the plant of leaves.",
+        "hi": "टमाटर की पत्तियों पर धब्बे वाला एक फफूंद रोग जो ज़्यादा नमी में बढ़ता है। यह फसल अवशेषों में बचा रहता है और बारिश के छींटों और हवा से फैलता है। ज़्यादा हमले में पौधे की सारी पत्तियां गिर सकती हैं।"
+      },
+      "recognise": {
+        "en": [
+          "Many small, round to irregular spots with a grey centre and a dark edge.",
+          "Spots join and the leaves dry up.",
+          "Stems and flowers can also be affected."
+        ],
+        "hi": [
+          "बहुत से छोटे, गोल से बेढंगे धब्बे जिनका बीच का भाग सलेटी और किनारा गहरा हो।",
+          "धब्बे आपस में मिल जाते हैं और पत्तियां सूख जाती हैं।",
+          "तने और फूल भी प्रभावित हो सकते हैं।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Remove and destroy the affected plant parts.",
+          "Treat seed with Trichoderma asperellum at 4 g per kg of seed.",
+          "Keep the field clean of old crop debris."
+        ],
+        "hi": [
+          "प्रभावित पौधों के हिस्से हटा कर नष्ट करें।",
+          "बीज को ट्राइकोडर्मा एस्पेरेलम (Trichoderma asperellum) से 4 ग्राम प्रति किलो बीज की दर से उपचारित करें।",
+          "खेत को पुरानी फसल के अवशेषों से साफ़ रखें।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Mancozeb",
+          "name_hi": "मैंकोज़ेब",
+          "product": "Mancozeb 75% WP",
+          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 10,
+          "source": "niphm_tomato"
+        }
+      ],
+      "chemical_note": {
+        "en": "Spray only if the spots are spreading.",
+        "hi": "छिड़काव तभी करें जब धब्बे फैल रहे हों।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few spots. Remove and destroy the spotted leaves and keep watching every week.",
+          "hi": "सिर्फ़ कुछ धब्बे हैं। धब्बे वाली पत्तियां हटा कर नष्ट करें और हर हफ़्ते देखते रहें।"
+        },
+        "moderate": {
+          "en": "The disease is spreading. Remove spotted leaves and spray mancozeb at the label dose.",
+          "hi": "रोग फैल रहा है। धब्बे वाली पत्तियां हटाएं और मैंकोज़ेब का लेबल की मात्रा में छिड़काव करें।"
+        },
+        "severe": {
+          "en": "Many leaves are dropping. Spray soon and get advice from your KVK.",
+          "hi": "कई पत्तियां गिर रही हैं। जल्दी छिड़काव करें और अपने KVK से सलाह लें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if the plants keep losing leaves after a spray.",
+        "hi": "अगर छिड़काव के बाद भी पौधों की पत्तियां गिरती रहें, तो KVK से संपर्क करें।"
+      },
+      "sources": ["tnau_tomato_septoria", "niphm_tomato"],
+      "hindi_reviewed": false
+    },
+    "tomato_yellow_leaf_curl_virus": {
+      "crop": "tomato",
+      "condition": "Yellow leaf curl virus",
+      "type": "disease",
+      "cause": "Tomato leaf curl virus, spread by whitefly (Bemisia tabaci)",
+      "description": {
+        "en": "A virus disease spread by whiteflies. In India it is called tomato leaf curl. There is no cure for a plant that is already infected, so control aims at the whitefly and at stopping the spread.",
+        "hi": "सफ़ेद मक्खी से फैलने वाला एक विषाणु (वायरस) रोग। भारत में इसे टमाटर पत्ती मोड़क (लीफ कर्ल) कहते हैं। जो पौधा संक्रमित हो चुका है उसका कोई इलाज नहीं है, इसलिए नियंत्रण सफ़ेद मक्खी को रोकने और फैलाव रोकने पर है।"
+      },
+      "recognise": {
+        "en": [
+          "Leaves curl downward and crinkle.",
+          "Older leaves become thick, leathery and brittle.",
+          "Plants are badly stunted, with short gaps between leaves and a bushy look."
+        ],
+        "hi": [
+          "पत्तियां नीचे की ओर मुड़ती और सिकुड़ती हैं।",
+          "पुरानी पत्तियां मोटी, चमड़े जैसी और भुरभुरी हो जाती हैं।",
+          "पौधे बहुत बौने रह जाते हैं, गांठों के बीच की दूरी कम होती है और पौधा झाड़ी जैसा दिखता है।"
+        ]
+      },
+      "cultural_ipm": {
+        "en": [
+          "Raise the nursery under a fine net so whiteflies cannot get in. Use seed from healthy plants.",
+          "Pull out and destroy infected plants early, in the nursery and in the field.",
+          "Grow maize, sorghum or bajra as a barrier crop around the field.",
+          "Put up yellow sticky traps, 10 per acre, to catch whiteflies.",
+          "Remove the weed host Abutilon indicum (kanghi) from around the field.",
+          "Spray neem seed kernel extract (NSKE) 5% against whiteflies."
+        ],
+        "hi": [
+          "नर्सरी बारीक जाली के नीचे तैयार करें ताकि सफ़ेद मक्खी अंदर न आ सके। स्वस्थ पौधों का बीज इस्तेमाल करें।",
+          "नर्सरी और खेत दोनों में संक्रमित पौधे जल्दी उखाड़ कर नष्ट करें।",
+          "खेत के चारों ओर मक्का, ज्वार या बाजरा को अवरोधक फसल के रूप में लगाएं।",
+          "सफ़ेद मक्खी पकड़ने के लिए पीले चिपचिपे ट्रैप, 10 प्रति एकड़, लगाएं।",
+          "खेत के आस-पास से खरपतवार कंघी (Abutilon indicum) हटाएं।",
+          "सफ़ेद मक्खी के लिए नीम बीज गिरी अर्क (NSKE) 5% का छिड़काव करें।"
+        ]
+      },
+      "chemicals": [
+        {
+          "name": "Imidacloprid",
+          "name_hi": "इमिडाक्लोप्रिड",
+          "product": "Imidacloprid 17.8 SL",
+          "dose": {"en": "60 to 70 ml in 200 litres of water per acre", "hi": "60 से 70 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 3,
+          "source": "niphm_tomato"
+        },
+        {
+          "name": "Thiamethoxam",
+          "name_hi": "थायामेथोक्साम",
+          "product": "Thiamethoxam 25 WG",
+          "dose": {"en": "80 g in 200 litres of water per acre", "hi": "80 ग्राम, 200 लीटर पानी में, प्रति एकड़"},
+          "waiting_days": 5,
+          "source": "niphm_tomato"
+        }
+      ],
+      "chemical_note": {
+        "en": "These sprays control the whitefly that carries the virus. They do not cure plants that are already infected.",
+        "hi": "ये छिड़काव वायरस फैलाने वाली सफ़ेद मक्खी को नियंत्रित करते हैं। ये पहले से संक्रमित पौधों को ठीक नहीं करते।"
+      },
+      "severity": {
+        "mild": {
+          "en": "Only a few plants show curling. Pull them out and destroy them now, and put up yellow sticky traps.",
+          "hi": "सिर्फ़ कुछ पौधों में पत्ती मुड़ी है। उन्हें अभी उखाड़ कर नष्ट करें, और पीले चिपचिपे ट्रैप लगाएं।"
+        },
+        "moderate": {
+          "en": "Many plants are infected. Remove them and control whiteflies with traps, neem and, if needed, one of the listed sprays.",
+          "hi": "कई पौधे संक्रमित हैं। उन्हें हटाएं और ट्रैप, नीम और ज़रूरत हो तो सूची में दिए गए किसी एक छिड़काव से सफ़ेद मक्खी को नियंत्रित करें।"
+        },
+        "severe": {
+          "en": "Most of the crop is infected and cannot be cured. Contact your KVK for advice on this crop and the next one.",
+          "hi": "ज़्यादातर फसल संक्रमित है और इसका इलाज नहीं हो सकता। इस फसल और अगली फसल के लिए अपने KVK से सलाह लें।"
+        }
+      },
+      "call_kvk": {
+        "en": "Call the KVK if many plants are curling, since a virus cannot be cured with sprays.",
+        "hi": "अगर कई पौधों की पत्तियां मुड़ रही हैं तो KVK से संपर्क करें, क्योंकि वायरस छिड़काव से ठीक नहीं होता।"
+      },
+      "sources": ["tnau_tomato_leaf_curl", "niphm_tomato"],
+      "hindi_reviewed": false
+    }
+  },
+  "sources": {
+    "tnau_tomato_early_blight": "https://agritech.tnau.ac.in/crop_protection/tomato_diseases_2.html",
+    "tnau_tomato_septoria": "https://agritech.tnau.ac.in/crop_protection/tomato_diseases_4.html",
+    "tnau_tomato_leaf_curl": "https://agritech.tnau.ac.in/crop_protection/tomato_diseases_6.html",
+    "tnau_tomato_late_blight": "https://agritech.tnau.ac.in/crop_protection/tomato_diseases_8.html",
+    "tnau_tomato_leaf_miner": "https://agritech.tnau.ac.in/crop_protection/tomato/tomato_2.html",
+    "tnau_potato_late_blight": "https://agritech.tnau.ac.in/crop_protection/crop_prot_crop%20diseases_veg_potato_1.html",
+    "tnau_potato_early_blight": "https://agritech.tnau.ac.in/crop_protection/crop_prot_crop%20diseases_veg_potato_2.html",
+    "niphm_tomato": "https://niphm.gov.in/IPMPackages/Tomato.pdf",
+    "niphm_potato": "https://niphm.gov.in/IPMPackages/Potato.pdf",
+    "cornell_leaf_mold": "https://vegetables.cornell.edu/crops/tomatoes/tomato-leaf-mold",
+    "rhs_leaf_mould": "https://www.rhs.org.uk/disease/tomato-leaf-mould"
+  }
+}

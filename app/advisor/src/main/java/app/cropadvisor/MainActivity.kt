@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        officer = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(primary = Green, background = Black, surface = Charcoal),
@@ -66,10 +67,18 @@ class MainActivity : ComponentActivity() {
                 val p = photo
                 if (d != null && p != null) {
                     BackHandler { diagnosis = null }
-                    ResultScreen(p, d) { diagnosis = null }
+                    val c = case
+                    ResultScreen(p, d, advice, adviceNote, if (c?.needsReferral == true) ({ sendSms(c) }) else null) {
+                        diagnosis = null
+                    }
                 } else {
                     HomeScreen(
-                        crop, busy, onCrop = { crop = it },
+                        crop, busy, officer,
+                        onOfficer = {
+                            officer = it.filter { ch -> ch.isDigit() || ch == '+' }
+                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
+                        },
+                        onCrop = { crop = it },
                         onCamera = { photoUri = newPhotoUri(); camera.launch(photoUri!!) },
                         onGallery = {
                             gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -96,6 +105,57 @@ class MainActivity : ComponentActivity() {
     private var photoUri: Uri? = null
     private var vision: Vision? = null
 
+    private var officer by mutableStateOf("")
+    private var case by mutableStateOf<Case?>(null)
+    private var advice by mutableStateOf("")
+    private var adviceNote by mutableStateOf("")
+    private val advisor by lazy { Advisor(this) }
+    private var llm: Llm? = null
+
+    // Shows the template text at once, then tries the language model in the
+    // background and swaps its text in only if it passes the safety check.
+    // Called from the classify thread.
+    private fun startAdvice(d: Diagnosis) {
+        val c = Case.from(d)
+        val tmpl = advisor.template(c)
+        runOnUiThread { case = c; advice = tmpl; adviceNote = "From the crop guide" }
+        if (c.uncertain) return
+        val mem = android.app.ActivityManager.MemoryInfo()
+        (getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager).getMemoryInfo(mem)
+        val freeMb = mem.availMem / (1024 * 1024)
+        val pte = ModelFiles.find(this, "llama.pte")
+        val tok = ModelFiles.find(this, "tokenizer.model")
+        if (freeMb < Advisor.LLAMA_NEEDS_MB || pte == null || tok == null) {
+            Perf.log(this, "advice mode=template free_mb=$freeMb model=${pte != null}")
+            return
+        }
+        runOnUiThread { adviceNote = "From the crop guide, writing simpler advice on the phone" }
+        try {
+            val m = llm ?: Llm(pte, tok).also { llm = it; it.load() }
+            val (sys, user) = advisor.prompt(c)
+            val r = m.generate(m.chatPrompt(sys, user), 768)
+            val text = advisor.cleanOutput(r.text)
+            val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("।") }
+            val fails = advisor.check(text, c, truncated)
+            Perf.log(this, "advice mode=llm free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
+            if (diagnosis !== d) return
+            runOnUiThread {
+                if (fails.isEmpty()) { advice = text; adviceNote = "Written on this phone from the crop guide" }
+                else adviceNote = "From the crop guide"
+            }
+        } catch (e: Throwable) {
+            Perf.log(this, "advice_error=$e")
+            runOnUiThread { adviceNote = "From the crop guide" }
+        }
+    }
+
+    private fun sendSms(c: Case) {
+        val number = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
+        val i = android.content.Intent(android.content.Intent.ACTION_SENDTO, Uri.parse("smsto:$number"))
+        i.putExtra("sms_body", advisor.sms(c))
+        startActivity(i)
+    }
+
     private fun newPhotoUri(): Uri {
         val dir = File(cacheDir, "photos").apply { mkdirs() }
         return FileProvider.getUriForFile(this, "app.cropadvisor.photos", File(dir, "leaf.jpg"))
@@ -119,6 +179,7 @@ class MainActivity : ComponentActivity() {
                 val d = Diagnosis.from(chosen, v.classify(bmp))
                 Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
                 runOnUiThread { photo = bmp; diagnosis = d }
+                startAdvice(d)
             } catch (e: Throwable) {
                 Perf.log(this, "classify_error=$e")
             } finally {

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -99,7 +100,10 @@ fun CropToggle(label: String, selected: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-fun HomeScreen(crop: String, busy: Boolean, onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit) {
+fun HomeScreen(
+    crop: String, busy: Boolean, officer: String, onOfficer: (String) -> Unit,
+    onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit,
+) {
     Column(Modifier.fillMaxSize().background(Black)) {
         Header("Offline leaf check for tomato and potato")
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -112,19 +116,33 @@ fun HomeScreen(crop: String, busy: Boolean, onCrop: (String) -> Unit, onCamera: 
             Text("Photo of one leaf, close up, in daylight", color = Muted, fontSize = 13.sp)
             PrimaryButton(if (busy) "Checking" else "Take photo", Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
             SecondaryButton("Choose from gallery", Modifier.fillMaxWidth(), onClick = onGallery)
+            Spacer(Modifier.height(12.dp))
+            Text("Extension officer phone number", color = Muted, fontSize = 13.sp)
+            androidx.compose.material3.OutlinedTextField(
+                officer, onOfficer, singleLine = true, shape = RectangleShape, modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone,
+                ),
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                    focusedBorderColor = Green, unfocusedBorderColor = Charcoal, cursorColor = Green,
+                ),
+            )
         }
     }
 }
 
 @Composable
-fun ResultScreen(photo: Bitmap, d: Diagnosis, onAgain: () -> Unit) {
+fun ResultScreen(
+    photo: Bitmap, d: Diagnosis, advice: String, adviceNote: String, onSms: (() -> Unit)?, onAgain: () -> Unit,
+) {
     Column(Modifier.fillMaxSize().background(Black).verticalScroll(rememberScrollState())) {
         Header(d.crop.replaceFirstChar { it.uppercase() })
         Image(
             photo.asImageBitmap(), null, contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth().aspectRatio(1.6f),
         )
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.navigationBarsPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             if (d.uncertain) {
                 Text("Not sure", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
                 Text(
@@ -140,7 +158,15 @@ fun ResultScreen(photo: Bitmap, d: Diagnosis, onAgain: () -> Unit) {
             Text("Top matches", color = Muted, fontSize = 13.sp)
             d.ranked.take(3).forEach { (label, p) -> ScoreBar(conditionName(label), p) }
             Text("Checked on this phone in ${d.ms} ms, no internet used", color = Muted, fontSize = 12.sp)
+            if (advice.isNotEmpty()) {
+                Spacer(Modifier.height(4.dp))
+                Box(Modifier.fillMaxWidth().background(Charcoal).padding(16.dp)) {
+                    Text(advice, color = Color.White, fontSize = 15.sp, lineHeight = 22.sp)
+                }
+                Text(adviceNote, color = Muted, fontSize = 12.sp)
+            }
             Spacer(Modifier.height(8.dp))
+            if (onSms != null) SecondaryButton("Send to extension officer", Modifier.fillMaxWidth(), onClick = onSms)
             PrimaryButton("Check another leaf", Modifier.fillMaxWidth(), onClick = onAgain)
         }
     }
