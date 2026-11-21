@@ -6,6 +6,7 @@ venv/
 
 # Data and model files (rebuilt by the scripts, too big or not ours to share)
 data/
+!detection/data/
 datasets/
 *.zip
 *.pte
