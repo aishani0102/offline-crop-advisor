@@ -114,6 +114,7 @@ class MainActivity : ComponentActivity() {
             }
             if (intent.getBooleanExtra("llmtest", false)) runLlmTest()
             if (intent.getBooleanExtra("visiontest", false)) runVisionTest()
+            if (intent.getBooleanExtra("sevtest", false)) runSeverityTest()
         }
     }
 
@@ -133,6 +134,30 @@ class MainActivity : ComponentActivity() {
     // Shows the template text at once, then tries the language model in the
     // background and swaps its text in only if it passes the safety check.
     // Called from the classify thread.
+    // Runs Severity.kt on the golden photos pushed into the files folder and compares with the
+    // values severity.py gave (golden.json from the detection branch).
+    private fun runSeverityTest() {
+        thread {
+            val dir = getExternalFilesDir(null)!!
+            val g = org.json.JSONObject(File(dir, "golden.json").readText()).getJSONArray("images")
+            var pass = 0
+            for (i in 0 until g.length()) {
+                val e = g.getJSONObject(i)
+                val name = e.getString("image").replace('/', '_')
+                val opts = android.graphics.BitmapFactory.Options().apply {
+                    inPreferredConfig = Bitmap.Config.ARGB_8888; inScaled = false
+                }
+                val bmp = android.graphics.BitmapFactory.decodeFile(File(dir, name).path, opts)
+                val r = Severity.estimate(bmp)
+                val gold = e.optDouble("severity_pct", Double.NaN)
+                val ok = r.severityPct != null && Math.abs(r.severityPct - gold) <= 1.0
+                if (ok) pass++
+                Perf.log(this, "sevtest $name golden=$gold ${e.getString("severity_band")} phone=${r.severityPct} ${r.band} ok=$ok")
+            }
+            Perf.log(this, "sevtest passed $pass of ${g.length()}")
+        }
+    }
+
     private fun startAdvice(d: Diagnosis) {
         val c = Case.from(d, lang)
         val tmpl = advisor.template(c)
@@ -152,7 +177,11 @@ class MainActivity : ComponentActivity() {
         try {
             val m = llm ?: Llm(pte, tok).also { llm = it; it.load() }
             val (sys, user) = advisor.prompt(c)
-            val r = m.generate(m.chatPrompt(sys, user), 768)
+            // seqLen counts prompt plus answer. Hindi needs about 3 times the tokens of
+            // English, and in the PC eval 12 of 13 fallbacks hit the 200 new token
+            // limit, so Hindi gets the whole 1024 context of the exported model.
+            val seqLen = if (c.lang == "hi") 1024 else 768
+            val r = m.generate(m.chatPrompt(sys, user), seqLen)
             var text = advisor.cleanOutput(r.text)
             val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("।") }
             var fails = advisor.check(text, c, truncated)
@@ -164,7 +193,7 @@ class MainActivity : ComponentActivity() {
                 fails = advisor.check(text, c, false)
             }
             Perf.log(this, "llm_text=" + text.replace("\n", " "))
-            Perf.log(this, "advice mode=llm free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
+            Perf.log(this, "advice mode=llm lang=${c.lang} seq_len=$seqLen free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
             if (diagnosis !== d) return
             runOnUiThread {
                 if (fails.isEmpty()) { advice = text; adviceNote = getString(R.string.src_llm) }
@@ -203,7 +232,15 @@ class MainActivity : ComponentActivity() {
                     if (s > 1024) dec.setTargetSampleSize(s / 1024)
                 }
                 val v = vision ?: Vision(ModelFiles.vision(this)!!.path).also { vision = it }
-                val d = Diagnosis.from(chosen, v.classify(bmp))
+                var d = Diagnosis.from(chosen, v.classify(bmp))
+                // Severity only for disease and pest labels. A healthy leaf scores high
+                // on this colour method (26% on the golden healthy photo), so skip it.
+                if (!d.label.endsWith("_healthy")) {
+                    val t0 = android.os.SystemClock.elapsedRealtime()
+                    val s = Severity.estimate(bmp.copy(Bitmap.Config.ARGB_8888, false))
+                    d = d.copy(sevPct = s.severityPct, band = s.band)
+                    Perf.log(this, "severity pct=${s.severityPct} band=${s.band} ms=${android.os.SystemClock.elapsedRealtime() - t0}")
+                }
                 Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
                 runOnUiThread { photo = bmp; diagnosis = d }
                 startAdvice(d)

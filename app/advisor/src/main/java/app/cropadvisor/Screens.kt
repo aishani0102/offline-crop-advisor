@@ -43,7 +43,11 @@ val LANGUAGE_NAMES = mapOf(
 )
 
 // What the result card shows. Probabilities are over the chosen crop only.
-data class Diagnosis(val crop: String, val ranked: List<Pair<String, Float>>, val ms: Long) {
+// sevPct and band come from Severity.kt, only for disease and pest labels.
+data class Diagnosis(
+    val crop: String, val ranked: List<Pair<String, Float>>, val ms: Long,
+    val sevPct: Double? = null, val band: String? = null,
+) {
     val label get() = ranked[0].first
     val confidence get() = ranked[0].second
     val uncertain get() = confidence < UNCERTAIN_BELOW
@@ -65,6 +69,12 @@ data class Diagnosis(val crop: String, val ranked: List<Pair<String, Float>>, va
 fun condName(label: String): String {
     val ctx = LocalContext.current
     return stringResource(ctx.resources.getIdentifier("cond_" + label.substringAfter('_'), "string", ctx.packageName))
+}
+
+fun bandRes(band: String) = when (band) {
+    "mild" -> R.string.band_mild
+    "moderate" -> R.string.band_moderate
+    else -> R.string.band_severe
 }
 
 // English name for the SMS and the safety check: "tomato_septoria_leaf_spot" -> "Septoria leaf spot"
@@ -177,6 +187,13 @@ fun ResultScreen(
             } else {
                 Text(condName(d.label), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
                 Text(stringResource(R.string.confidence, (d.confidence * 100).toInt()), color = Green, fontSize = 14.sp)
+                when (d.band) {
+                    "mild", "moderate", "severe" -> Text(
+                        stringResource(R.string.spread, stringResource(bandRes(d.band))),
+                        color = Color.White, fontSize = 14.sp,
+                    )
+                    "no_leaf" -> Text(stringResource(R.string.no_leaf), color = Muted, fontSize = 14.sp)
+                }
             }
             Spacer(Modifier.height(4.dp))
             Text(stringResource(R.string.top_matches), color = Muted, fontSize = 13.sp)

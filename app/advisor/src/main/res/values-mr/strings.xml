@@ -31,4 +31,11 @@
     <string name="cond_leaf_mold">पानावरील बुरशी</string>
     <string name="cond_septoria_leaf_spot">सेप्टोरिया पानावरील ठिपके</string>
     <string name="cond_yellow_leaf_curl_virus">पर्णगुच्छ (लीफ कर्ल) विषाणू</string>
+    <string name="spread">अंदाजे प्रसार: %1$s</string>
+    <string name="band_mild">सौम्य</string>
+    <string name="band_moderate">मध्यम</string>
+    <string name="band_severe">तीव्र</string>
+    <string name="no_leaf">फोटोत पान स्पष्ट सापडले नाही, म्हणून प्रसार दाखवला नाही. एका पानाचा जवळून फोटो घ्या.</string>
+    <string name="wait_days">काढणीपूर्वीच्या शेवटच्या %1$d दिवसांत फवारणी करू नका</string>
+    <string name="wait_label">प्रतीक्षा कालावधी लेबलवर पाहा</string>
 </resources>

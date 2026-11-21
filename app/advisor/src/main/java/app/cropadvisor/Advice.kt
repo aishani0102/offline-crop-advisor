@@ -10,9 +10,10 @@ import java.util.Locale
 // Port of the advisory stage (advisory/knowledge.py, prompt.py, template.py,
 // safety.py, referral.py, memory.py). Everything said comes from kb.json.
 //
-// The phone does not estimate severity yet, so band is null for a disease or
-// pest. Then we give the signs and the non chemical steps only, never a spray
-// or dose, and always add the KVK referral line.
+// Severity comes from Severity.kt (port of detection/severity.py). Like
+// knowledge.py check_case, a no_leaf result counts as uncertain, so no
+// treatment is named. If severity is missing for a disease (should not happen)
+// we give the non chemical steps only and add the KVK line.
 
 data class Case(
     val label: String, val crop: String, val condition: String, val type: String,
@@ -28,9 +29,10 @@ data class Case(
                 d.label.endsWith("_leaf_miner") -> "pest"
                 else -> "disease"
             }
+            val band = if (type == "healthy") "none" else d.band?.takeIf { it != "no_leaf" }
             return Case(
-                d.label, crop, conditionName(d.label), type, d.confidence, d.uncertain,
-                if (type == "healthy") "none" else null, null, lang,
+                d.label, crop, conditionName(d.label), type, d.confidence, d.uncertain || d.band == "no_leaf",
+                band, d.sevPct?.toFloat(), lang,
             )
         }
     }
@@ -93,6 +95,9 @@ class Advisor(private val ctx: Context) {
         return if (lang == "hi") {
             val wait = if (days > 0) "तुड़ाई से $days दिन पहले तक छिड़काव न करें" else "प्रतीक्षा अवधि लेबल पर देखें"
             "${c.getString("name_hi")} (${c.getString("product")}): $dose, $wait"
+        } else if (lang != "en") {
+            val wait = if (days > 0) ctx.getString(R.string.wait_days, days) else ctx.getString(R.string.wait_label)
+            "${c.getString("product")}: $dose, $wait"
         } else {
             val wait = if (days > 0) "do not spray in the last $days days before harvest" else "check the waiting period on the label"
             "${c.getString("product")}: $dose, $wait"
@@ -103,8 +108,8 @@ class Advisor(private val ctx: Context) {
         var t = if (c.lang == "en") "${c.crop.replaceFirstChar { it.uppercase() }}: ${c.condition.lowercase()}"
         else "${res(c.crop)}: ${res("cond_" + c.label.substringAfter('_'))}"
         if (c.band in listOf("mild", "moderate", "severe")) {
-            t += ", ${c.band}"
-            c.pct?.let { t += " (about ${Math.round(it)}% of the leaf)" }
+            t += ", " + if (c.lang == "en") c.band else res("band_" + c.band)
+            if (c.lang == "en") c.pct?.let { t += " (about ${Math.round(it)}% of the leaf)" }
         }
         return t
     }

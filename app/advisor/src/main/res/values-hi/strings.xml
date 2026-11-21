@@ -31,4 +31,11 @@
     <string name="cond_leaf_mold">पत्ती फफूंद</string>
     <string name="cond_septoria_leaf_spot">सेप्टोरिया पत्ती धब्बा</string>
     <string name="cond_yellow_leaf_curl_virus">पत्ती मोड़क वायरस</string>
+    <string name="spread">अनुमानित फैलाव: %1$s</string>
+    <string name="band_mild">हल्का</string>
+    <string name="band_moderate">मध्यम</string>
+    <string name="band_severe">गंभीर</string>
+    <string name="no_leaf">फोटो में पत्ती साफ नहीं मिली, इसलिए फैलाव नहीं दिखाया गया। एक पत्ती की पास से फोटो लें।</string>
+    <string name="wait_days">तुड़ाई से %1$d दिन पहले तक छिड़काव न करें</string>
+    <string name="wait_label">प्रतीक्षा अवधि लेबल पर देखें</string>
 </resources>

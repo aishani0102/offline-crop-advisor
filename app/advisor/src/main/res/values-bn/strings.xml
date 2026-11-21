@@ -31,4 +31,11 @@
     <string name="cond_leaf_mold">পাতার ছত্রাক</string>
     <string name="cond_septoria_leaf_spot">সেপ্টোরিয়া পাতার দাগ</string>
     <string name="cond_yellow_leaf_curl_virus">পাতা কোঁকড়ানো ভাইরাস</string>
+    <string name="spread">আনুমানিক বিস্তার: %1$s</string>
+    <string name="band_mild">হালকা</string>
+    <string name="band_moderate">মাঝারি</string>
+    <string name="band_severe">গুরুতর</string>
+    <string name="no_leaf">ছবিতে পাতা স্পষ্ট পাওয়া যায়নি, তাই বিস্তার দেখানো হয়নি। একটি পাতার কাছ থেকে ছবি তুলুন।</string>
+    <string name="wait_days">ফসল তোলার আগের %1$d দিন স্প্রে করবেন না</string>
+    <string name="wait_label">অপেক্ষার সময় লেবেলে দেখুন</string>
 </resources>

@@ -31,4 +31,11 @@
     <string name="cond_leaf_mold">ఆకు బూజు తెగులు</string>
     <string name="cond_septoria_leaf_spot">సెప్టోరియా ఆకు మచ్చ</string>
     <string name="cond_yellow_leaf_curl_virus">ఆకు ముడత వైరస్</string>
+    <string name="spread">సుమారు వ్యాప్తి: %1$s</string>
+    <string name="band_mild">తక్కువ</string>
+    <string name="band_moderate">మధ్యస్థం</string>
+    <string name="band_severe">తీవ్రం</string>
+    <string name="no_leaf">ఫోటోలో ఆకు స్పష్టంగా కనిపించలేదు, కాబట్టి వ్యాప్తి చూపలేదు. ఒక ఆకును దగ్గరగా ఫోటో తీయండి.</string>
+    <string name="wait_days">కోతకు ముందు చివరి %1$d రోజుల్లో పిచికారీ చేయవద్దు</string>
+    <string name="wait_label">వేచి ఉండాల్సిన కాలం లేబుల్‌పై చూడండి</string>
 </resources>

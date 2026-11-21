@@ -27,6 +27,23 @@ Why time to first token is so different: prefill runs at about 30 tokens/s on th
 short test prompt is 40 tokens, so it takes about 1.3 s. The grounded prompt carries the system
 rules plus the KB facts for the case (about 230 tokens), so prefill alone takes about 7.5 s.
 
+Hindi (same image, severe Septoria leaf spot, grounded Hindi prompt, seq_len 1024): load 3.6 s,
+time to first token 19.3 s, 84 tokens, 27.6 s in total, peak RSS 1517 MB, passed the safety check.
+Hindi gets seq_len 1024 (the full context of the exported model) because Hindi needs about 3 times
+the tokens of English and in the PC eval 12 of 13 fallbacks hit the 200 new token limit. English
+keeps 768. The Hindi prompt is long, so most of the wait is prefill.
+
+## Severity (Severity.kt from the detection branch)
+
+| What | Value |
+|---|---|
+| Golden file, 8 field photos, phone vs `severity.py` | 8 of 8 within 1 point (all identical to 0.1, same band) |
+| Time per photo in the app | about 3 s on the first photo (test_015492.jpg, 74.2%, severe) |
+
+Severity only runs for disease and pest labels; a healthy leaf scores 26% with this colour method.
+A `no_leaf` result counts as uncertain, like `check_case` in the advisory code, so no treatment is
+named. Spray advice comes back only for moderate and severe, as in `knowledge.py`.
+
 ## Free RAM gate
 
 The app only starts Llama when the phone reports at least **1900 MB** free (`Advisor.LLAMA_NEEDS_MB`).

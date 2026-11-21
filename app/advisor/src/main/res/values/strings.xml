@@ -32,4 +32,11 @@
     <string name="cond_leaf_mold">Leaf mold</string>
     <string name="cond_septoria_leaf_spot">Septoria leaf spot</string>
     <string name="cond_yellow_leaf_curl_virus">Yellow leaf curl virus</string>
+    <string name="spread">Approximate spread: %1$s</string>
+    <string name="band_mild">mild</string>
+    <string name="band_moderate">moderate</string>
+    <string name="band_severe">severe</string>
+    <string name="no_leaf">No clear leaf found in the photo, so the spread is not shown. Take a closer photo of one leaf.</string>
+    <string name="wait_days">do not spray in the last %1$d days before harvest</string>
+    <string name="wait_label">check the waiting period on the label</string>
 </resources>

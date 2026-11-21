@@ -31,4 +31,11 @@
     <string name="cond_leaf_mold">இலைப் பூஞ்சை</string>
     <string name="cond_septoria_leaf_spot">செப்டோரியா இலைப் புள்ளி</string>
     <string name="cond_yellow_leaf_curl_virus">இலைச் சுருள் வைரஸ்</string>
+    <string name="spread">தோராயமான பரவல்: %1$s</string>
+    <string name="band_mild">லேசானது</string>
+    <string name="band_moderate">மிதமானது</string>
+    <string name="band_severe">கடுமையானது</string>
+    <string name="no_leaf">படத்தில் இலை தெளிவாகத் தெரியவில்லை, எனவே பரவல் காட்டப்படவில்லை. ஒரு இலையை அருகில் படம் எடுக்கவும்.</string>
+    <string name="wait_days">அறுவடைக்கு முந்தைய கடைசி %1$d நாட்களில் தெளிக்க வேண்டாம்</string>
+    <string name="wait_label">காத்திருப்புக் காலத்தை லேபிளில் பார்க்கவும்</string>
 </resources>
