@@ -244,7 +244,8 @@ def main():
             s = res["stats"]
             print(f"[{i + 1}/{len(cases)}] {cid} fails={res['fails']} "
                   f"ttft={s.get('ttft_s')} tok/s={s.get('decode_tok_per_s')}", flush=True)
-    meta["peak_rss_mb"] = round(peak_rss_mb(), 1)
+    if runner:
+        meta["peak_rss_mb"] = round(peak_rss_mb(), 1)
     summarise(rows, Path(args.md), meta)
     print("wrote", args.md)
 
