@@ -30,10 +30,17 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val Muted = Color(0xFF9A9A9A)
+
+// Each language is shown in its own script, so the picker reads the same in any language.
+val LANGUAGE_NAMES = mapOf(
+    "en" to "English", "hi" to "हिन्दी", "bn" to "বাংলা", "mr" to "मराठी", "ta" to "தமிழ்", "te" to "తెలుగు",
+)
 
 // What the result card shows. Probabilities are over the chosen crop only.
 data class Diagnosis(val crop: String, val ranked: List<Pair<String, Float>>, val ms: Long) {
@@ -53,7 +60,14 @@ data class Diagnosis(val crop: String, val ranked: List<Pair<String, Float>>, va
     }
 }
 
-// "tomato_septoria_leaf_spot" -> "Septoria leaf spot"
+// Condition name in the chosen language, from the cond_* string resources.
+@Composable
+fun condName(label: String): String {
+    val ctx = LocalContext.current
+    return stringResource(ctx.resources.getIdentifier("cond_" + label.substringAfter('_'), "string", ctx.packageName))
+}
+
+// English name for the SMS and the safety check: "tomato_septoria_leaf_spot" -> "Septoria leaf spot"
 fun conditionName(label: String): String {
     val rest = label.substringAfter('_').replace('_', ' ')
     return when (rest) {
@@ -71,7 +85,7 @@ fun Header(subtitle: String) {
     Column(
         Modifier.fillMaxWidth().background(headerBrush).statusBarsPadding().padding(horizontal = 24.dp, vertical = 28.dp),
     ) {
-        Text("Crop Advisor", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.app_name), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
         Text(subtitle, color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp)
     }
 }
@@ -101,23 +115,30 @@ fun CropToggle(label: String, selected: Boolean, modifier: Modifier, onClick: ()
 
 @Composable
 fun HomeScreen(
-    crop: String, busy: Boolean, officer: String, onOfficer: (String) -> Unit,
+    crop: String, busy: Boolean, officer: String, lang: String, onLang: (String) -> Unit, onOfficer: (String) -> Unit,
     onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().background(Black)) {
-        Header("Offline leaf check for tomato and potato")
+        Header(stringResource(R.string.subtitle))
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Crop", color = Muted, fontSize = 13.sp)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CropToggle("Tomato", crop == "tomato", Modifier.weight(1f)) { onCrop("tomato") }
-                CropToggle("Potato", crop == "potato", Modifier.weight(1f)) { onCrop("potato") }
+            Text(stringResource(R.string.language), color = Muted, fontSize = 13.sp)
+            LANGUAGES.chunked(3).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { l -> CropToggle(LANGUAGE_NAMES.getValue(l), l == lang, Modifier.weight(1f)) { onLang(l) } }
+                }
             }
             Spacer(Modifier.height(12.dp))
-            Text("Photo of one leaf, close up, in daylight", color = Muted, fontSize = 13.sp)
-            PrimaryButton(if (busy) "Checking" else "Take photo", Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
-            SecondaryButton("Choose from gallery", Modifier.fillMaxWidth(), onClick = onGallery)
+            Text(stringResource(R.string.crop), color = Muted, fontSize = 13.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CropToggle(stringResource(R.string.tomato), crop == "tomato", Modifier.weight(1f)) { onCrop("tomato") }
+                CropToggle(stringResource(R.string.potato), crop == "potato", Modifier.weight(1f)) { onCrop("potato") }
+            }
             Spacer(Modifier.height(12.dp))
-            Text("Extension officer phone number", color = Muted, fontSize = 13.sp)
+            Text(stringResource(R.string.photo_hint), color = Muted, fontSize = 13.sp)
+            PrimaryButton(stringResource(if (busy) R.string.checking else R.string.take_photo), Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
+            SecondaryButton(stringResource(R.string.gallery), Modifier.fillMaxWidth(), onClick = onGallery)
+            Spacer(Modifier.height(12.dp))
+            Text(stringResource(R.string.officer), color = Muted, fontSize = 13.sp)
             androidx.compose.material3.OutlinedTextField(
                 officer, onOfficer, singleLine = true, shape = RectangleShape, modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
@@ -135,29 +156,32 @@ fun HomeScreen(
 @Composable
 fun ResultScreen(
     photo: Bitmap, d: Diagnosis, advice: String, adviceNote: String, onSms: (() -> Unit)?, onAgain: () -> Unit,
+    scrollDown: Boolean = false,
 ) {
-    Column(Modifier.fillMaxSize().background(Black).verticalScroll(rememberScrollState())) {
-        Header(d.crop.replaceFirstChar { it.uppercase() })
+    val scroll = rememberScrollState()
+    // debug only: jump to the advice so a screenshot can show it
+    if (scrollDown) androidx.compose.runtime.LaunchedEffect(advice, scroll.maxValue) { scroll.scrollTo(scroll.maxValue) }
+    Column(Modifier.fillMaxSize().background(Black).verticalScroll(scroll)) {
+        Header(stringResource(if (d.crop == "potato") R.string.potato else R.string.tomato))
         Image(
             photo.asImageBitmap(), null, contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth().aspectRatio(1.6f),
         )
         Column(Modifier.navigationBarsPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             if (d.uncertain) {
-                Text("Not sure", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.not_sure), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "The photo does not match any condition clearly. Take a closer photo of a single leaf " +
-                        "in daylight, or show it to your extension officer.",
+                    stringResource(R.string.not_sure_body),
                     color = Muted, fontSize = 14.sp,
                 )
             } else {
-                Text(conditionName(d.label), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
-                Text("${(d.confidence * 100).toInt()}% confidence", color = Green, fontSize = 14.sp)
+                Text(condName(d.label), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.confidence, (d.confidence * 100).toInt()), color = Green, fontSize = 14.sp)
             }
             Spacer(Modifier.height(4.dp))
-            Text("Top matches", color = Muted, fontSize = 13.sp)
-            d.ranked.take(3).forEach { (label, p) -> ScoreBar(conditionName(label), p) }
-            Text("Checked on this phone in ${d.ms} ms, no internet used", color = Muted, fontSize = 12.sp)
+            Text(stringResource(R.string.top_matches), color = Muted, fontSize = 13.sp)
+            d.ranked.take(3).forEach { (label, p) -> ScoreBar(condName(label), p) }
+            Text(stringResource(R.string.checked_ms, d.ms.toInt()), color = Muted, fontSize = 12.sp)
             if (advice.isNotEmpty()) {
                 Spacer(Modifier.height(4.dp))
                 Box(Modifier.fillMaxWidth().background(Charcoal).padding(16.dp)) {
@@ -166,8 +190,8 @@ fun ResultScreen(
                 Text(adviceNote, color = Muted, fontSize = 12.sp)
             }
             Spacer(Modifier.height(8.dp))
-            if (onSms != null) SecondaryButton("Send to extension officer", Modifier.fillMaxWidth(), onClick = onSms)
-            PrimaryButton("Check another leaf", Modifier.fillMaxWidth(), onClick = onAgain)
+            if (onSms != null) SecondaryButton(stringResource(R.string.send_officer), Modifier.fillMaxWidth(), onClick = onSms)
+            PrimaryButton(stringResource(R.string.check_another), Modifier.fillMaxWidth(), onClick = onAgain)
         }
     }
 }

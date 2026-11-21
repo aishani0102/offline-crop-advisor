@@ -49,6 +49,23 @@ class MainActivity : ComponentActivity() {
     private var out by mutableStateOf("")
     private var busy by mutableStateOf(false)
 
+    // The chosen language is kept in settings and applied to this activity, so
+    // string resources and the advice both follow it.
+    private val lang by lazy { getSharedPreferences("settings", MODE_PRIVATE).getString("lang", "en") ?: "en" }
+
+    override fun attachBaseContext(base: android.content.Context) {
+        val l = base.getSharedPreferences("settings", MODE_PRIVATE).getString("lang", "en") ?: "en"
+        val conf = android.content.res.Configuration(base.resources.configuration)
+        conf.setLocale(java.util.Locale.forLanguageTag(l))
+        super.attachBaseContext(base.createConfigurationContext(conf))
+    }
+
+    private fun setLanguage(l: String) {
+        if (l == lang) return
+        getSharedPreferences("settings", MODE_PRIVATE).edit().putString("lang", l).commit()
+        recreate()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         officer = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
@@ -68,12 +85,13 @@ class MainActivity : ComponentActivity() {
                 if (d != null && p != null) {
                     BackHandler { diagnosis = null }
                     val c = case
-                    ResultScreen(p, d, advice, adviceNote, if (c?.needsReferral == true) ({ sendSms(c) }) else null) {
-                        diagnosis = null
-                    }
+                    ResultScreen(
+                        p, d, advice, adviceNote, if (c?.needsReferral == true) ({ sendSms(c) }) else null,
+                        onAgain = { diagnosis = null }, scrollDown = intent.getBooleanExtra("scrolldown", false),
+                    )
                 } else {
                     HomeScreen(
-                        crop, busy, officer,
+                        crop, busy, officer, lang, onLang = { setLanguage(it) },
                         onOfficer = {
                             officer = it.filter { ch -> ch.isDigit() || ch == '+' }
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
@@ -116,10 +134,11 @@ class MainActivity : ComponentActivity() {
     // background and swaps its text in only if it passes the safety check.
     // Called from the classify thread.
     private fun startAdvice(d: Diagnosis) {
-        val c = Case.from(d)
+        val c = Case.from(d, lang)
         val tmpl = advisor.template(c)
-        runOnUiThread { case = c; advice = tmpl; adviceNote = "From the crop guide" }
-        if (c.uncertain) return
+        runOnUiThread { case = c; advice = tmpl; adviceNote = getString(R.string.src_guide) }
+        // Uncertain results never go to Llama, and Llama only writes en and hi.
+        if (c.uncertain || c.lang !in LLM_LANGUAGES) return
         val mem = android.app.ActivityManager.MemoryInfo()
         (getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager).getMemoryInfo(mem)
         val freeMb = mem.availMem / (1024 * 1024)
@@ -129,7 +148,7 @@ class MainActivity : ComponentActivity() {
             Perf.log(this, "advice mode=template free_mb=$freeMb model=${pte != null}")
             return
         }
-        runOnUiThread { adviceNote = "From the crop guide, writing simpler advice on the phone" }
+        runOnUiThread { adviceNote = getString(R.string.src_writing) }
         try {
             val m = llm ?: Llm(pte, tok).also { llm = it; it.load() }
             val (sys, user) = advisor.prompt(c)
@@ -138,7 +157,8 @@ class MainActivity : ComponentActivity() {
             val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("।") }
             var fails = advisor.check(text, c, truncated)
             // The 1B model often drops the last sentence. The referral line is
-            // fixed KB text, so add it ourselves and check again.
+            // fixed KB text, so add it ourselves and check again. Note: this retry
+            // is only in the app, the Python advisory code (safety.py) does not do it.
             if (fails == listOf("missing_referral")) {
                 text += "\n\n" + advisor.facts(c).referral
                 fails = advisor.check(text, c, false)
@@ -147,12 +167,12 @@ class MainActivity : ComponentActivity() {
             Perf.log(this, "advice mode=llm free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
             if (diagnosis !== d) return
             runOnUiThread {
-                if (fails.isEmpty()) { advice = text; adviceNote = "Written on this phone from the crop guide" }
-                else adviceNote = "From the crop guide"
+                if (fails.isEmpty()) { advice = text; adviceNote = getString(R.string.src_llm) }
+                else adviceNote = getString(R.string.src_guide)
             }
         } catch (e: Throwable) {
             Perf.log(this, "advice_error=$e")
-            runOnUiThread { adviceNote = "From the crop guide" }
+            runOnUiThread { adviceNote = getString(R.string.src_guide) }
         }
     }
 

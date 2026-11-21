@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle">टमाटर और आलू की पत्ती की जांच, बिना इंटरनेट</string>
+    <string name="language">भाषा</string>
+    <string name="crop">फसल</string>
+    <string name="tomato">टमाटर</string>
+    <string name="potato">आलू</string>
+    <string name="photo_hint">दिन की रोशनी में एक पत्ती की पास से फोटो</string>
+    <string name="checking">जांच हो रही है</string>
+    <string name="take_photo">फोटो लें</string>
+    <string name="gallery">गैलरी से चुनें</string>
+    <string name="officer">कृषि अधिकारी का फोन नंबर</string>
+    <string name="not_sure">पक्का नहीं</string>
+    <string name="not_sure_body">फोटो किसी भी रोग से साफ मेल नहीं खाती। दिन की रोशनी में एक पत्ती की पास से फोटो लें, या इसे अपने कृषि अधिकारी को दिखाएं।</string>
+    <string name="confidence">%1$d%% भरोसा</string>
+    <string name="top_matches">सबसे करीबी मिलान</string>
+    <string name="checked_ms">इस फोन पर %1$d ms में जांचा गया, इंटरनेट नहीं लगा</string>
+    <string name="send_officer">कृषि अधिकारी को भेजें</string>
+    <string name="check_another">दूसरी पत्ती जांचें</string>
+    <string name="src_guide">फसल गाइड से</string>
+    <string name="src_writing">फसल गाइड से, फोन पर आसान सलाह लिखी जा रही है</string>
+    <string name="src_llm">फसल गाइड से इसी फोन पर लिखी गई</string>
+    <string name="signs">पहचान</string>
+    <string name="what_to_do">क्या करें</string>
+    <string name="spray">अगर छिड़काव ज़रूरी हो तो इनमें से कोई एक</string>
+    <string name="keep_healthy">फसल स्वस्थ रखने के लिए</string>
+    <string name="cond_healthy">स्वस्थ</string>
+    <string name="cond_early_blight">अगेती झुलसा</string>
+    <string name="cond_late_blight">पछेती झुलसा</string>
+    <string name="cond_leaf_miner">पत्ती सुरंगक कीट</string>
+    <string name="cond_leaf_mold">पत्ती फफूंद</string>
+    <string name="cond_septoria_leaf_spot">सेप्टोरिया पत्ती धब्बा</string>
+    <string name="cond_yellow_leaf_curl_virus">पत्ती मोड़क वायरस</string>
+</resources>

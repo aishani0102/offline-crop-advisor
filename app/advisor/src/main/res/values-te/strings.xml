@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle">ఇంటర్నెట్ లేకుండా టమాటా, బంగాళదుంప ఆకు పరీక్ష</string>
+    <string name="language">భాష</string>
+    <string name="crop">పంట</string>
+    <string name="tomato">టమాటా</string>
+    <string name="potato">బంగాళదుంప</string>
+    <string name="photo_hint">పగటి వెలుగులో ఒక ఆకు దగ్గరి ఫోటో</string>
+    <string name="checking">పరీక్షిస్తోంది</string>
+    <string name="take_photo">ఫోటో తీయండి</string>
+    <string name="gallery">గ్యాలరీ నుండి ఎంచుకోండి</string>
+    <string name="officer">వ్యవసాయ అధికారి ఫోన్ నంబర్</string>
+    <string name="not_sure">ఖచ్చితంగా తెలియదు</string>
+    <string name="not_sure_body">ఫోటో ఏ వ్యాధితోనూ స్పష్టంగా సరిపోలడం లేదు. పగటి వెలుగులో ఒక ఆకును దగ్గరగా ఫోటో తీయండి, లేదా వ్యవసాయ అధికారికి చూపించండి.</string>
+    <string name="confidence">%1$d%% నమ్మకం</string>
+    <string name="top_matches">దగ్గరి పోలికలు</string>
+    <string name="checked_ms">ఈ ఫోన్‌లో %1$d ms లో పరీక్షించబడింది, ఇంటర్నెట్ అవసరం లేదు</string>
+    <string name="send_officer">వ్యవసాయ అధికారికి పంపండి</string>
+    <string name="check_another">మరో ఆకును పరీక్షించండి</string>
+    <string name="src_guide">పంట మార్గదర్శిని నుండి</string>
+    <string name="src_writing">పంట మార్గదర్శిని నుండి, ఫోన్‌లో సులభమైన సలహా రాస్తోంది</string>
+    <string name="src_llm">పంట మార్గదర్శిని నుండి ఈ ఫోన్‌లో రాయబడింది</string>
+    <string name="signs">లక్షణాలు</string>
+    <string name="what_to_do">ఏమి చేయాలి</string>
+    <string name="spray">పిచికారీ అవసరమైతే వీటిలో ఒకటి వాడండి</string>
+    <string name="keep_healthy">పంటను ఆరోగ్యంగా ఉంచడానికి</string>
+    <string name="cond_healthy">ఆరోగ్యంగా ఉంది</string>
+    <string name="cond_early_blight">ముందస్తు ఆకు ఎండు తెగులు (Early blight)</string>
+    <string name="cond_late_blight">ఆలస్య ఆకు ఎండు తెగులు (Late blight)</string>
+    <string name="cond_leaf_miner">ఆకు తొలిచే పురుగు</string>
+    <string name="cond_leaf_mold">ఆకు బూజు తెగులు</string>
+    <string name="cond_septoria_leaf_spot">సెప్టోరియా ఆకు మచ్చ</string>
+    <string name="cond_yellow_leaf_curl_virus">ఆకు ముడత వైరస్</string>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle">टोमॅटो आणि बटाट्याच्या पानाची तपासणी, इंटरनेटशिवाय</string>
+    <string name="language">भाषा</string>
+    <string name="crop">पीक</string>
+    <string name="tomato">टोमॅटो</string>
+    <string name="potato">बटाटा</string>
+    <string name="photo_hint">दिवसाच्या उजेडात एका पानाचा जवळून फोटो</string>
+    <string name="checking">तपासत आहे</string>
+    <string name="take_photo">फोटो घ्या</string>
+    <string name="gallery">गॅलरीतून निवडा</string>
+    <string name="officer">कृषी अधिकाऱ्याचा फोन नंबर</string>
+    <string name="not_sure">खात्री नाही</string>
+    <string name="not_sure_body">फोटो कोणत्याही रोगाशी स्पष्टपणे जुळत नाही. दिवसाच्या उजेडात एका पानाचा जवळून फोटो घ्या, किंवा कृषी अधिकाऱ्याला दाखवा.</string>
+    <string name="confidence">%1$d%% खात्री</string>
+    <string name="top_matches">सर्वात जवळचे जुळणारे</string>
+    <string name="checked_ms">या फोनवर %1$d ms मध्ये तपासले, इंटरनेट लागले नाही</string>
+    <string name="send_officer">कृषी अधिकाऱ्याला पाठवा</string>
+    <string name="check_another">दुसरे पान तपासा</string>
+    <string name="src_guide">पीक मार्गदर्शिकेतून</string>
+    <string name="src_writing">पीक मार्गदर्शिकेतून, फोनवर सोपा सल्ला लिहिला जात आहे</string>
+    <string name="src_llm">पीक मार्गदर्शिकेतून याच फोनवर लिहिलेला</string>
+    <string name="signs">लक्षणे</string>
+    <string name="what_to_do">काय करावे</string>
+    <string name="spray">फवारणी करायची असल्यास यापैकी एक वापरा</string>
+    <string name="keep_healthy">पीक निरोगी ठेवण्यासाठी</string>
+    <string name="cond_healthy">निरोगी</string>
+    <string name="cond_early_blight">लवकर येणारा करपा (Early blight)</string>
+    <string name="cond_late_blight">उशिरा येणारा करपा (Late blight)</string>
+    <string name="cond_leaf_miner">पाने पोखरणारी अळी</string>
+    <string name="cond_leaf_mold">पानावरील बुरशी</string>
+    <string name="cond_septoria_leaf_spot">सेप्टोरिया पानावरील ठिपके</string>
+    <string name="cond_yellow_leaf_curl_virus">पर्णगुच्छ (लीफ कर्ल) विषाणू</string>
+</resources>

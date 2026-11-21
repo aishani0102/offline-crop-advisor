@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Crop Advisor</string>
+    <string name="subtitle">Offline leaf check for tomato and potato</string>
+    <string name="language">Language</string>
+    <string name="crop">Crop</string>
+    <string name="tomato">Tomato</string>
+    <string name="potato">Potato</string>
+    <string name="photo_hint">Photo of one leaf, close up, in daylight</string>
+    <string name="checking">Checking</string>
+    <string name="take_photo">Take photo</string>
+    <string name="gallery">Choose from gallery</string>
+    <string name="officer">Extension officer phone number</string>
+    <string name="not_sure">Not sure</string>
+    <string name="not_sure_body">The photo does not match any condition clearly. Take a closer photo of a single leaf in daylight, or show it to your extension officer.</string>
+    <string name="confidence">%1$d%% confidence</string>
+    <string name="top_matches">Top matches</string>
+    <string name="checked_ms">Checked on this phone in %1$d ms, no internet used</string>
+    <string name="send_officer">Send to extension officer</string>
+    <string name="check_another">Check another leaf</string>
+    <string name="src_guide">From the crop guide</string>
+    <string name="src_writing">From the crop guide, writing simpler advice on the phone</string>
+    <string name="src_llm">Written on this phone from the crop guide</string>
+    <string name="signs">Signs</string>
+    <string name="what_to_do">What to do</string>
+    <string name="spray">If you need to spray, use one of these</string>
+    <string name="keep_healthy">To keep it healthy</string>
+    <string name="cond_healthy">Healthy</string>
+    <string name="cond_early_blight">Early blight</string>
+    <string name="cond_late_blight">Late blight</string>
+    <string name="cond_leaf_miner">Leaf miner</string>
+    <string name="cond_leaf_mold">Leaf mold</string>
+    <string name="cond_septoria_leaf_spot">Septoria leaf spot</string>
+    <string name="cond_yellow_leaf_curl_virus">Yellow leaf curl virus</string>
+</resources>

@@ -54,16 +54,41 @@ class Facts(val lang: String, val kind: String) {
         signs + steps + chemicals + safety).filter { it.isNotEmpty() }.joinToString("\n")
 }
 
-class Advisor(ctx: Context) {
-    val kb = JSONObject(ctx.assets.open("kb.json").bufferedReader(Charsets.UTF_8).readText())
+// Languages the app offers. Llama only writes en and hi (the advisory eval only
+// covered those). The others always get the translated template.
+val LANGUAGES = listOf("en", "hi", "bn", "mr", "ta", "te")
+val LLM_LANGUAGES = setOf("en", "hi")
+
+// ctx should be the activity, so getString gives the chosen language.
+class Advisor(private val ctx: Context) {
+    val kb = JSONObject(readAsset("kb.json"))
     private val entries = kb.getJSONObject("entries")
 
+    init {
+        // kb_<lang>.json files have the same keys as kb.json with one language
+        // each. Merge them in, so a missing text falls back to English below.
+        for (l in LANGUAGES - setOf("en", "hi")) merge(kb, JSONObject(readAsset("kb_$l.json")))
+    }
+
+    private fun readAsset(name: String) = ctx.assets.open(name).bufferedReader(Charsets.UTF_8).readText()
+
+    private fun merge(base: JSONObject, over: JSONObject) {
+        for (k in over.keys()) {
+            val b = base.opt(k)
+            val o = over.get(k)
+            if (b is JSONObject && o is JSONObject) merge(b, o) else if (b == null) base.put(k, o)
+        }
+    }
+
     private fun JSONArray.strings() = List(length()) { getString(it) }
-    private fun JSONObject.lang(key: String, lang: String) = getJSONObject(key).getString(lang)
-    private fun JSONObject.langList(key: String, lang: String) = getJSONObject(key).getJSONArray(lang).strings()
+    private fun JSONObject.lang(key: String, lang: String) = getJSONObject(key).let { it.optString(lang, "").ifEmpty { it.getString("en") } }
+    private fun JSONObject.langList(key: String, lang: String) =
+        getJSONObject(key).let { (it.optJSONArray(lang) ?: it.getJSONArray("en")).strings() }
+
+    private fun res(name: String) = ctx.getString(ctx.resources.getIdentifier(name, "string", ctx.packageName))
 
     private fun chemLine(c: JSONObject, lang: String): String {
-        val dose = c.getJSONObject("dose").getString(lang)
+        val dose = c.lang("dose", lang)
         val days = c.optInt("waiting_days", 0)
         return if (lang == "hi") {
             val wait = if (days > 0) "तुड़ाई से $days दिन पहले तक छिड़काव न करें" else "प्रतीक्षा अवधि लेबल पर देखें"
@@ -75,7 +100,8 @@ class Advisor(ctx: Context) {
     }
 
     fun title(c: Case): String {
-        var t = "${c.crop.replaceFirstChar { it.uppercase() }}: ${c.condition.lowercase()}"
+        var t = if (c.lang == "en") "${c.crop.replaceFirstChar { it.uppercase() }}: ${c.condition.lowercase()}"
+        else "${res(c.crop)}: ${res("cond_" + c.label.substringAfter('_'))}"
         if (c.band in listOf("mild", "moderate", "severe")) {
             t += ", ${c.band}"
             c.pct?.let { t += " (about ${Math.round(it)}% of the leaf)" }
@@ -123,28 +149,29 @@ class Advisor(ctx: Context) {
         return f
     }
 
-    // template.py
+    // template.py. Template text is KB text only, so it is safe by construction
+    // and is not run through the safety check.
     fun template(c: Case): String {
         val f = facts(c)
         val lines = mutableListOf<String>()
         if (f.kind == "uncertain") return listOf(f.summary, f.referral).joinToString("\n")
-        lines += f.title + "."
+        lines += f.title + if (c.lang == "en") "." else ""
         lines += f.summary
         if (f.kind == "healthy") {
-            lines += "To keep it healthy:"
+            lines += res("keep_healthy") + ":"
             lines += f.steps.take(3).map { "- $it" }
             lines += f.watch
             return lines.joinToString("\n")
         }
         if (f.severityNote.isNotEmpty()) lines += f.severityNote
         if (f.signs.isNotEmpty()) {
-            lines += "Signs:"
+            lines += res("signs") + ":"
             lines += f.signs.map { "- $it" }
         }
-        lines += "What to do:"
+        lines += res("what_to_do") + ":"
         lines += f.steps.map { "- $it" }
         if (f.chemicals.isNotEmpty()) {
-            lines += "If you need to spray, use one of these:"
+            lines += res("spray") + ":"
             lines += f.chemicals.map { "- $it" }
             lines += f.safety
         } else if (f.noDose.isNotEmpty()) {
@@ -250,50 +277,70 @@ object Safety {
         "bavistin", "blitox", "dithane", "indofil", "ridomil", "curzate", "confidor", "actara", "coragen",
         "kavach", "saaf", "nativo", "amistar", "antracol", "kocide", "sulfex", "nuvan", "rogor",
     )
+    // Hindi names, used when Llama writes in Hindi.
+    private val EXTRA_HI = listOf(
+        "क्लोरपायरीफॉस", "क्लोरपाइरीफॉस", "मोनोक्रोटोफॉस", "कार्बेन्डाजिम", "कार्बेंडाजिम", "कार्बोफ्यूरान",
+        "फोरेट", "प्रोफेनोफॉस", "साइपरमेथ्रिन", "एंडोसल्फान", "डाइमेथोएट", "एसीफेट", "मेटालैक्सिल",
+        "प्रोपिनेब", "हेक्साकोनाज़ोल", "हेक्साकोनाजोल", "टेबुकोनाज़ोल", "कॉपर", "तांबा", "गंधक", "सल्फर",
+        "बोर्डो", "स्ट्रेप्टोसाइक्लिन", "इमामेक्टिन", "स्पिनोसैड", "क्लोरएन्ट्रानिलिप्रोल", "थीरम", "थायरम",
+        "ज़िनेब", "जिनेब", "मैलाथियान", "क्विनालफॉस", "ग्लाइफोसेट", "पैराक्वाट", "फिप्रोनिल", "नीम",
+        "ट्राइकोडर्मा", "क्लोरोथालोनिल", "कैप्टान", "मैंकोज़ेब", "मैन्कोज़ेब", "मैंकोजेब", "मेन्कोजेब",
+        "एज़ोक्सीस्ट्रोबिन", "साइमोक्सानिल", "साइज़ोफ़ामिड", "डाइमेथोमॉर्फ", "इमिडाक्लोप्रिड",
+        "थायामेथोक्साम", "थियामेथोक्सम", "साइएन्ट्रानिलिप्रोल", "यूरिया", "डीएपी", "पोटाश",
+    )
     private val CHEM_SUFFIX = Regex(
         "\\b[a-z]{3,}(?:zole|zol|strobin|carb|phos|fos|thrin|mectin|cloprid|thoxam|thalonil|" +
             "ozeb|zeb|neb|sulfan|thion|oxanil|famid|morph|uron|prole)\\b",
     )
     private const val UNITS_EN = "(?:g|gm|gram|grams|kg|ml|millilitre|millilitres|milliliter|litre|litres|liter|liters|l|lit|percent|%|ppm|acre|ha|hectare)"
     private const val NUM_WORDS_EN = "(?:one|two|three|four|five|six|seven|eight|nine|ten|twenty|fifty|hundred|half|quarter)"
-    val WORD_DOSE = Regex("\\b$NUM_WORDS_EN\\s+$UNITS_EN\\b", RegexOption.IGNORE_CASE)
+    private const val UNITS_HI = "(?:ग्राम|किलो|मिली|मिलीलीटर|लीटर|प्रतिशत|एकड़|हेक्टेयर)"
+    private const val NUM_WORDS_HI = "(?:एक|दो|तीन|चार|पांच|पाँच|छह|सात|आठ|नौ|दस|बीस|पचास|सौ|आधा|आधी)"
+    val WORD_DOSE = Regex("\\b$NUM_WORDS_EN\\s+$UNITS_EN\\b|(?<!\\S)$NUM_WORDS_HI\\s+$UNITS_HI", RegexOption.IGNORE_CASE)
     private val CROPS = listOf(
         "tomato", "potato", "wheat", "rice", "paddy", "maize", "corn", "cotton", "chilli", "chili",
         "brinjal", "eggplant", "onion", "soybean", "sugarcane", "mustard", "groundnut", "banana",
+        "टमाटर", "आलू", "गेहूं", "गेहूँ", "धान", "चावल", "मक्का", "कपास", "मिर्च", "बैंगन", "प्याज",
+        "सोयाबीन", "गन्ना", "सरसों", "मूंगफली", "केला",
     )
     private val CONDITIONS = listOf(
         "early blight", "late blight", "leaf mold", "leaf mould", "septoria", "leaf curl",
         "leaf miner", "powdery mildew", "downy mildew", "rust", "wilt", "mosaic", "bacterial spot",
         "anthracnose", "canker", "pest infestation", "nutrient deficiency", "root rot",
+        "अगेती झुलसा", "पछेती झुलसा", "पत्ती फफूंद", "सेप्टोरिया", "पत्ती मोड़क", "पत्ती सुरंगक",
+        "चूर्णिल आसिता", "रतुआ", "उकठा", "मोज़ेक", "विल्ट",
     )
     private val UNIT_MAP = mapOf(
         "g" to "g", "gm" to "g", "gram" to "g", "grams" to "g", "kg" to "kg", "kilo" to "kg",
         "kilogram" to "kg", "kilograms" to "kg", "ml" to "ml", "millilitre" to "ml", "millilitres" to "ml",
         "l" to "l", "lit" to "l", "litre" to "l", "litres" to "l", "liter" to "l", "liters" to "l",
         "%" to "%", "percent" to "%", "days" to "day", "day" to "day",
+        "ग्राम" to "g", "किलो" to "kg", "मिली" to "ml", "लीटर" to "l", "प्रतिशत" to "%", "दिन" to "day",
     )
     private val DOSE_RE = Regex(
-        "(\\d+(?:\\.\\d+)?)(?:\\s*(?:to|-)\\s*(\\d+(?:\\.\\d+)?))?\\s*" +
+        "(\\d+(?:\\.\\d+)?)(?:\\s*(?:to|-|से)\\s*(\\d+(?:\\.\\d+)?))?\\s*" +
             "(kilograms|kilogram|millilitres|millilitre|grams|gram|litres|litre|liters|liter|" +
-            "percent|days|day|kilo|lit|gm|kg|ml|g|l|%)(?![a-z])",
+            "percent|days|day|kilo|lit|gm|kg|ml|g|l|%|ग्राम|किलो|मिली|लीटर|प्रतिशत|दिन)(?![a-z])",
         RegexOption.IGNORE_CASE,
     )
 
     private var lexicon: List<String>? = null
 
     private fun lexicon(kb: JSONObject): List<String> = lexicon ?: run {
-        val names = EXTRA_EN.toMutableSet()
+        val names = (EXTRA_EN + EXTRA_HI).toMutableSet()
         val entries = kb.getJSONObject("entries")
         for (key in entries.keys()) {
             val chems = entries.getJSONObject(key).getJSONArray("chemicals")
             for (i in 0 until chems.length()) {
                 chems.getJSONObject(i).getString("name").split("+").forEach { names += it.trim().lowercase() }
+                chems.getJSONObject(i).getString("name_hi").split("+").forEach { names += it.trim() }
             }
         }
         names.sortedByDescending { it.length }.also { lexicon = it }
     }
 
-    private fun hasWord(low: String, name: String) =
+    // Hindi names are matched as plain substrings, like safety.py does.
+    private fun hasWord(low: String, name: String) = if (name.any { it in '\u0900'..'\u097F' }) name in low else
         Regex("(?<![a-z])" + Regex.escape(name) + "(?![a-z])").containsMatchIn(low)
 
     fun chemicals(text: String, kb: JSONObject): Set<String> {
@@ -311,7 +358,10 @@ object Safety {
         return (CROPS + CONDITIONS).filter { hasWord(low, it) && it !in src }
     }
 
-    fun dosePairs(text: String): Set<Pair<String, String>> {
+    private fun asciiDigits(s: String) = s.map { if (it in '\u0966'..'\u096F') '0' + (it - '\u0966') else it }.joinToString("")
+
+    fun dosePairs(raw: String): Set<Pair<String, String>> {
+        val text = asciiDigits(raw)
         val out = mutableSetOf<Pair<String, String>>()
         for (m in DOSE_RE.findAll(text)) {
             val u = UNIT_MAP[m.groupValues[3].lowercase()] ?: continue
@@ -322,14 +372,17 @@ object Safety {
     }
 
     fun numbers(text: String): Set<String> {
-        val t = text.replace(Regex("(?m)^\\s*\\d+[.)]\\s+"), "").replace("1800-180-1551", " HELPLINE ")
+        val t = asciiDigits(text).replace(Regex("(?m)^\\s*\\d+[.)]\\s+"), "").replace("1800-180-1551", " HELPLINE ")
         return Regex("\\d+(?:\\.\\d+)?").findAll(t).map { it.value }.toSet()
     }
 
     fun hasReferral(text: String): Boolean {
         val low = text.lowercase()
-        val digits = text.filter { it.isDigit() }
-        return "18001801551" in digits || listOf("kvk", "krishi vigyan kendra", "kisan call centre", "kisan call center")
+        val digits = asciiDigits(text).filter { it in '0'..'9' }
+        return "18001801551" in digits || listOf(
+            "kvk", "krishi vigyan kendra", "kisan call centre", "kisan call center",
+            "कृषि विज्ञान केंद्र", "कृषि विज्ञान केन्द्र", "केवीके", "किसान कॉल सेंटर",
+        )
             .any { it in low }
     }
 
