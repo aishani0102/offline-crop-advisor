@@ -30,7 +30,19 @@ android {
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
     packaging { jniLibs { useLegacyPackaging = true } }
+    androidResources { noCompress += "pte" }
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/modelAssets"))
 }
+
+// The leaf model goes inside the APK, but .pte files stay out of git, so it is
+// copied into the build from the data folder. Override with -PvisionPte=<path>.
+val copyVisionModel by tasks.registering(Copy::class) {
+    val src = providers.gradleProperty("visionPte")
+        .orElse("C:/Users/a_roy/aisoc_data/models/mnv3_large_cont/mnv3_large_int8.pte")
+    from(src) { rename { "vision.pte" } }
+    into(layout.buildDirectory.dir("generated/modelAssets"))
+}
+tasks.named("preBuild") { dependsOn(copyVisionModel) }
 
 dependencies {
     // Must match the ExecuTorch version the .pte files were exported with (1.5.1)

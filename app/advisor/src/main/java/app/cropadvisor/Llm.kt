@@ -13,6 +13,22 @@ object ModelFiles {
         val dirs = listOfNotNull(ctx.getExternalFilesDir(null), File("/data/local/tmp/cropadv"))
         return dirs.map { File(it, name) }.firstOrNull { it.canRead() }
     }
+
+    // The leaf model ships inside the APK. The runtime needs a file path, so it
+    // is copied to filesDir once. A pushed copy is only used if the asset is missing.
+    fun vision(ctx: Context): File? {
+        val out = File(ctx.filesDir, "vision.pte")
+        try {
+            ctx.assets.openFd("vision.pte").use { fd ->
+                if (out.length() != fd.length) {
+                    ctx.assets.open("vision.pte").use { i -> out.outputStream().use { i.copyTo(it) } }
+                }
+            }
+            return out
+        } catch (e: java.io.IOException) {
+            return find(ctx, "vision.pte")
+        }
+    }
 }
 
 class Llm(private val pte: File, private val tokenizer: File) {

@@ -224,8 +224,10 @@ class Advisor(ctx: Context) {
     }
 
     companion object {
-        // memory.py: measured Llama peak (2032 MB) plus a 512 MB margin.
-        const val LLAMA_NEEDS_MB = 2544L
+        // memory.py uses 2544 MB (2032 MB peak on the laptop plus 512 MB margin).
+        // On the Redmi 12 the whole app peaked at 1559 MB RSS with Llama loaded,
+        // so 1900 MB free leaves about 340 MB margin and lets Llama run there.
+        const val LLAMA_NEEDS_MB = 1900L
     }
 }
 

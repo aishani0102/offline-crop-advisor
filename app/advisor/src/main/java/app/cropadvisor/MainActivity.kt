@@ -134,9 +134,16 @@ class MainActivity : ComponentActivity() {
             val m = llm ?: Llm(pte, tok).also { llm = it; it.load() }
             val (sys, user) = advisor.prompt(c)
             val r = m.generate(m.chatPrompt(sys, user), 768)
-            val text = advisor.cleanOutput(r.text)
+            var text = advisor.cleanOutput(r.text)
             val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("।") }
-            val fails = advisor.check(text, c, truncated)
+            var fails = advisor.check(text, c, truncated)
+            // The 1B model often drops the last sentence. The referral line is
+            // fixed KB text, so add it ourselves and check again.
+            if (fails == listOf("missing_referral")) {
+                text += "\n\n" + advisor.facts(c).referral
+                fails = advisor.check(text, c, false)
+            }
+            Perf.log(this, "llm_text=" + text.replace("\n", " "))
             Perf.log(this, "advice mode=llm free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
             if (diagnosis !== d) return
             runOnUiThread {
@@ -175,7 +182,7 @@ class MainActivity : ComponentActivity() {
                     val s = minOf(info.size.width, info.size.height)
                     if (s > 1024) dec.setTargetSampleSize(s / 1024)
                 }
-                val v = vision ?: Vision(ModelFiles.find(this, "vision.pte")!!.path).also { vision = it }
+                val v = vision ?: Vision(ModelFiles.vision(this)!!.path).also { vision = it }
                 val d = Diagnosis.from(chosen, v.classify(bmp))
                 Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
                 runOnUiThread { photo = bmp; diagnosis = d }
@@ -193,7 +200,7 @@ class MainActivity : ComponentActivity() {
         thread {
             try {
                 val dir = getExternalFilesDir(null)!!
-                val pte = ModelFiles.find(this, "vision.pte") ?: error("vision.pte not found")
+                val pte = ModelFiles.vision(this) ?: error("vision.pte not found")
                 val t0 = System.currentTimeMillis()
                 val vision = Vision(pte.path)
                 Perf.log(this, "vision_load_ms=${System.currentTimeMillis() - t0}")
