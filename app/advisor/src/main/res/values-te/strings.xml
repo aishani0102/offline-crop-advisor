@@ -53,4 +53,8 @@
     <string name="show_advice">సలహా చూడండి</string>
     <string name="state">రాష్ట్రం</string>
     <string name="choose_state">రాష్ట్రం ఎంచుకోండి</string>
+    <string name="theme">రూపం</string>
+    <string name="theme_system">ఫోన్ లాగా</string>
+    <string name="theme_light">లేత</string>
+    <string name="theme_dark">ముదురు</string>
 </resources>

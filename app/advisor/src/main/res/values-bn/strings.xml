@@ -53,4 +53,8 @@
     <string name="show_advice">পরামর্শ দেখুন</string>
     <string name="state">রাজ্য</string>
     <string name="choose_state">রাজ্য বাছুন</string>
+    <string name="theme">চেহারা</string>
+    <string name="theme_system">ফোনের মতো</string>
+    <string name="theme_light">হালকা</string>
+    <string name="theme_dark">গাঢ়</string>
 </resources>

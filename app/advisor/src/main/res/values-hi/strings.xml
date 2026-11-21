@@ -53,4 +53,8 @@
     <string name="show_advice">सलाह देखें</string>
     <string name="state">राज्य</string>
     <string name="choose_state">राज्य चुनें</string>
+    <string name="theme">रूप</string>
+    <string name="theme_system">फोन जैसा</string>
+    <string name="theme_light">हल्का</string>
+    <string name="theme_dark">गहरा</string>
 </resources>

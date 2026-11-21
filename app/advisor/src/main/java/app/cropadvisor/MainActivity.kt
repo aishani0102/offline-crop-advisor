@@ -70,9 +70,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         officer = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
         state = getSharedPreferences("settings", MODE_PRIVATE).getString("state", "") ?: ""
+        theme = getSharedPreferences("settings", MODE_PRIVATE).getString("theme", "system") ?: "system"
         setContent {
+            // Light or dark: follows the phone unless the farmer picked one in settings.
+            val dark = when (theme) {
+                "light" -> false
+                "dark" -> true
+                else -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            val pal = if (dark) DarkPalette else LightPalette
+            androidx.compose.runtime.CompositionLocalProvider(LocalPalette provides pal) {
             MaterialTheme(
-                colorScheme = darkColorScheme(primary = Green, background = Black, surface = Charcoal),
+                colorScheme = if (dark) darkColorScheme(primary = Green, background = Black, surface = Charcoal)
+                else androidx.compose.material3.lightColorScheme(primary = pal.accent, background = pal.bg, surface = pal.surface),
                 shapes = SquareShapes,
             ) {
                 val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
@@ -100,6 +110,11 @@ class MainActivity : ComponentActivity() {
                             officer = it.filter { ch -> ch.isDigit() || ch == '+' }
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
                         },
+                        theme = theme,
+                        onTheme = {
+                            theme = it
+                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("theme", it).apply()
+                        },
                         state = state,
                         onState = {
                             state = it
@@ -112,6 +127,7 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                 }
+            }
             }
         }
         // only on a fresh start, so a recreated activity does not run the test again
@@ -135,6 +151,7 @@ class MainActivity : ComponentActivity() {
 
     private var officer by mutableStateOf("")
     private var state by mutableStateOf("")
+    private var theme by mutableStateOf("system")
     private var asking by mutableStateOf(false)
 
     // Answers from the questions screen, plus month and state, then the advice.

@@ -53,4 +53,8 @@
     <string name="show_advice">सल्ला पाहा</string>
     <string name="state">राज्य</string>
     <string name="choose_state">राज्य निवडा</string>
+    <string name="theme">रूप</string>
+    <string name="theme_system">फोनप्रमाणे</string>
+    <string name="theme_light">फिकट</string>
+    <string name="theme_dark">गडद</string>
 </resources>
