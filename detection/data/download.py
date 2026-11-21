@@ -224,9 +224,20 @@ def get_plantseg(raw):
     extract(zpath, raw / "plantseg" / "extracted")
 
 
+def already_complete(dest):
+    """A .complete marker means every file is there, so we do not even ask
+    Mendeley (it sometimes refuses requests from cloud machines like Colab)."""
+    if (dest / ".complete").exists():
+        print(f"  {dest.name}: already complete, skipping")
+        return True
+    return False
+
+
 def get_indonesia(raw):
-    meta = get_json(MENDELEY_API.format(id="ptz377bwb8"))
     dest = raw / "potato_indonesia"
+    if already_complete(dest):
+        return
+    meta = get_json(MENDELEY_API.format(id="ptz377bwb8"))
     n = 0
     for f in meta["files"]:
         cls = INDONESIA_FOLDERS.get(f.get("folder_id"))
@@ -236,16 +247,20 @@ def get_indonesia(raw):
         if fetch(cd["download_url"], dest / cls / f["filename"], size=f["size"], sha256=cd.get("sha256_hash")):
             n += 1
     print(f"  potato_indonesia: {n} new files")
+    (dest / ".complete").write_text("ok\n")
 
 
 def get_ethiopia(raw):
-    meta = get_json(MENDELEY_API.format(id="v4w72bsts5") + "/files?folder_id=root&version=2")
     dest = raw / "potato_ethiopia"
+    if already_complete(dest):
+        return
+    meta = get_json(MENDELEY_API.format(id="v4w72bsts5") + "/files?folder_id=root&version=2")
     for f in meta:
         cd = f["content_details"]
         out = dest / f["filename"]
         fetch(cd["download_url"], out, size=f["size"], sha256=cd.get("sha256_hash"))
         extract(out, dest / "extracted")
+    (dest / ".complete").write_text("ok\n")
 
 
 SOURCES = {
