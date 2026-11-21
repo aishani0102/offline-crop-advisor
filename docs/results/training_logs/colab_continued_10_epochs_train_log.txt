@@ -1,0 +1,12 @@
+start: val macro F1 0.9520, field val macro F1 0.8066
+extra epoch 1/10: loss 0.5676, val macro F1 0.9493, field val macro F1 0.8008, 86s
+extra epoch 2/10: loss 0.5668, val macro F1 0.9502, field val macro F1 0.7863, 80s
+extra epoch 3/10: loss 0.5611, val macro F1 0.9518, field val macro F1 0.8027, 85s
+extra epoch 4/10: loss 0.5574, val macro F1 0.9514, field val macro F1 0.7920, 81s
+extra epoch 5/10: loss 0.5493, val macro F1 0.9532, field val macro F1 0.8211, 78s  (new best)
+extra epoch 6/10: loss 0.5446, val macro F1 0.9552, field val macro F1 0.8174, 77s  (new best)
+extra epoch 7/10: loss 0.5443, val macro F1 0.9562, field val macro F1 0.8247, 76s  (new best)
+extra epoch 8/10: loss 0.5397, val macro F1 0.9561, field val macro F1 0.8224, 78s
+extra epoch 9/10: loss 0.5419, val macro F1 0.9566, field val macro F1 0.8235, 78s  (new best)
+extra epoch 10/10: loss 0.5397, val macro F1 0.9561, field val macro F1 0.8239, 79s
+temperature 0.709, total extra time 800s, best val macro F1 0.9566
