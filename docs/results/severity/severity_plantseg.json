@@ -1,0 +1,74 @@
+{
+ "images": 813,
+ "mean_iou": 0.18033591126989645,
+ "median_iou": 0.15500188750471877,
+ "mean_dice": 0.27896866962758265,
+ "median_dice": 0.26840109818276897,
+ "share_iou_over_0_5": 0.04059040590405904,
+ "pearson_lesion_area_pred_vs_gt": 0.07732587022005856,
+ "by_split": {
+  "train": {
+   "n": 563,
+   "mean_iou": 0.17647561894634586,
+   "mean_dice": 0.273452781556082
+  },
+  "val": {
+   "n": 90,
+   "mean_iou": 0.18050046914265105,
+   "mean_dice": 0.2794209521770883
+  },
+  "test": {
+   "n": 160,
+   "mean_iou": 0.19382675107996553,
+   "mean_dice": 0.2981232918450785
+  }
+ },
+ "by_disease": {
+  "potato early blight": {
+   "n": 68,
+   "mean_iou": 0.20532272379756944,
+   "mean_dice": 0.3096251678879435
+  },
+  "potato late blight": {
+   "n": 78,
+   "mean_iou": 0.2114317487406092,
+   "mean_dice": 0.3158011454983119
+  },
+  "tomato bacterial leaf spot": {
+   "n": 90,
+   "mean_iou": 0.1599157002291681,
+   "mean_dice": 0.255255839046928
+  },
+  "tomato early blight": {
+   "n": 153,
+   "mean_iou": 0.1649943539630629,
+   "mean_dice": 0.26165687072686483
+  },
+  "tomato late blight": {
+   "n": 117,
+   "mean_iou": 0.20767522029911245,
+   "mean_dice": 0.30711581039887464
+  },
+  "tomato leaf mold": {
+   "n": 102,
+   "mean_iou": 0.2293295518269874,
+   "mean_dice": 0.3493383686637687
+  },
+  "tomato mosaic virus": {
+   "n": 43,
+   "mean_iou": 0.08495505178942142,
+   "mean_dice": 0.1381076957159946
+  },
+  "tomato septoria leaf spot": {
+   "n": 99,
+   "mean_iou": 0.19809366162985903,
+   "mean_dice": 0.3141479020620391
+  },
+  "tomato yellow leaf curl virus": {
+   "n": 63,
+   "mean_iou": 0.08839635358412348,
+   "mean_dice": 0.15085181374984064
+  }
+ },
+ "note": "PlantSeg masks mark lesions only, so leaf area (and our severity percentage) cannot be checked directly. IoU and Dice compare lesion masks over the whole image. All tomato and potato disease images are used. The colour thresholds were picked on 220 PlantSeg train images, so the test split number is the clean one."
+}
