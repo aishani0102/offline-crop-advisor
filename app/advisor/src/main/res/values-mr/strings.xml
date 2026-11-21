@@ -38,4 +38,19 @@
     <string name="no_leaf">फोटोत पान स्पष्ट सापडले नाही, म्हणून प्रसार दाखवला नाही. एका पानाचा जवळून फोटो घ्या.</string>
     <string name="wait_days">काढणीपूर्वीच्या शेवटच्या %1$d दिवसांत फवारणी करू नका</string>
     <string name="wait_label">प्रतीक्षा कालावधी लेबलवर पाहा</string>
+    <string name="q_intro">चांगल्या सल्ल्यासाठी तीन प्रश्न</string>
+    <string name="q_rain">गेल्या 3 दिवसांत पाऊस झाला?</string>
+    <string name="ans_yes">हो</string>
+    <string name="ans_no">नाही</string>
+    <string name="ans_unsure">माहीत नाही</string>
+    <string name="q_stage">पिकाची अवस्था</string>
+    <string name="stage_seedling">रोप</string>
+    <string name="stage_growing">वाढीची</string>
+    <string name="stage_flowering">फुले किंवा फळे</string>
+    <string name="stage_harvest">काढणीजवळ</string>
+    <string name="q_sprayed">गेल्या 7 दिवसांत काही फवारले?</string>
+    <string name="skip">वगळा</string>
+    <string name="show_advice">सल्ला पाहा</string>
+    <string name="state">राज्य</string>
+    <string name="choose_state">राज्य निवडा</string>
 </resources>

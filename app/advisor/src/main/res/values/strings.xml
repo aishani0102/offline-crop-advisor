@@ -39,4 +39,19 @@
     <string name="no_leaf">No clear leaf found in the photo, so the spread is not shown. Take a closer photo of one leaf.</string>
     <string name="wait_days">do not spray in the last %1$d days before harvest</string>
     <string name="wait_label">check the waiting period on the label</string>
+    <string name="q_intro">Three questions for better advice</string>
+    <string name="q_rain">Rain in the last 3 days?</string>
+    <string name="ans_yes">Yes</string>
+    <string name="ans_no">No</string>
+    <string name="ans_unsure">Not sure</string>
+    <string name="q_stage">Crop stage</string>
+    <string name="stage_seedling">Seedling</string>
+    <string name="stage_growing">Growing</string>
+    <string name="stage_flowering">Flowering or fruiting</string>
+    <string name="stage_harvest">Near harvest</string>
+    <string name="q_sprayed">Sprayed anything in the last 7 days?</string>
+    <string name="skip">Skip</string>
+    <string name="show_advice">Show advice</string>
+    <string name="state">State</string>
+    <string name="choose_state">Choose state</string>
 </resources>

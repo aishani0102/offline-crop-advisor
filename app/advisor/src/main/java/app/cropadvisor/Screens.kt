@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -30,6 +32,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -103,18 +107,18 @@ fun Header(subtitle: String) {
 @Composable
 fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
     Button(
-        onClick = onClick, enabled = enabled, shape = RectangleShape, modifier = modifier.height(52.dp),
+        onClick = onClick, enabled = enabled, shape = RectangleShape, modifier = modifier.heightIn(min = 52.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Black),
-    ) { Text(text, fontWeight = FontWeight.SemiBold) }
+    ) { Text(text, fontWeight = FontWeight.SemiBold, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
 }
 
 @Composable
 fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedButton(
-        onClick = onClick, shape = RectangleShape, modifier = modifier.height(52.dp),
+        onClick = onClick, shape = RectangleShape, modifier = modifier.heightIn(min = 52.dp),
         border = BorderStroke(1.dp, Green),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = Green),
-    ) { Text(text) }
+    ) { Text(text, textAlign = androidx.compose.ui.text.style.TextAlign.Center) }
 }
 
 @Composable
@@ -126,6 +130,7 @@ fun CropToggle(label: String, selected: Boolean, modifier: Modifier, onClick: ()
 @Composable
 fun HomeScreen(
     crop: String, busy: Boolean, officer: String, lang: String, onLang: (String) -> Unit, onOfficer: (String) -> Unit,
+    state: String, onState: (String) -> Unit,
     onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize().background(Black)) {
@@ -148,6 +153,9 @@ fun HomeScreen(
             PrimaryButton(stringResource(if (busy) R.string.checking else R.string.take_photo), Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
             SecondaryButton(stringResource(R.string.gallery), Modifier.fillMaxWidth(), onClick = onGallery)
             Spacer(Modifier.height(12.dp))
+            Text(stringResource(R.string.state), color = Muted, fontSize = 13.sp)
+            StatePicker(state, onState)
+            Spacer(Modifier.height(4.dp))
             Text(stringResource(R.string.officer), color = Muted, fontSize = 13.sp)
             androidx.compose.material3.OutlinedTextField(
                 officer, onOfficer, singleLine = true, shape = RectangleShape, modifier = Modifier.fillMaxWidth(),
@@ -222,6 +230,69 @@ fun ScoreBar(name: String, p: Float) {
         }
         Box(Modifier.fillMaxWidth().height(4.dp).background(Charcoal)) {
             Box(Modifier.fillMaxWidth(p.coerceIn(0.01f, 1f)).height(4.dp).background(Green))
+        }
+    }
+}
+
+// One row of square options. Tapping the chosen one again clears it.
+@Composable
+fun OptionRow(options: List<Pair<String, Int>>, chosen: String?, onPick: (String?) -> Unit) {
+    // same height for every option in the row, even when one label wraps
+    Row(Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.forEach { (key, label) ->
+            CropToggle(stringResource(label), key == chosen, Modifier.weight(1f).fillMaxHeight()) { onPick(if (key == chosen) null else key) }
+        }
+    }
+}
+
+// Asked after a confident disease or pest result. Every question can be left
+// blank, and Skip goes straight to the advice.
+@Composable
+fun QuestionsScreen(crop: String, onDone: (rain: String?, stage: String?, sprayed: String?) -> Unit) {
+    var rain by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    var stage by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    var sprayed by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    Column(Modifier.fillMaxSize().background(Black).verticalScroll(rememberScrollState())) {
+        Header(stringResource(if (crop == "potato") R.string.potato else R.string.tomato))
+        Column(Modifier.navigationBarsPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(stringResource(R.string.q_intro), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(4.dp))
+            Text(stringResource(R.string.q_rain), color = Muted, fontSize = 14.sp)
+            OptionRow(listOf("yes" to R.string.ans_yes, "no" to R.string.ans_no, "unsure" to R.string.ans_unsure), rain) { rain = it }
+            Spacer(Modifier.height(4.dp))
+            Text(stringResource(R.string.q_stage), color = Muted, fontSize = 14.sp)
+            OptionRow(listOf("seedling" to R.string.stage_seedling, "growing" to R.string.stage_growing), stage) { stage = it }
+            OptionRow(listOf("flowering" to R.string.stage_flowering, "harvest" to R.string.stage_harvest), stage) { stage = it }
+            Spacer(Modifier.height(4.dp))
+            Text(stringResource(R.string.q_sprayed), color = Muted, fontSize = 14.sp)
+            OptionRow(listOf("yes" to R.string.ans_yes, "no" to R.string.ans_no), sprayed) { sprayed = it }
+            Spacer(Modifier.height(12.dp))
+            PrimaryButton(stringResource(R.string.show_advice), Modifier.fillMaxWidth()) { onDone(rain, stage, sprayed) }
+            SecondaryButton(stringResource(R.string.skip), Modifier.fillMaxWidth()) { onDone(null, null, null) }
+        }
+    }
+}
+
+val STATES = listOf(
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Delhi", "Goa", "Gujarat",
+    "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", "Kerala", "Ladakh",
+    "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry",
+    "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+    "West Bengal",
+)
+
+@Composable
+fun StatePicker(state: String, onState: (String) -> Unit) {
+    var open by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    Box {
+        SecondaryButton(state.ifEmpty { stringResource(R.string.choose_state) }, Modifier.fillMaxWidth()) { open = true }
+        androidx.compose.material3.DropdownMenu(
+            open, { open = false }, shape = RectangleShape, containerColor = Charcoal,
+            modifier = Modifier.height(360.dp),
+        ) {
+            STATES.forEach { s ->
+                androidx.compose.material3.DropdownMenuItem({ Text(s, color = Color.White) }, { onState(s); open = false })
+            }
         }
     }
 }

@@ -38,4 +38,19 @@
     <string name="no_leaf">फोटो में पत्ती साफ नहीं मिली, इसलिए फैलाव नहीं दिखाया गया। एक पत्ती की पास से फोटो लें।</string>
     <string name="wait_days">तुड़ाई से %1$d दिन पहले तक छिड़काव न करें</string>
     <string name="wait_label">प्रतीक्षा अवधि लेबल पर देखें</string>
+    <string name="q_intro">बेहतर सलाह के लिए तीन सवाल</string>
+    <string name="q_rain">पिछले 3 दिनों में बारिश हुई?</string>
+    <string name="ans_yes">हां</string>
+    <string name="ans_no">नहीं</string>
+    <string name="ans_unsure">पता नहीं</string>
+    <string name="q_stage">फसल की अवस्था</string>
+    <string name="stage_seedling">पौध</string>
+    <string name="stage_growing">बढ़वार</string>
+    <string name="stage_flowering">फूल या फल</string>
+    <string name="stage_harvest">कटाई के पास</string>
+    <string name="q_sprayed">पिछले 7 दिनों में कोई छिड़काव किया?</string>
+    <string name="skip">छोड़ें</string>
+    <string name="show_advice">सलाह देखें</string>
+    <string name="state">राज्य</string>
+    <string name="choose_state">राज्य चुनें</string>
 </resources>

@@ -38,4 +38,19 @@
     <string name="no_leaf">ఫోటోలో ఆకు స్పష్టంగా కనిపించలేదు, కాబట్టి వ్యాప్తి చూపలేదు. ఒక ఆకును దగ్గరగా ఫోటో తీయండి.</string>
     <string name="wait_days">కోతకు ముందు చివరి %1$d రోజుల్లో పిచికారీ చేయవద్దు</string>
     <string name="wait_label">వేచి ఉండాల్సిన కాలం లేబుల్‌పై చూడండి</string>
+    <string name="q_intro">మంచి సలహా కోసం మూడు ప్రశ్నలు</string>
+    <string name="q_rain">గత 3 రోజుల్లో వర్షం పడిందా?</string>
+    <string name="ans_yes">అవును</string>
+    <string name="ans_no">లేదు</string>
+    <string name="ans_unsure">తెలియదు</string>
+    <string name="q_stage">పంట దశ</string>
+    <string name="stage_seedling">నారు</string>
+    <string name="stage_growing">పెరుగుదల</string>
+    <string name="stage_flowering">పూత లేదా కాత</string>
+    <string name="stage_harvest">కోతకు దగ్గర</string>
+    <string name="q_sprayed">గత 7 రోజుల్లో ఏదైనా పిచికారీ చేశారా?</string>
+    <string name="skip">వదిలేయండి</string>
+    <string name="show_advice">సలహా చూడండి</string>
+    <string name="state">రాష్ట్రం</string>
+    <string name="choose_state">రాష్ట్రం ఎంచుకోండి</string>
 </resources>

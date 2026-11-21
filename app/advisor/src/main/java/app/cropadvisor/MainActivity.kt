@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         officer = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
+        state = getSharedPreferences("settings", MODE_PRIVATE).getString("state", "") ?: ""
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(primary = Green, background = Black, surface = Charcoal),
@@ -82,7 +83,10 @@ class MainActivity : ComponentActivity() {
                 }
                 val d = diagnosis
                 val p = photo
-                if (d != null && p != null) {
+                if (d != null && p != null && asking) {
+                    BackHandler { diagnosis = null; asking = false }
+                    QuestionsScreen(d.crop) { r, s, sp -> asking = false; adviseWith(d, r, s, sp) }
+                } else if (d != null && p != null) {
                     BackHandler { diagnosis = null }
                     val c = case
                     ResultScreen(
@@ -95,6 +99,11 @@ class MainActivity : ComponentActivity() {
                         onOfficer = {
                             officer = it.filter { ch -> ch.isDigit() || ch == '+' }
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
+                        },
+                        state = state,
+                        onState = {
+                            state = it
+                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("state", it).apply()
                         },
                         onCrop = { crop = it },
                         onCamera = { photoUri = newPhotoUri(); camera.launch(photoUri!!) },
@@ -125,6 +134,16 @@ class MainActivity : ComponentActivity() {
     private var vision: Vision? = null
 
     private var officer by mutableStateOf("")
+    private var state by mutableStateOf("")
+    private var asking by mutableStateOf(false)
+
+    // Answers from the questions screen, plus month and state, then the advice.
+    private fun adviseWith(d: Diagnosis, rain: String?, stage: String?, sprayed: String?) {
+        val month = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH) + 1
+        val a = Answers(rain, stage, sprayed, month, state)
+        Perf.log(this, "answers rain=$rain stage=$stage sprayed=$sprayed month=$month state=$state")
+        thread { startAdvice(d, a) }
+    }
     private var case by mutableStateOf<Case?>(null)
     private var advice by mutableStateOf("")
     private var adviceNote by mutableStateOf("")
@@ -158,8 +177,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startAdvice(d: Diagnosis) {
-        val c = Case.from(d, lang)
+    private fun startAdvice(d: Diagnosis, answers: Answers? = null) {
+        val c = Case.from(d, lang, answers)
         val tmpl = advisor.template(c)
         runOnUiThread { case = c; advice = tmpl; adviceNote = getString(R.string.src_guide) }
         // Uncertain results never go to Llama, and Llama only writes en and hi.
@@ -242,8 +261,13 @@ class MainActivity : ComponentActivity() {
                     Perf.log(this, "severity pct=${s.severityPct} band=${s.band} ms=${android.os.SystemClock.elapsedRealtime() - t0}")
                 }
                 Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
-                runOnUiThread { photo = bmp; diagnosis = d }
-                startAdvice(d)
+                // Questions only for a confident disease or pest result with a leaf found.
+                val ask = !d.uncertain && !d.label.endsWith("_healthy") && d.band != "no_leaf"
+                // debug: --es answers rain,stage,sprayed (for example yes,harvest,no) answers without tapping
+                val preset = intent.getStringExtra("answers")?.split(",")?.map { it.takeIf { v -> v != "-" } }
+                runOnUiThread { advice = ""; photo = bmp; diagnosis = d; asking = ask && preset == null }
+                if (ask && preset != null) adviseWith(d, preset.getOrNull(0), preset.getOrNull(1), preset.getOrNull(2))
+                else if (!ask) startAdvice(d)
             } catch (e: Throwable) {
                 Perf.log(this, "classify_error=$e")
             } finally {

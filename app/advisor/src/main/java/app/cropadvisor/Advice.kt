@@ -15,14 +15,39 @@ import java.util.Locale
 // treatment is named. If severity is missing for a disease (should not happen)
 // we give the non chemical steps only and add the KVK line.
 
+// The farmer's answers on the questions screen. null means skipped or not asked.
+// rain: yes / no / unsure, stage: seedling / growing / flowering / harvest,
+// sprayed: yes / no. month (1 to 12) is from the phone clock, state from settings.
+data class Answers(
+    val rain: String? = null, val stage: String? = null, val sprayed: String? = null,
+    val month: Int = 0, val state: String = "",
+) {
+    // Plain English for the Llama prompt. No numbers, so the safety check is unchanged.
+    fun promptText(): String {
+        val parts = mutableListOf<String>()
+        rain?.let { parts += "Rain in the last few days: " + mapOf("yes" to "yes", "no" to "no", "unsure" to "not sure")[it] }
+        stage?.let {
+            parts += "Crop stage: " + mapOf(
+                "seedling" to "seedling", "growing" to "growing", "flowering" to "flowering or fruiting",
+                "harvest" to "near harvest",
+            )[it]
+        }
+        sprayed?.let { parts += "Sprayed in the last week: $it" }
+        if (month in 1..12) parts += "Month: " + java.text.DateFormatSymbols(Locale.US).months[month - 1]
+        if (state.isNotEmpty()) parts += "State: $state"
+        return parts.joinToString(". ")
+    }
+}
+
 data class Case(
     val label: String, val crop: String, val condition: String, val type: String,
     val confidence: Float, val uncertain: Boolean, val band: String?, val pct: Float?, val lang: String = "en",
+    val answers: Answers? = null,
 ) {
     val needsReferral get() = uncertain || band == "severe" || (type != "healthy" && band == null)
 
     companion object {
-        fun from(d: Diagnosis, lang: String = "en"): Case {
+        fun from(d: Diagnosis, lang: String = "en", answers: Answers? = null): Case {
             val crop = d.label.substringBefore('_')
             val type = when {
                 d.label.endsWith("_healthy") -> "healthy"
@@ -32,7 +57,7 @@ data class Case(
             val band = if (type == "healthy") "none" else d.band?.takeIf { it != "no_leaf" }
             return Case(
                 d.label, crop, conditionName(d.label), type, d.confidence, d.uncertain || d.band == "no_leaf",
-                band, d.sevPct?.toFloat(), lang,
+                band, d.sevPct?.toFloat(), lang, answers,
             )
         }
     }
@@ -50,10 +75,12 @@ class Facts(val lang: String, val kind: String) {
     var noDose = ""
     var referral = ""
     var watch = ""
+    var context = listOf<String>()   // kb.json "context" lines picked by the answers
+    var urgentFirst = false          // put the severity note before everything else
 
     // All fact text in one string, the allowed source for the safety check.
     fun text(): String = (listOf(title, summary, severityNote, chemicalNote, noDose, referral, watch) +
-        signs + steps + chemicals + safety).filter { it.isNotEmpty() }.joinToString("\n")
+        signs + steps + chemicals + safety + context).filter { it.isNotEmpty() }.joinToString("\n")
 }
 
 // Languages the app offers. Llama only writes en and hi (the advisory eval only
@@ -136,12 +163,37 @@ class Advisor(private val ctx: Context) {
         f.title = title(c)
         f.summary = entry.lang("description", lang)
         f.signs = entry.langList("recognise", lang).take(if (compact) 1 else 2)
-        f.steps = entry.langList("cultural_ipm", lang).take(if (compact) 2 else 3)
+        val a = c.answers
+        // Seedling stage: steps that talk about the nursery or seed go first. The
+        // choice is made on the English text, then the same order is used for
+        // every language, so only the order changes, never the content.
+        val allSteps = entry.langList("cultural_ipm", lang)
+        val enSteps = entry.langList("cultural_ipm", "en")
+        val order = if (a?.stage == "seedling") {
+            allSteps.indices.sortedBy { i -> if (Regex("nursery|seed").containsMatchIn(enSteps.getOrElse(i) { "" }.lowercase())) 0 else 1 }
+        } else allSteps.indices.toList()
+        f.steps = order.map { allSteps[it] }.take(if (compact) 2 else 3)
         if (band != null) f.severityNote = entry.getJSONObject("severity").lang(band, lang)
+        // Rain lately and the KB says rain or humidity spreads this problem:
+        // the severity note goes first.
+        val rainRisk = entry.optJSONObject("context")?.optBoolean("rain_raises_risk") == true
+        f.urgentFirst = a?.rain == "yes" && rainRisk && f.severityNote.isNotEmpty()
         if (band == "moderate" || band == "severe") {
             val all = entry.getJSONArray("chemicals")
-            val n = if (compact) minOf(2, all.length()) else all.length()
-            f.chemicals = List(n) { chemLine(all.getJSONObject(it), lang) }
+            // Near harvest: products with the shortest waiting period first.
+            val chems = List(all.length()) { all.getJSONObject(it) }.let { l ->
+                if (a?.stage == "harvest") l.sortedBy { it.optInt("waiting_days", Int.MAX_VALUE).takeIf { d -> d > 0 } ?: Int.MAX_VALUE } else l
+            }
+            val n = if (compact) minOf(2, chems.size) else chems.size
+            f.chemicals = chems.take(n).map { chemLine(it, lang) }
+            if (chems.isNotEmpty()) {
+                val ctxLines = kb.getJSONObject("context")
+                val picked = mutableListOf<String>()
+                if (a?.stage == "harvest") picked += ctxLines.lang("harvest_wait", lang)
+                if (a?.rain == "yes") picked += ctxLines.lang("before_rain", lang)
+                if (a?.sprayed == "yes") { picked += ctxLines.lang("label_dose", lang); picked += ctxLines.lang("no_mix", lang) }
+                f.context = picked.distinct()
+            }
             f.chemicalNote = entry.lang("chemical_note", lang)
             if (all.length() > 0) {
                 val gs = kb.getJSONObject("general_safety").getJSONArray(lang).strings()
@@ -150,6 +202,8 @@ class Advisor(private val ctx: Context) {
                 f.noDose = kb.lang("no_dose_text", lang)
             }
         }
+        // do not repeat a safety line that is already shown
+        f.context = f.context.filter { it !in f.safety }
         if (c.needsReferral) f.referral = kb.lang("referral", lang)
         return f
     }
@@ -161,6 +215,7 @@ class Advisor(private val ctx: Context) {
         val lines = mutableListOf<String>()
         if (f.kind == "uncertain") return listOf(f.summary, f.referral).joinToString("\n")
         lines += f.title + if (c.lang == "en") "." else ""
+        if (f.urgentFirst) lines += f.severityNote
         lines += f.summary
         if (f.kind == "healthy") {
             lines += res("keep_healthy") + ":"
@@ -168,7 +223,7 @@ class Advisor(private val ctx: Context) {
             lines += f.watch
             return lines.joinToString("\n")
         }
-        if (f.severityNote.isNotEmpty()) lines += f.severityNote
+        if (f.severityNote.isNotEmpty() && !f.urgentFirst) lines += f.severityNote
         if (f.signs.isNotEmpty()) {
             lines += res("signs") + ":"
             lines += f.signs.map { "- $it" }
@@ -178,6 +233,7 @@ class Advisor(private val ctx: Context) {
         if (f.chemicals.isNotEmpty()) {
             lines += res("spray") + ":"
             lines += f.chemicals.map { "- $it" }
+            lines += f.context
             lines += f.safety
         } else if (f.noDose.isNotEmpty()) {
             lines += f.noDose
@@ -197,18 +253,25 @@ class Advisor(private val ctx: Context) {
             "Write $words words or less, in plain sentences, no headings."
         val lines = mutableListOf<String>()
         if (f.title.isNotEmpty()) lines += f.title
+        if (f.urgentFirst) lines += f.severityNote
         lines += f.summary
         lines += f.signs
-        if (f.severityNote.isNotEmpty()) lines += f.severityNote
+        if (f.severityNote.isNotEmpty() && !f.urgentFirst) lines += f.severityNote
         lines += f.steps
         if (f.watch.isNotEmpty()) lines += f.watch
         if (f.chemicals.isNotEmpty()) {
             lines += f.chemicalNote
             lines += f.chemicals
+            lines += f.context
             lines += f.safety
         }
         if (f.noDose.isNotEmpty()) lines += f.noDose
         var user = "FACTS:\n" + lines.joinToString("\n") { "- $it" }
+        // The answers only help the model choose what to say first. The rules
+        // above still say: use only the FACTS.
+        c.answers?.promptText()?.takeIf { it.isNotEmpty() }?.let {
+            user += "\n\nFARM (from the farmer, use it only to choose what matters most, not as a fact): $it."
+        }
         if (f.kind == "healthy") user += "\n\nThe leaf is healthy. Give a short reassurance and two or three prevention tips."
         if (f.referral.isNotEmpty()) user += "\n\nEnd with this exact sentence: " + f.referral
         return system to user
@@ -251,7 +314,7 @@ class Advisor(private val ctx: Context) {
         if (c.uncertain) cond = "possible $cond (unsure)"
         val sev = if (c.band in listOf("mild", "moderate", "severe")) ", ${c.band}" else ""
         val conf = Math.round(c.confidence * 100)
-        return "KVK help: ${c.crop} $cond$sev, app confidence $conf%. Date $d, village ______. " +
+        return "KVK help: ${c.crop} $cond$sev, app confidence $conf%. Date $d, village ______${c.answers?.state?.takeIf { it.isNotEmpty() }?.let { ", $it" } ?: ""}. " +
             "Seen by offline crop app. Please advise."
     }
 

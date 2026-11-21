@@ -38,4 +38,19 @@
     <string name="no_leaf">படத்தில் இலை தெளிவாகத் தெரியவில்லை, எனவே பரவல் காட்டப்படவில்லை. ஒரு இலையை அருகில் படம் எடுக்கவும்.</string>
     <string name="wait_days">அறுவடைக்கு முந்தைய கடைசி %1$d நாட்களில் தெளிக்க வேண்டாம்</string>
     <string name="wait_label">காத்திருப்புக் காலத்தை லேபிளில் பார்க்கவும்</string>
+    <string name="q_intro">சிறந்த ஆலோசனைக்கு மூன்று கேள்விகள்</string>
+    <string name="q_rain">கடந்த 3 நாட்களில் மழை பெய்ததா?</string>
+    <string name="ans_yes">ஆம்</string>
+    <string name="ans_no">இல்லை</string>
+    <string name="ans_unsure">தெரியவில்லை</string>
+    <string name="q_stage">பயிர் நிலை</string>
+    <string name="stage_seedling">நாற்று</string>
+    <string name="stage_growing">வளர்ச்சி</string>
+    <string name="stage_flowering">பூ அல்லது காய்</string>
+    <string name="stage_harvest">அறுவடைக்கு அருகில்</string>
+    <string name="q_sprayed">கடந்த 7 நாட்களில் ஏதாவது தெளித்தீர்களா?</string>
+    <string name="skip">தவிர்</string>
+    <string name="show_advice">ஆலோசனையைக் காட்டு</string>
+    <string name="state">மாநிலம்</string>
+    <string name="choose_state">மாநிலத்தைத் தேர்வு செய்</string>
 </resources>

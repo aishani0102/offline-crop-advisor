@@ -38,4 +38,19 @@
     <string name="no_leaf">ছবিতে পাতা স্পষ্ট পাওয়া যায়নি, তাই বিস্তার দেখানো হয়নি। একটি পাতার কাছ থেকে ছবি তুলুন।</string>
     <string name="wait_days">ফসল তোলার আগের %1$d দিন স্প্রে করবেন না</string>
     <string name="wait_label">অপেক্ষার সময় লেবেলে দেখুন</string>
+    <string name="q_intro">ভালো পরামর্শের জন্য তিনটি প্রশ্ন</string>
+    <string name="q_rain">গত 3 দিনে বৃষ্টি হয়েছে?</string>
+    <string name="ans_yes">হ্যাঁ</string>
+    <string name="ans_no">না</string>
+    <string name="ans_unsure">জানি না</string>
+    <string name="q_stage">ফসলের অবস্থা</string>
+    <string name="stage_seedling">চারা</string>
+    <string name="stage_growing">বাড়ন্ত</string>
+    <string name="stage_flowering">ফুল বা ফল</string>
+    <string name="stage_harvest">তোলার কাছাকাছি</string>
+    <string name="q_sprayed">গত 7 দিনে কিছু স্প্রে করেছেন?</string>
+    <string name="skip">বাদ দিন</string>
+    <string name="show_advice">পরামর্শ দেখুন</string>
+    <string name="state">রাজ্য</string>
+    <string name="choose_state">রাজ্য বাছুন</string>
 </resources>
