@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from knowledge import check_case, load_kb  # noqa: E402
 from safety import check_output, safe_advice  # noqa: E402
 from template import template_advice  # noqa: E402
+from run_advice import advise  # noqa: E402
 
 KB = load_kb()
 
@@ -63,6 +64,17 @@ TESTS = [
     ("hindi asked, english given", case("tomato_septoria_leaf_spot", "moderate", 20, lang="hi"),
      "Remove the spotted leaves.", ["wrong_language"]),
     ("cut off", case("tomato_early_blight", "moderate", 18.5), GOOD_MODERATE_EN, ["cut_off"]),
+    ("wrong crop and problem", case("tomato_early_blight", "severe", 45),
+     "The crop is wheat. The problem is pest infestation. Please show the plant to your KVK.",
+     ["crop_or_condition_mismatch"]),
+    ("other disease named", case("tomato_early_blight", "moderate", 18.5),
+     GOOD_MODERATE_EN + " This is late blight.", ["crop_or_condition_mismatch"]),
+    ("other crop named", case("potato_late_blight", "moderate", 20),
+     "Your tomato has late blight. Spray Mancozeb 75% WP.", ["crop_or_condition_mismatch"]),
+    ("hindi wrong crop", case("tomato_septoria_leaf_spot", "moderate", 20, lang="hi"),
+     "आपके गेहूं में सेप्टोरिया पत्ती धब्बा है। धब्बे वाली पत्तियां हटाएं।", ["crop_or_condition_mismatch"]),
+    ("barrier crop is allowed", case("tomato_yellow_leaf_curl_virus", "mild", 5),
+     "Your tomato has leaf curl. Grow maize around the field and pull out infected plants.", []),
 ]
 
 
@@ -86,6 +98,20 @@ def run():
                     if fails:
                         failed += 1
                         print("FAIL  template", label, band, lang, unc, fails)
+    # Low confidence makes a case uncertain even if the flag says false.
+    low = check_case({"label": "tomato_late_blight", "severity_band": "severe", "severity_pct": 40,
+                      "uncertain": False, "language": "en", "confidence": 0.41})
+    assert low["uncertain"], "low confidence must count as uncertain"
+
+    # Uncertain cases never reach the model.
+    class NoModel:
+        def encode_chat(self, text):
+            raise AssertionError("model was called for an uncertain case")
+    res = advise(low, NoModel(), KB)
+    assert res["mode"] == "template" and res["reason"] == "uncertain"
+    assert "1800-180-1551" in res["advice"] and "late blight" not in res["advice"].lower()
+    print("uncertain cases go to the template")
+
     final, fails, fallback = safe_advice("Use chlorpyrifos 5 ml.", case("tomato_early_blight", "moderate", 18.5), KB)
     assert fallback and "chlorpyrifos" not in final.lower()
     print("template checks done")

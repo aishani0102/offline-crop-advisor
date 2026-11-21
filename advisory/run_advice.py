@@ -125,9 +125,13 @@ class LlamaRunner:
 def advise(case, runner=None, kb=None, max_new_tokens=200, stream=None, question=None):
     """Full advisory step for one case. Returns a result dict."""
     kb = kb or load_kb()
-    if runner is None:
-        return {"advice": template_advice(case, kb), "mode": "template", "fails": [],
-                "fallback": False, "raw": None, "stats": {}}
+    if runner is None or case["uncertain"]:
+        # Uncertain cases never go to Llama: in testing it made up a crop and a
+        # problem ("wheat, pest infestation"). The template gives the KB text,
+        # a retake tip and the referral, with no diagnosis.
+        return {"advice": template_advice(case, kb), "mode": "template",
+                "reason": "uncertain" if case["uncertain"] else "no model",
+                "fails": [], "fallback": False, "raw": None, "stats": {}}
     messages, facts = build_messages(case, kb, question=question)
     ids = runner.encode_chat(to_llama3_text(messages))
     raw, stats = runner.generate(ids, max_new_tokens, on_text=stream)

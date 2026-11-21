@@ -7,9 +7,11 @@ Checks:
 2. numbers: every number in the output must also appear in the facts
    (doses, waiting days, severity percent, helpline). Number words next to
    a unit ("two grams") are also caught.
-3. referral: severe and uncertain cases must mention the KVK or the
+3. names: the output may not name a crop or a problem that is not in the
+   facts for this case (it once said "wheat, pest infestation").
+4. referral: severe and uncertain cases must mention the KVK or the
    Kisan Call Centre number.
-4. form: not empty, right script for the language, not cut off, not too long.
+5. form: not empty, right script for the language, not cut off, not too long.
 
 If any check fails we throw the model text away and use the template,
 which is written straight from the KB.
@@ -64,6 +66,17 @@ WORD_DOSE = re.compile(
     rf"\b{NUM_WORDS_EN}\s+{UNITS_EN}\b|(?<!\S){NUM_WORDS_HI}\s+{UNITS_HI}", re.IGNORECASE
 )
 
+# Crops and problems the output may only name if the case facts name them.
+CROPS = ["tomato", "potato", "wheat", "rice", "paddy", "maize", "corn", "cotton", "chilli", "chili",
+         "brinjal", "eggplant", "onion", "soybean", "sugarcane", "mustard", "groundnut", "banana",
+         "टमाटर", "आलू", "गेहूं", "गेहूँ", "धान", "चावल", "मक्का", "कपास", "मिर्च", "बैंगन", "प्याज",
+         "सोयाबीन", "गन्ना", "सरसों", "मूंगफली", "केला"]
+CONDITIONS = ["early blight", "late blight", "leaf mold", "leaf mould", "septoria", "leaf curl",
+              "leaf miner", "powdery mildew", "downy mildew", "rust", "wilt", "mosaic", "bacterial spot",
+              "anthracnose", "canker", "pest infestation", "nutrient deficiency", "root rot",
+              "अगेती झुलसा", "पछेती झुलसा", "पत्ती फफूंद", "सेप्टोरिया", "पत्ती मोड़क", "पत्ती सुरंगक",
+              "चूर्णिल आसिता", "रतुआ", "उकठा", "मोज़ेक", "विल्ट"]
+
 HELPLINE_DIGITS = "18001801551"
 KVK_WORDS = ["kvk", "krishi vigyan kendra", "कृषि विज्ञान केंद्र", "कृषि विज्ञान केन्द्र", "केवीके"]
 CALL_CENTRE_WORDS = ["kisan call centre", "kisan call center", "किसान कॉल सेंटर"]
@@ -99,6 +112,17 @@ def find_chemicals(text, kb):
             found.add(m.group(0))
     # "copper oxychloride" also matches "copper"; keep only the longest match.
     return {f for f in found if not any(f != g and f in g for g in found)}
+
+
+def wrong_names(text, source):
+    """Crop or problem names in text that the case facts do not contain."""
+    low, src = text.lower(), source.lower()
+    bad = []
+    for name in CROPS + CONDITIONS:
+        n = name.lower()
+        if re.search(r"(?<![a-z])" + re.escape(n) + r"(?![a-z])", low) and n not in src:
+            bad.append(name)
+    return bad
 
 
 def numbers(text):
@@ -154,6 +178,10 @@ def check_output(text, case, kb=None, facts=None, truncated=False, limit_length=
     word_doses = [m.group(0) for m in WORD_DOSE.finditer(text) if m.group(0).lower() not in source.lower()]
     if word_doses:
         fails.append("dose_in_words:" + ",".join(word_doses))
+
+    mismatch = wrong_names(text, source)
+    if mismatch:
+        fails.append("crop_or_condition_mismatch:" + ",".join(mismatch))
 
     if needs_referral(case) and not _has_referral(text):
         fails.append("missing_referral")

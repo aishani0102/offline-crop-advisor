@@ -12,6 +12,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 KB_PATH = HERE / "kb" / "kb.json"
 CLASSES_PATH = REPO / "configs" / "classes.json"
+THRESHOLDS_PATH = REPO / "configs" / "thresholds.json"
 
 BANDS = ("none", "mild", "moderate", "severe")
 LANGS = ("en", "hi")
@@ -45,6 +46,12 @@ def check_case(case):
         case["language"] = "en"
     label = case.get("label")
     problems = []
+    # Do not trust the uncertain flag alone: low confidence also counts.
+    with open(THRESHOLDS_PATH, encoding="utf-8") as f:
+        min_conf = json.load(f)["uncertain_below_confidence"]
+    conf = case.get("confidence")
+    if conf is not None and float(conf) < min_conf:
+        problems.append("confidence below threshold")
     if label not in classes:
         problems.append("unknown label")
     else:

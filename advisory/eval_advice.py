@@ -104,6 +104,7 @@ def summarise(rows, out_md, meta):
         f"| Raw output grounded (no chemical, dose or number outside the KB facts) | {pct(grounded, n)} |",
         f"| Referral present where needed (severe or uncertain) | {pct(ref_ok, len(need_ref))} |",
         f"| Fallback to the KB template triggered | {pct(n - raw_pass, n)} |",
+        f"| Uncertain cases answered by the KB template only (Llama not called) | {pct(sum(1 for r in rows if r['uncertain'] and r['mode'] == 'template'), sum(1 for r in rows if r['uncertain']))} |",
         f"| Final advice shown to the farmer passed every check | {pct(final_ok, len(rows))} |",
         "",
         "Why the raw output failed (one case can fail more than one check):",
@@ -213,7 +214,7 @@ def main():
             if cid in done:
                 continue
             res = advise(c, runner, kb, args.max_new_tokens)
-            final_fails = check_output(res["advice"], c, kb, limit_length=not (res["fallback"] or runner is None))
+            final_fails = check_output(res["advice"], c, kb, limit_length=res["mode"] == "llm" and not res["fallback"])
             row = {"id": cid, "label": c["label"], "severity_band": c["severity_band"],
                    "uncertain": c["uncertain"], "language": c["language"],
                    "needs_referral": c["uncertain"] or c["severity_band"] == "severe",
