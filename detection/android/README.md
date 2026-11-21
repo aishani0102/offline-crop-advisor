@@ -19,6 +19,10 @@ val r = Severity.estimate(bitmap)   // upright ARGB_8888 Bitmap, any size
 The bitmap must be upright (apply the EXIF rotation first, as for the classifier) and
 ARGB_8888. It is shrunk to 512 on the longer side inside. It takes about 100 ms per photo on
 a laptop JVM, so run it off the main thread.
+With the JIT turned off (closer to a debug build on the phone) a 341x256 photo takes
+about 0.3 s, down from 1.5 s before the faster morphology. Release builds are much faster.
+The photo is shrunk to 512 first, so its full size does not matter, but copying the full
+size bitmap before calling this (for example `bitmap.copy(...)`) does cost time.
 
 Settings at the top of the object, copied from `configs/thresholds.json`:
 `mildBelowPct = 10`, `severeFromPct = 30`, `minLeafShare = 0.05`. If you load

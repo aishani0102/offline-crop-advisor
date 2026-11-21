@@ -116,13 +116,24 @@ object Severity {
         val tmp = IntArray(w * h)
         val out = IntArray(w * h)
         for (y in 0 until h) for (x in 0 until w) {
-            var s = 0
-            for (j in -2..2) s += k[j + 2] * src[y * w + reflect(x + j, w)]
-            tmp[y * w + x] = s
+            val o = y * w
+            tmp[o + x] = if (x >= 2 && x < w - 2) {
+                src[o + x - 2] + 4 * src[o + x - 1] + 6 * src[o + x] + 4 * src[o + x + 1] + src[o + x + 2]
+            } else {
+                var s = 0
+                for (j in -2..2) s += k[j + 2] * src[o + reflect(x + j, w)]
+                s
+            }
         }
         for (y in 0 until h) for (x in 0 until w) {
-            var s = 0
-            for (j in -2..2) s += k[j + 2] * tmp[reflect(y + j, h) * w + x]
+            val s = if (y >= 2 && y < h - 2) {
+                tmp[(y - 2) * w + x] + 4 * tmp[(y - 1) * w + x] + 6 * tmp[y * w + x] +
+                    4 * tmp[(y + 1) * w + x] + tmp[(y + 2) * w + x]
+            } else {
+                var t = 0
+                for (j in -2..2) t += k[j + 2] * tmp[reflect(y + j, h) * w + x]
+                t
+            }
             out[y * w + x] = (s + 128) shr 8
         }
         return out
@@ -170,15 +181,11 @@ object Severity {
         return rows
     }
 
-    private fun prefix(m: BooleanArray, w: Int, h: Int): IntArray {
-        val p = IntArray(h * (w + 1))
-        for (y in 0 until h) for (x in 0 until w) {
-            p[y * (w + 1) + x + 1] = p[y * (w + 1) + x] + if (m[y * w + x]) 1 else 0
-        }
-        return p
-    }
-
-    // outside the image never counts, like OpenCV's default border for dilate and erode
+    // outside the image never counts, like OpenCV's default border for dilate and erode.
+    // For each row we store the distance to the nearest pixel that would change the result
+    // (a set pixel for dilate, an unset one for erode). A kernel row with half width hw then
+    // hits when that distance is <= hw. Same result as checking every kernel pixel, but much
+    // less work per pixel, which matters on the phone.
     private fun dilate(m: BooleanArray, w: Int, h: Int, k: List<IntArray>): BooleanArray =
         morph(m, w, h, k, true)
 
@@ -186,21 +193,38 @@ object Severity {
         morph(m, w, h, k, false)
 
     private fun morph(m: BooleanArray, w: Int, h: Int, k: List<IntArray>, isDilate: Boolean): BooleanArray {
-        val p = prefix(m, w, h)
-        val out = BooleanArray(w * h)
-        for (y in 0 until h) for (x in 0 until w) {
-            var res = !isDilate
-            for (row in k) {
-                val yy = y + row[0]
-                if (yy < 0 || yy >= h) continue
-                val x0 = max(x + row[1], 0)
-                val x1 = min(x + row[2], w - 1)
-                if (x1 < x0) continue
-                val cnt = p[yy * (w + 1) + x1 + 1] - p[yy * (w + 1) + x0]
-                if (isDilate && cnt > 0) { res = true; break }
-                if (!isDilate && cnt < x1 - x0 + 1) { res = false; break }
+        val far = 1 shl 20  // no such pixel in the row
+        val dist = IntArray(w * h)
+        for (y in 0 until h) {
+            val o = y * w
+            var last = -far
+            for (x in 0 until w) {
+                if (m[o + x] == isDilate) last = x
+                dist[o + x] = x - last
             }
-            out[y * w + x] = res
+            last = w + far
+            for (x in w - 1 downTo 0) {
+                if (m[o + x] == isDilate) last = x
+                val d = last - x
+                if (d < dist[o + x]) dist[o + x] = d
+            }
+        }
+        // kernel rows, centre row first so a hit is found early
+        val rows = k.sortedBy { abs(it[0]) }
+        val kd = IntArray(rows.size) { rows[it][0] }
+        val kh = IntArray(rows.size) { rows[it][2] }
+        val out = BooleanArray(w * h)
+        for (y in 0 until h) {
+            for (x in 0 until w) {
+                var hit = false
+                var i = 0
+                while (i < kd.size) {
+                    val yy = y + kd[i]
+                    if (yy >= 0 && yy < h && dist[yy * w + x] <= kh[i]) { hit = true; break }
+                    i++
+                }
+                out[y * w + x] = if (hit) isDilate else !isDilate
+            }
         }
         return out
     }
