@@ -111,7 +111,7 @@ python -I detection/severity.py --eval-plantseg --root <data_root>
 Lesion pixels divided by leaf pixels, from HSV colour rules. The second command
 compares our lesion mask with the PlantSeg lesion masks (IoU and Dice) and writes
 `docs/results/severity/`. Bands come from `configs/thresholds.json`.
-If no leaf is found, `severity_pct` and `severity_band` are `null`.
+If no leaf is found, `severity_pct` is `null` and `severity_band` is `"no_leaf"`.
 
 ## 7. Predict
 

@@ -86,7 +86,7 @@ def severity(bgr):
     leaf, lesion = segment(bgr)
     leaf_px = int((leaf > 0).sum())
     if leaf_px == 0:
-        return {"severity_pct": None, "severity_band": None, "leaf_fraction": 0.0}
+        return {"severity_pct": None, "severity_band": "no_leaf", "leaf_fraction": 0.0}
     pct = 100.0 * float((lesion > 0).sum()) / leaf_px
     return {"severity_pct": round(pct, 1), "severity_band": band_for(pct),
             "leaf_fraction": round(leaf_px / leaf.size, 3)}
