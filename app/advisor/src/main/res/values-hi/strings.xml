@@ -55,4 +55,9 @@
     <string name="choose_state">राज्य चुनें</string>
     <string name="theme_light">हल्का</string>
     <string name="theme_dark">गहरा</string>
+    <string name="q_too_dark">फोटो बहुत अंधेरी है। दिन की रोशनी में, पत्ती को रोशनी में रखकर फिर से फोटो लें।</string>
+    <string name="q_too_blurry">फोटो धुंधली है। फोन को स्थिर रखें, पत्ती पर टैप करके फोकस करें और फिर से फोटो लें।</string>
+    <string name="no_leaf_retake">फोटो में पत्ती साफ नहीं मिली। एक पत्ती की पास से फोटो लें।</string>
+    <string name="err_model">पत्ती मॉडल नहीं खुल सका। ऐप को फिर से इंस्टॉल करें।</string>
+    <string name="err_photo">यह फोटो नहीं खुल सकी। कोई दूसरी फोटो चुनें।</string>
 </resources>

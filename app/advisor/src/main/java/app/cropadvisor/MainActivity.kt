@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                     )
                 } else {
                     HomeScreen(
-                        crop, busy, officer, lang, onLang = { setLanguage(it) },
+                        crop, busy, officer, lang, error = error, onLang = { setLanguage(it) },
                         onOfficer = {
                             officer = it.filter { ch -> ch.isDigit() || ch == '+' }
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                             getSharedPreferences("settings", MODE_PRIVATE).edit().putString("state", it).apply()
                         },
                         onCrop = { crop = it },
-                        onCamera = { photoUri = newPhotoUri(); camera.launch(photoUri!!) },
+                        onCamera = { newPhotoUri().let { photoUri = it; camera.launch(it) } },
                         onGallery = {
                             gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         },
@@ -150,6 +150,7 @@ class MainActivity : ComponentActivity() {
     private var state by mutableStateOf("")
     private var theme by mutableStateOf("system")
     private var asking by mutableStateOf(false)
+    private var error by mutableStateOf("")   // shown on the home screen
 
     // Answers from the questions screen, plus month and state, then the advice.
     private fun adviseWith(d: Diagnosis, rain: String?, stage: String?, sprayed: String?) {
@@ -171,7 +172,7 @@ class MainActivity : ComponentActivity() {
     // values severity.py gave (golden.json from the detection branch).
     private fun runSeverityTest() {
         thread {
-            val dir = getExternalFilesDir(null)!!
+            val dir = getExternalFilesDir(null) ?: return@thread
             val g = org.json.JSONObject(File(dir, "golden.json").readText()).getJSONArray("images")
             var pass = 0
             for (i in 0 until g.length()) {
@@ -257,24 +258,38 @@ class MainActivity : ComponentActivity() {
         val chosen = crop
         thread {
             try {
+                runOnUiThread { error = "" }
                 val src = ImageDecoder.createSource(contentResolver, uri)
-                val bmp = ImageDecoder.decodeBitmap(src) { dec, info, _ ->
+                val bmp = try { ImageDecoder.decodeBitmap(src) { dec, info, _ ->
                     dec.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
                     // big camera photos are shrunk on decode, the model only needs 256 px
                     val s = minOf(info.size.width, info.size.height)
                     if (s > 1024) dec.setTargetSampleSize(s / 1024)
+                } } catch (e: Exception) {
+                    Perf.log(this, "decode_error=$e")
+                    runOnUiThread { error = getString(R.string.err_photo) }
+                    return@thread
                 }
-                val v = vision ?: Vision(ModelFiles.vision(this)!!.path).also { vision = it }
-                var d = Diagnosis.from(chosen, v.classify(bmp))
+                val v = vision ?: try {
+                    Vision(ModelFiles.vision(this)?.path ?: error("vision.pte missing")).also { vision = it }
+                } catch (e: Throwable) {
+                    Perf.log(this, "model_error=$e")
+                    runOnUiThread { error = getString(R.string.err_model) }
+                    return@thread
+                }
+                // Quality gate first, like predict.py: anything but ok makes the result uncertain.
+                val quality = Quality.check(bmp)
+                var d = Diagnosis.from(chosen, v.classify(bmp)).copy(quality = quality)
+                if (quality == "no_leaf") d = d.copy(band = "no_leaf")
                 // Severity only for disease and pest labels. A healthy leaf scores high
                 // on this colour method (26% on the golden healthy photo), so skip it.
-                if (!d.label.endsWith("_healthy")) {
+                if (!d.label.endsWith("_healthy") && quality != "no_leaf") {
                     val t0 = android.os.SystemClock.elapsedRealtime()
                     val s = Severity.estimate(bmp.copy(Bitmap.Config.ARGB_8888, false))
                     d = d.copy(sevPct = s.severityPct, band = s.band)
                     Perf.log(this, "severity pct=${s.severityPct} band=${s.band} ms=${android.os.SystemClock.elapsedRealtime() - t0}")
                 }
-                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} ms=${d.ms}")
+                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} quality=$quality ms=${d.ms}")
                 // Questions only for a confident disease or pest result with a leaf found.
                 val ask = !d.uncertain && !d.label.endsWith("_healthy") && d.band != "no_leaf"
                 // debug: --es answers rain,stage,sprayed (for example yes,harvest,no) answers without tapping
@@ -284,6 +299,7 @@ class MainActivity : ComponentActivity() {
                 else if (!ask) startAdvice(d)
             } catch (e: Throwable) {
                 Perf.log(this, "classify_error=$e")
+                runOnUiThread { error = getString(R.string.err_photo) }
             } finally {
                 runOnUiThread { busy = false }
             }
@@ -294,12 +310,12 @@ class MainActivity : ComponentActivity() {
     private fun runVisionTest() {
         thread {
             try {
-                val dir = getExternalFilesDir(null)!!
+                val dir = getExternalFilesDir(null) ?: return@thread
                 val pte = ModelFiles.vision(this) ?: error("vision.pte not found")
                 val t0 = System.currentTimeMillis()
                 val vision = Vision(pte.path)
                 Perf.log(this, "vision_load_ms=${System.currentTimeMillis() - t0}")
-                val images = dir.listFiles { f -> f.name.startsWith("test_") && f.name.endsWith(".jpg") }!!.sorted()
+                val images = dir.listFiles { f -> f.name.startsWith("test_") && f.name.endsWith(".jpg") }.orEmpty().sorted()
                 for (f in images) {
                     val bmp = android.graphics.BitmapFactory.decodeFile(f.path)
                     vision.classify(bmp) // warm up

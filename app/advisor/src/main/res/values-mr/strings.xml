@@ -55,4 +55,9 @@
     <string name="choose_state">राज्य निवडा</string>
     <string name="theme_light">फिकट</string>
     <string name="theme_dark">गडद</string>
+    <string name="q_too_dark">फोटो खूप अंधारा आहे. दिवसाच्या उजेडात, पान उजेडात ठेवून पुन्हा फोटो घ्या.</string>
+    <string name="q_too_blurry">फोटो अस्पष्ट आहे. फोन स्थिर धरा, पानावर टॅप करून फोकस करा आणि पुन्हा फोटो घ्या.</string>
+    <string name="no_leaf_retake">फोटोत पान स्पष्ट सापडले नाही. एका पानाचा जवळून फोटो घ्या.</string>
+    <string name="err_model">पानाचे मॉडेल उघडता आले नाही. अॅप पुन्हा इन्स्टॉल करा.</string>
+    <string name="err_photo">हा फोटो उघडता आला नाही. दुसरा फोटो निवडा.</string>
 </resources>

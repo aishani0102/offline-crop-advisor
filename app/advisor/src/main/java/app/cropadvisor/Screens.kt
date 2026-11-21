@@ -54,10 +54,11 @@ val LANGUAGE_NAMES = mapOf(
 data class Diagnosis(
     val crop: String, val ranked: List<Pair<String, Float>>, val ms: Long,
     val sevPct: Double? = null, val band: String? = null,
+    val quality: String = "ok",   // photo quality gate: ok, too_dark, too_blurry, no_leaf
 ) {
     val label get() = ranked[0].first
     val confidence get() = ranked[0].second
-    val uncertain get() = confidence < UNCERTAIN_BELOW
+    val uncertain get() = confidence < UNCERTAIN_BELOW || quality != "ok"
 
     companion object {
         const val UNCERTAIN_BELOW = 0.6f
@@ -138,7 +139,7 @@ fun CropToggle(label: String, selected: Boolean, modifier: Modifier, onClick: ()
 
 @Composable
 fun HomeScreen(
-    crop: String, busy: Boolean, officer: String, lang: String, onLang: (String) -> Unit, onOfficer: (String) -> Unit,
+    crop: String, busy: Boolean, officer: String, lang: String, error: String, onLang: (String) -> Unit, onOfficer: (String) -> Unit,
     state: String, onState: (String) -> Unit,
     onCrop: (String) -> Unit, onCamera: () -> Unit, onGallery: () -> Unit,
 ) {
@@ -159,6 +160,7 @@ fun HomeScreen(
             }
             Spacer(Modifier.height(12.dp))
             Text(stringResource(R.string.photo_hint), color = P.muted, fontSize = 13.sp)
+            if (error.isNotEmpty()) Text(error, color = P.ink, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             PrimaryButton(stringResource(if (busy) R.string.checking else R.string.take_photo), Modifier.fillMaxWidth(), enabled = !busy, onClick = onCamera)
             SecondaryButton(stringResource(R.string.gallery), Modifier.fillMaxWidth(), onClick = onGallery)
             Spacer(Modifier.height(12.dp))
@@ -198,7 +200,14 @@ fun ResultScreen(
             if (d.uncertain) {
                 Text(stringResource(R.string.not_sure), color = P.ink, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    stringResource(R.string.not_sure_body),
+                    stringResource(
+                        when (d.quality) {
+                            "too_dark" -> R.string.q_too_dark
+                            "too_blurry" -> R.string.q_too_blurry
+                            "no_leaf" -> R.string.no_leaf_retake
+                            else -> R.string.not_sure_body
+                        },
+                    ),
                     color = P.muted, fontSize = 14.sp,
                 )
             } else {

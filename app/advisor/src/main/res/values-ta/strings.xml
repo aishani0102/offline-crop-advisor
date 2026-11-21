@@ -55,4 +55,9 @@
     <string name="choose_state">மாநிலத்தைத் தேர்வு செய்</string>
     <string name="theme_light">வெளிர்</string>
     <string name="theme_dark">இருள்</string>
+    <string name="q_too_dark">படம் மிகவும் இருட்டாக உள்ளது. பகல் வெளிச்சத்தில், இலையை வெளிச்சத்தில் வைத்து மீண்டும் எடுக்கவும்.</string>
+    <string name="q_too_blurry">படம் மங்கலாக உள்ளது. போனை அசையாமல் பிடித்து, இலையைத் தொட்டு ஃபோகஸ் செய்து மீண்டும் எடுக்கவும்.</string>
+    <string name="no_leaf_retake">படத்தில் இலை தெளிவாகத் தெரியவில்லை. ஒரு இலையை அருகில் படம் எடுக்கவும்.</string>
+    <string name="err_model">இலை மாடலைத் திறக்க முடியவில்லை. செயலியை மீண்டும் நிறுவவும்.</string>
+    <string name="err_photo">இந்தப் படத்தைத் திறக்க முடியவில்லை. வேறு படத்தைத் தேர்வு செய்யவும்.</string>
 </resources>

@@ -55,4 +55,9 @@
     <string name="choose_state">রাজ্য বাছুন</string>
     <string name="theme_light">হালকা</string>
     <string name="theme_dark">গাঢ়</string>
+    <string name="q_too_dark">ছবিটি খুব অন্ধকার। দিনের আলোয়, পাতাটি আলোয় রেখে আবার ছবি তুলুন।</string>
+    <string name="q_too_blurry">ছবিটি ঝাপসা। ফোন স্থির রাখুন, পাতায় ট্যাপ করে ফোকাস করুন এবং আবার ছবি তুলুন।</string>
+    <string name="no_leaf_retake">ছবিতে পাতা স্পষ্ট পাওয়া যায়নি। একটি পাতার কাছ থেকে ছবি তুলুন।</string>
+    <string name="err_model">পাতার মডেল খোলা যায়নি। অ্যাপটি আবার ইনস্টল করুন।</string>
+    <string name="err_photo">এই ছবিটি খোলা যায়নি। অন্য একটি ছবি বেছে নিন।</string>
 </resources>

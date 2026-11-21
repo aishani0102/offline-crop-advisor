@@ -38,10 +38,9 @@ class Vision(path: String) {
         private val STD = floatArrayOf(0.229f, 0.224f, 0.225f)
 
         fun toChw(src: Bitmap): FloatArray {
-            val scale = 256f / minOf(src.width, src.height)
-            val w = (src.width * scale).roundToInt()
-            val h = (src.height * scale).roundToInt()
-            val resized = Bitmap.createScaledBitmap(src, w, h, true)
+            val resized = Photo.shortSide256(src)
+            val w = resized.width
+            val h = resized.height
             val crop = Bitmap.createBitmap(resized, (w - SIZE) / 2, (h - SIZE) / 2, SIZE, SIZE)
             val px = IntArray(SIZE * SIZE)
             crop.getPixels(px, 0, SIZE, 0, 0, SIZE, SIZE)

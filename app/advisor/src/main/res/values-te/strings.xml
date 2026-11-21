@@ -55,4 +55,9 @@
     <string name="choose_state">రాష్ట్రం ఎంచుకోండి</string>
     <string name="theme_light">లేత</string>
     <string name="theme_dark">ముదురు</string>
+    <string name="q_too_dark">ఫోటో చాలా చీకటిగా ఉంది. పగటి వెలుగులో, ఆకును వెలుగులో ఉంచి మళ్ళీ తీయండి.</string>
+    <string name="q_too_blurry">ఫోటో మసకగా ఉంది. ఫోన్‌ను కదలకుండా పట్టుకుని, ఆకుపై తాకి ఫోకస్ చేసి మళ్ళీ తీయండి.</string>
+    <string name="no_leaf_retake">ఫోటోలో ఆకు స్పష్టంగా కనిపించలేదు. ఒక ఆకును దగ్గరగా ఫోటో తీయండి.</string>
+    <string name="err_model">ఆకు మోడల్‌ను తెరవలేకపోయాం. యాప్‌ను మళ్ళీ ఇన్‌స్టాల్ చేయండి.</string>
+    <string name="err_photo">ఈ ఫోటోను తెరవలేకపోయాం. వేరే ఫోటో ఎంచుకోండి.</string>
 </resources>

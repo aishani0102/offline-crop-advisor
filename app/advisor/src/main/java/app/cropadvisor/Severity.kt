@@ -111,7 +111,7 @@ object Severity {
     }
 
     // cv2.GaussianBlur(img, (5, 5), 0): kernel 1 4 6 4 1 / 16 each way, border reflect 101
-    private fun blur5(src: IntArray, w: Int, h: Int): IntArray {
+    internal fun blur5(src: IntArray, w: Int, h: Int): IntArray {
         val k = intArrayOf(1, 4, 6, 4, 1)
         val tmp = IntArray(w * h)
         val out = IntArray(w * h)
@@ -139,7 +139,7 @@ object Severity {
     private val hdiv = IntArray(256) { if (it == 0) 0 else Math.rint((180 shl 12) / (6.0 * it)).toInt() }
 
     // cv2.COLOR_BGR2HSV for 8 bit images. Returns h shl 16 or s shl 8 or v.
-    private fun toHsv(r: Int, g: Int, b: Int): Int {
+    internal fun toHsv(r: Int, g: Int, b: Int): Int {
         val v = max(r, max(g, b))
         val diff = v - min(r, min(g, b))
         val s = (diff * sdiv[v] + (1 shl 11)) shr 12

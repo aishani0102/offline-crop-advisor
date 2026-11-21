@@ -56,4 +56,9 @@
     <string name="choose_state">Choose state</string>
     <string name="theme_light">Light mode</string>
     <string name="theme_dark">Dark mode</string>
+    <string name="q_too_dark">The photo is too dark. Take it again in daylight, with the leaf in the light.</string>
+    <string name="q_too_blurry">The photo is blurred. Hold the phone still, tap the leaf to focus and take it again.</string>
+    <string name="no_leaf_retake">No leaf found clearly in the photo. Take a closer photo of one leaf.</string>
+    <string name="err_model">The leaf model could not be loaded. Install the app again.</string>
+    <string name="err_photo">This photo could not be opened. Try another photo.</string>
 </resources>
