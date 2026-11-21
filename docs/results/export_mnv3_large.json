@@ -1,0 +1,50 @@
+{
+ "checkpoint": "best.pt",
+ "arch": "large",
+ "input": 224,
+ "calibration": {
+  "field": 160,
+  "lab": 96
+ },
+ "fp32": {
+  "file": "mnv3_large_fp32.pte",
+  "size_mb": 16.88,
+  "max_abs_logit_diff_vs_pytorch_one_image": 0.0,
+  "latency_x86_laptop": {
+   "median_ms": 18.96,
+   "p90_ms": 21.26,
+   "mean_ms": 18.93,
+   "runs": 50
+  },
+  "test_lab_macro_f1": 0.991107664363218,
+  "test_field_macro_f1": 0.8651382681680007,
+  "test_lab_accuracy": 0.9903083700440528,
+  "test_field_accuracy": 0.9213483146067416,
+  "test_lab_crop_known_accuracy": 0.9938325991189427,
+  "test_field_crop_known_accuracy": 0.9341894060995185
+ },
+ "int8": {
+  "file": "mnv3_large_int8.pte",
+  "size_mb": 4.52,
+  "max_abs_logit_diff_vs_pytorch_one_image": 1.425,
+  "latency_x86_laptop": {
+   "median_ms": 11.24,
+   "p90_ms": 13.39,
+   "mean_ms": 11.17,
+   "runs": 50
+  },
+  "test_lab_macro_f1": 0.9862439160093894,
+  "test_field_macro_f1": 0.8447994569940963,
+  "test_lab_accuracy": 0.9859030837004406,
+  "test_field_accuracy": 0.9052969502407705,
+  "test_lab_crop_known_accuracy": 0.9894273127753304,
+  "test_field_crop_known_accuracy": 0.9261637239165329
+ },
+ "pytorch_eager_latency_x86_laptop": {
+  "median_ms": 37.27,
+  "mean_ms": 63.2,
+  "runs": 50
+ },
+ "note": "Latency is batch 1 on an Intel i5-1135G7 laptop CPU with 4 threads through the ExecuTorch Python runtime. It is not phone latency.",
+ "int8_field_macro_f1_drop_points": 2.03
+}
