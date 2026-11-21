@@ -8,14 +8,14 @@ None of the images live in this repo. `detection/data/download.py` fetches every
 
 | # | Dataset | Type of photos | Where it comes from | Licence | Link |
 |---|---|---|---|---|---|
-| 1 | PlantVillage | Lab, single leaf on a plain background | Penn State PlantVillage project (Hughes and Salathe, 2015) | No licence file in the repo. Cite the paper. | https://github.com/spMohanty/PlantVillage-Dataset |
+| 1 | PlantVillage | Lab, single leaf on a plain background | Penn State PlantVillage project (Hughes and Salathe, 2015) | No licence file in the GitHub repo. The authors' own Hugging Face copy (mohanty/PlantVillage) lists CC BY-SA 3.0. Cite the paper. | https://github.com/spMohanty/PlantVillage-Dataset |
 | 2 | PlantDoc | Field and web photos, cluttered backgrounds | IIT Gandhinagar (Singh et al., 2020) | CC BY 4.0 | https://github.com/pratikkayal/PlantDoc-Dataset |
 | 3 | PlantSeg | Field and web photos, with lesion masks | University of Queensland and partners (Wei et al., 2024) | CC BY-NC 4.0 | https://zenodo.org/records/17719108 |
 | 4 | Tomato-Village | Field photos from Jodhpur and Jaipur, Rajasthan | Gehlot et al., Multimedia Systems, 2023 | No licence file in the repo. Cite the paper. | https://github.com/mamta-joshi-gehlot/Tomato-Village |
 | 5 | Potato Leaf Disease in Uncontrolled Environment | Field photos from farms in Central Java, Indonesia | Shabrina et al., Data in Brief, 2024 | CC BY 4.0 | https://data.mendeley.com/datasets/ptz377bwb8/1 |
 | 6 | Potato Leaf (Healthy and Late Blight) | Field photos from Holeta, Ethiopia | Mendeley Data | CC BY 4.0 | https://data.mendeley.com/datasets/v4w72bsts5/2 |
 
-PlantSeg is non-commercial only. That is fine for the challenge, but it has to be dropped if this ever becomes a product. Tomato-Village and PlantVillage have no licence file, so we only download them in our scripts and never re-host the images.
+PlantSeg is non-commercial only (its Metadata.csv marks 7,741 images CC BY-NC and 33 CC0). That is fine for the challenge, but it has to be dropped if this ever becomes a product. Tomato-Village still has no licence file (checked on 21 Nov 2026), so we only download it in our scripts and never re-host the images. PlantVillage has no licence file on GitHub, but the authors publish the same images on Hugging Face as CC BY-SA 3.0, so that is the licence we go by. We still do not re-host it.
 
 ## What we take from each source
 
@@ -36,6 +36,17 @@ Numbers are image counts as published by each source, before we remove duplicate
 
 PlantSeg counts include both its own field photos and the images its authors collected from web search (file names ending in `_google`).
 
+### What we actually downloaded (21 Nov 2026)
+
+Most numbers match the table above. These did not:
+
+- **PlantSeg has fewer tomato and potato images than we planned for.** The current Zenodo zip (record 17719108, `Metadata.csv`) has 680 images in our 7 classes: tomato early blight 153, late blight 117, leaf mold 102, Septoria 99, leaf curl virus 63, potato early blight 68, potato late blight 78. The planned numbers (187, 163 and so on) were probably from an older release. Every PlantSeg image comes with a lesion mask.
+- **Ethiopia late blight has 67 images, not 63.** The page text says 63, the archive has 67.
+- **PlantDoc potato early blight has 116, not 117.** One file fewer in the repo than the paper says.
+- **Tomato-Village repeats itself a lot.** Of its 2,640 images in our classes, 524 are near-duplicates of another Tomato-Village image (often the same photo cropped twice), and some cross its own train, val and test folders. De-duplication keeps the test copy, so those leaks are gone from our splits.
+
+The real counts after cleaning, per class, source and split, are in `docs/data_counts.md`.
+
 ### What we leave out, and why
 
 - **Indonesia potato "Fungi" (748 images).** It mixes several fungal diseases under one label. Early blight is one of them, but nothing marks which photos are which, so putting them under early blight would add wrong labels.
@@ -54,11 +65,14 @@ PlantSeg counts include both its own field photos and the images its authors col
 
 ## Splits
 
-- **Test (field only, never trained on):** the PlantDoc test split, the PlantSeg test split, the Tomato-Village test split, and a 20 percent stratified hold-out from the two potato field datasets.
-- **Validation:** the PlantSeg and Tomato-Village validation splits, plus 10 percent of everything else.
-- **Train:** the rest, after the balancing above.
+- **Test (field only, never trained on):** the PlantDoc test split, the PlantSeg test split, the Tomato-Village test split, and a 20 percent stratified hold-out from the two potato field datasets. In the manifest this is `test_field`.
+- **Lab test:** 10 percent of each PlantVillage class, at most 200 per class (`test_lab`). Only used to show the gap between lab and field.
+- **Validation:** the PlantSeg and Tomato-Village validation splits, plus 10 percent of PlantDoc train and of each potato field set, plus 10 percent of each PlantVillage class capped at 100. The cap is new: without it, validation would be mostly lab photos, and we pick the best checkpoint on validation.
+- **Train:** the rest, after the balancing above. What balancing leaves out is marked `unused`.
 
-If a near-duplicate of a test image shows up in train, the train copy is removed.
+If a near-duplicate of a test image shows up in train, the train copy is removed. Near-duplicate means a perceptual hash (pHash, 64 bits) within 4 bits. If the copies in a group have different labels (this happens between PlantDoc and PlantSeg, which were both scraped from the web), the whole group is dropped, because we cannot tell which label is right.
+
+Known weak spot: PlantVillage has several photos of the same physical leaf, and we split it at random, not by leaf. So the lab test number is a bit optimistic. The field test set does not have this problem. The field test set is also small for some classes (14 potato early blight, 21 leaf curl virus, 24 leaf mold), so per-class numbers there move a lot with a few images.
 
 We report two accuracy numbers: one on the PlantVillage test images, which is always high and mostly shows the model learned something, and one on the field-only test set, which is the number that matters.
 
