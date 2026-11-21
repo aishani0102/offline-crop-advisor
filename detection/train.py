@@ -1,6 +1,6 @@
 """Train the MobileNetV3 leaf classifier.
 
-    python -I detection/train.py --root C:/Users/a_roy/aisoc_data --arch large --out C:/Users/a_roy/aisoc_data/models/mnv3l
+    python -I detection/train.py --root <data_root> --arch large --out <data_root>/models/mnv3l
 
 Stage 1 trains only the new head with the ImageNet backbone frozen. Stage 2
 fine-tunes everything for a few epochs at a lower learning rate. After each

@@ -1,7 +1,7 @@
 """Score a trained model on the lab test set and the field-only test set.
 
-    python -I detection/evaluate.py --root C:/Users/a_roy/aisoc_data --ckpt C:/Users/a_roy/aisoc_data/models/mnv3l/best.pt --tag mnv3l_fp32_pytorch
-    python -I detection/evaluate.py --root ... --pte C:/Users/a_roy/aisoc_data/models/mnv3l/mnv3l_int8.pte --tag mnv3l_int8_pte
+    python -I detection/evaluate.py --root <data_root> --ckpt <data_root>/models/mnv3l/best.pt --tag mnv3l_fp32_pytorch
+    python -I detection/evaluate.py --root ... --pte <data_root>/models/mnv3l/mnv3l_int8.pte --tag mnv3l_int8_pte
 
 Writes docs/results/<tag>/metrics.json, metrics.md and one confusion matrix
 PNG per test set. "Crop known" accuracy only lets the model pick between the

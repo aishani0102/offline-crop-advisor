@@ -1,6 +1,6 @@
 """Build the train, validation and test splits from the raw downloads.
 
-    python -I detection/data/build_dataset.py --root C:/Users/a_roy/aisoc_data
+    python -I detection/data/build_dataset.py --root <data_root>
 
 Reads <root>/raw, writes resized copies and manifest.csv to <root>/built, and
 writes docs/data_counts.md in the repo. The plan it follows is docs/DATASETS.md.

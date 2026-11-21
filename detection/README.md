@@ -6,9 +6,9 @@ A MobileNetV3 classifier picks the condition and a plain OpenCV step estimates s
 All data and model files live outside the repo. On the laptop we use:
 
 ```
-C:/Users/a_roy/aisoc_data/raw/<source>/   downloads, one folder per source
-C:/Users/a_roy/aisoc_data/built/          resized images + manifest.csv
-C:/Users/a_roy/aisoc_data/models/<run>/   best.pt, temperature.json, .pte files, logs
+<data_root>/raw/<source>/   downloads, one folder per source
+<data_root>/built/          resized images + manifest.csv
+<data_root>/models/<run>/   best.pt, temperature.json, .pte files, logs
 ```
 
 Run everything from the repo root. `-I` keeps Python from picking up stray files
@@ -17,15 +17,15 @@ from the current folder, which matters because the downloads are not our code.
 ## Setup
 
 ```
-python -m venv C:/Users/a_roy/aisoc_data/venv
-C:/Users/a_roy/aisoc_data/venv/Scripts/activate
+python -m venv <data_root>/venv
+<data_root>/venv/Scripts/activate
 pip install -r detection/requirements.txt
 ```
 
 ## 1. Download
 
 ```
-python -I detection/data/download.py --root C:/Users/a_roy/aisoc_data
+python -I detection/data/download.py --root <data_root>
 ```
 
 About 1.5 GB in total. It only fetches tomato and potato folders from the GitHub
@@ -36,7 +36,7 @@ PlantDoc has file names with `?` in them, so we write those files out with `_` i
 ## 2. Build the dataset
 
 ```
-python -I detection/data/build_dataset.py --root C:/Users/a_roy/aisoc_data
+python -I detection/data/build_dataset.py --root <data_root>
 ```
 
 Takes about 3 minutes. It hashes every image, removes near-duplicates across all
@@ -47,7 +47,7 @@ The split fingerprint in `docs/data_counts.md` changes if the splits change.
 ## 3. Train
 
 ```
-python -I detection/train.py --root C:/Users/a_roy/aisoc_data --out C:/Users/a_roy/aisoc_data/models/mnv3_large --arch large --epochs 15 --frozen-epochs 3
+python -I detection/train.py --root <data_root> --out <data_root>/models/mnv3_large --arch large --epochs 15 --frozen-epochs 3
 ```
 
 Options that matter: `--device cpu|cuda|auto`, `--batch-size`, `--num-workers`,
@@ -60,7 +60,7 @@ Writes `best.pt` (best validation macro F1), `temperature.json`, `train_log.txt`
 Quick check that the pipeline runs (a few minutes on the laptop):
 
 ```
-python -I detection/train.py --root C:/Users/a_roy/aisoc_data --out C:/Users/a_roy/aisoc_data/models/smoke --limit 300 --epochs 2 --frozen-epochs 1
+python -I detection/train.py --root <data_root> --out <data_root>/models/smoke --limit 300 --epochs 2 --frozen-epochs 1
 ```
 
 ## Training on Colab
@@ -74,13 +74,13 @@ does not download again), trains with mixed precision, evaluates, and copies
 
 The build uses the same seed as the laptop. Check that the split fingerprint printed
 in the notebook matches `docs/data_counts.md`. Then copy `best.pt` and
-`temperature.json` into `C:/Users/a_roy/aisoc_data/models/mnv3_large/` and run
+`temperature.json` into `<data_root>/models/mnv3_large/` and run
 evaluate and export below on the laptop.
 
 ## 4. Evaluate
 
 ```
-python -I detection/evaluate.py --root C:/Users/a_roy/aisoc_data --ckpt C:/Users/a_roy/aisoc_data/models/mnv3_large/best.pt --tag mnv3_large_fp32_pytorch
+python -I detection/evaluate.py --root <data_root> --ckpt <data_root>/models/mnv3_large/best.pt --tag mnv3_large_fp32_pytorch
 ```
 
 Writes `docs/results/<tag>/metrics.md`, `metrics.json` and a confusion matrix per set.
@@ -91,7 +91,7 @@ classes of the true crop, because the app asks for the crop first.
 ## 5. Export to ExecuTorch
 
 ```
-python -I detection/export.py --root C:/Users/a_roy/aisoc_data --ckpt C:/Users/a_roy/aisoc_data/models/mnv3_large/best.pt
+python -I detection/export.py --root <data_root> --ckpt <data_root>/models/mnv3_large/best.pt
 ```
 
 Writes `mnv3_large_fp32.pte`, `mnv3_large_int8.pte` and `mnv3_large_meta.json` next to
@@ -105,7 +105,7 @@ through the ExecuTorch Python runtime and saves size and latency to
 
 ```
 python -I detection/severity.py --image leaf.jpg --save-mask mask.png
-python -I detection/severity.py --eval-plantseg --root C:/Users/a_roy/aisoc_data
+python -I detection/severity.py --eval-plantseg --root <data_root>
 ```
 
 Lesion pixels divided by leaf pixels, from HSV colour rules. The second command
@@ -116,8 +116,8 @@ If no leaf is found, `severity_pct` and `severity_band` are `null`.
 ## 7. Predict
 
 ```
-python -I detection/predict.py --image leaf.jpg --crop tomato --model C:/Users/a_roy/aisoc_data/models/mnv3_large/best.pt
-python -I detection/predict.py --image leaf.jpg --crop tomato --model C:/Users/a_roy/aisoc_data/models/mnv3_large/mnv3_large_int8.pte
+python -I detection/predict.py --image leaf.jpg --crop tomato --model <data_root>/models/mnv3_large/best.pt
+python -I detection/predict.py --image leaf.jpg --crop tomato --model <data_root>/models/mnv3_large/mnv3_large_int8.pte
 ```
 
 Prints the JSON from `docs/INTERFACE.md`. Only classes of the given crop are

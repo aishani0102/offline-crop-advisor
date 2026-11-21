@@ -4,7 +4,7 @@ Everything goes to <root>/raw/<source>/ outside the repo. Running it again
 skips what is already there, and the big PlantSeg zip resumes where it
 stopped.
 
-    python -I detection/data/download.py --root C:/Users/a_roy/aisoc_data
+    python -I detection/data/download.py --root <data_root>
     python -I detection/data/download.py --root ... --only plantdoc tomato_village
 
 We never run anything that comes inside a download. Archives are only
