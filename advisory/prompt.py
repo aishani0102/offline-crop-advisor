@@ -5,37 +5,27 @@ rewrite them in simple words. It never sees the whole KB, so it has no
 other chemical names or doses to copy from.
 """
 
+import re
+
 from knowledge import load_kb, select_facts
 
 WORD_LIMIT = {"en": 120, "hi": 80}
+LANG_NAME = {"en": "English", "hi": "simple Hindi (Devanagari script)"}
 
-SYSTEM = {
-    "en": (
-        "You help small farmers in India. Rewrite the FACTS below as short, simple advice for a farmer, "
-        "in English. Rules: use only the FACTS. Do not add any chemical, product, dose or number that is "
-        "not in the FACTS. Do not add new advice. Write {words} words or less, in plain sentences, no headings."
-    ),
-    "hi": (
-        "आप भारत के छोटे किसानों की मदद करते हैं। नीचे दिए गए FACTS को किसान के लिए छोटी, सरल सलाह के रूप में "
-        "हिंदी में दोबारा लिखें। नियम: केवल FACTS का इस्तेमाल करें। कोई ऐसी दवा, उत्पाद, मात्रा या संख्या न जोड़ें "
-        "जो FACTS में नहीं है। नई सलाह न जोड़ें। {words} शब्दों या उससे कम में, सरल वाक्यों में लिखें, शीर्षक नहीं।"
-    ),
-}
+# The rules are in English for both languages. They are shorter in tokens,
+# and the 1B model follows English instructions better. Only the answer
+# language changes.
+SYSTEM = (
+    "You help small farmers in India. Rewrite the FACTS as short, simple advice for a farmer, "
+    "in {lang}. Rules: use only the FACTS. Do not add any chemical, product, dose or number that is "
+    "not in the FACTS. Do not add new advice. Start by naming the crop and the problem. "
+    "Write {words} words or less, in plain sentences, no headings."
+)
 
-END_WITH = {
-    "en": "End with this exact sentence: ",
-    "hi": "आखिर में यह वाक्य ज्यों का त्यों लिखें: ",
-}
-
-HEALTHY_HINT = {
-    "en": "The leaf is healthy. Give a short reassurance and two or three prevention tips.",
-    "hi": "पत्ती स्वस्थ है। किसान को छोटा सा भरोसा दें और बचाव के दो या तीन सुझाव दें।",
-}
-
-UNCERTAIN_HINT = {
-    "en": "The app is not sure what the problem is. Do not name any disease treatment or chemical.",
-    "hi": "ऐप को पक्का नहीं पता कि समस्या क्या है। किसी इलाज या दवा का नाम न लें।",
-}
+END_WITH = "End with this exact sentence: "
+HEALTHY_HINT = "The leaf is healthy. Give a short reassurance and two or three prevention tips."
+UNCERTAIN_HINT = "The app is not sure what the problem is. Do not name any treatment or chemical."
+QUESTION = "Farmer's question (answer only from the FACTS): "
 
 
 def facts_block(facts):
@@ -61,23 +51,29 @@ def facts_block(facts):
 def build_messages(case, kb=None, question=None):
     """Return (messages, facts). messages is a list of {role, content}."""
     kb = kb or load_kb()
-    facts = select_facts(case, kb)
+    facts = select_facts(case, kb, compact=True)
     lang = facts["lang"]
-    system = SYSTEM[lang].format(words=WORD_LIMIT[lang])
+    system = SYSTEM.format(lang=LANG_NAME[lang], words=WORD_LIMIT[lang])
     user = "FACTS:\n" + facts_block(facts)
     if facts["kind"] == "healthy":
-        user += "\n\n" + HEALTHY_HINT[lang]
+        user += "\n\n" + HEALTHY_HINT
     if facts["kind"] == "uncertain":
-        user += "\n\n" + UNCERTAIN_HINT[lang]
+        user += "\n\n" + UNCERTAIN_HINT
     if question:
         # A follow-up from the farmer. It is answered only from the same FACTS.
-        q = {"en": "Farmer's question (answer only from the FACTS): ",
-             "hi": "किसान का सवाल (केवल FACTS से जवाब दें): "}[lang]
-        user += "\n\n" + q + question.strip()
+        user += "\n\n" + QUESTION + question.strip()
     if facts.get("referral"):
-        user += "\n\n" + END_WITH[lang] + facts["referral"]
+        user += "\n\n" + END_WITH + facts["referral"]
     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
     return messages, facts
+
+
+PREAMBLE = re.compile(r"^\s*(here is|here's|sure|okay|ok,|यहां|यहाँ|ज़रूर|जरूर)[^\n]*:\s*\n", re.IGNORECASE)
+
+
+def clean_output(text):
+    """Drop a chatty first line such as "Here is the rewritten advice:"."""
+    return PREAMBLE.sub("", text, count=1).strip()
 
 
 def to_llama3_text(messages):

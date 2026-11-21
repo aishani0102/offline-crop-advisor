@@ -92,8 +92,12 @@ def _chem_line(chem, lang, kb):
     return f"{name}: {dose}, {wait}"
 
 
-def select_facts(case, kb=None):
+def select_facts(case, kb=None, compact=False):
     """Return the KB facts for this case as a dict of short text pieces.
+
+    compact=True keeps fewer items, for the model prompt. A 1B model on a phone
+    is slow to read a long prompt, and Hindi text takes about three times the
+    tokens of English.
 
     Rules:
     - healthy: description plus prevention tips, no chemicals.
@@ -118,21 +122,22 @@ def select_facts(case, kb=None):
     facts["summary"] = entry["description"][lang]
     if case["type"] == "healthy":
         facts["kind"] = "healthy"
-        facts["steps"] = entry["cultural_ipm"][lang][:4]
+        facts["steps"] = entry["cultural_ipm"][lang][:3 if compact else 4]
         facts["watch"] = entry["call_kvk"][lang]
         return facts
 
     band = case["severity_band"]
     facts["kind"] = band
-    facts["signs"] = entry["recognise"][lang][:2]
-    facts["steps"] = entry["cultural_ipm"][lang][:3]
+    facts["signs"] = entry["recognise"][lang][:1 if compact else 2]
+    facts["steps"] = entry["cultural_ipm"][lang][:2 if compact else 3]
     facts["severity_note"] = entry["severity"][band][lang]
     if band in ("moderate", "severe"):
-        facts["chemicals"] = [_chem_line(c, lang, kb) for c in entry["chemicals"]]
+        chems = entry["chemicals"][:2] if compact else entry["chemicals"]
+        facts["chemicals"] = [_chem_line(c, lang, kb) for c in chems]
         facts["chem_names"] = entry["chemicals"]
         facts["chemical_note"] = entry["chemical_note"][lang]
         if entry["chemicals"]:
-            facts["safety"] = kb["general_safety"][lang][:2]
+            facts["safety"] = kb["general_safety"][lang][1:2] if compact else kb["general_safety"][lang][:2]
         else:
             facts["no_dose"] = kb["no_dose_text"][lang]
     if band == "severe":
