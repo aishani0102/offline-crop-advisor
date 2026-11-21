@@ -61,7 +61,36 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        if (intent.getBooleanExtra("llmtest", false)) runLlmTest()
+        // only on a fresh start, so a recreated activity does not run the test again
+        if (savedInstanceState == null) {
+            if (intent.getBooleanExtra("llmtest", false)) runLlmTest()
+            if (intent.getBooleanExtra("visiontest", false)) runVisionTest()
+        }
+    }
+
+    // Classifies every test_*.jpg in the app's files folder and logs top 3.
+    private fun runVisionTest() {
+        thread {
+            try {
+                val dir = getExternalFilesDir(null)!!
+                val pte = ModelFiles.find(this, "vision.pte") ?: error("vision.pte not found")
+                val t0 = System.currentTimeMillis()
+                val vision = Vision(pte.path)
+                Perf.log(this, "vision_load_ms=${System.currentTimeMillis() - t0}")
+                val images = dir.listFiles { f -> f.name.startsWith("test_") && f.name.endsWith(".jpg") }!!.sorted()
+                for (f in images) {
+                    val bmp = android.graphics.BitmapFactory.decodeFile(f.path)
+                    vision.classify(bmp) // warm up
+                    val r = vision.classify(bmp)
+                    val top = r.top(3).joinToString(" ") { "${Vision.LABELS[it]}:${"%.3f".format(r.probs[it])}" }
+                    Perf.log(this, "vision ${f.name} ms=${r.ms} top3=$top")
+                }
+                Perf.log(this, "vision_done peak_rss_mb=${Perf.peakRssMb()}")
+                vision.close()
+            } catch (e: Throwable) {
+                Perf.log(this, "vision_error=$e")
+            }
+        }
     }
 
     private fun runLlmTest() {
