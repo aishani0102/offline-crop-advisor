@@ -18,7 +18,7 @@ This stage takes the detection result (the JSON object in `docs/INTERFACE.md`) a
 | `memory.py` | Picks Llama or template-only mode from the free RAM. |
 | `referral.py` | Short SMS text for the KVK in severe or uncertain cases. |
 | `speech.py` | Cleans the advice so offline text-to-speech reads it well. |
-| `tests/` | Tests that need no model. |
+| `tests/` | Tests that need no model, including `adversarial.json` (32 tricky cases) and `test_adversarial.py`. |
 
 ## Setup
 
@@ -77,7 +77,7 @@ We use `Llama-3.2-1B-Instruct-SpinQuant_INT4_EO8.pte` from `executorch-community
 
 - **Grounded prompting, no fine-tuning (Phase 1).** For each case `knowledge.py` picks a few KB facts (signs, two IPM steps, up to two chemicals with dose and waiting period, one safety line). Llama only sees those facts and is told to rewrite them for a farmer, in 120 words or less (80 for Hindi), with no new chemicals, doses or numbers. Severe cases must end with the KVK and Kisan Call Centre line.
 - **Uncertain cases never go to Llama.** If `uncertain` is true, or the confidence is below the threshold in `configs/thresholds.json`, the app shows the template: no diagnosis, a retake tip and the referral. In our first test Llama answered every uncertain case with "The crop is wheat. The problem is pest infestation."
-- **Safety check on every answer** (`safety.py`): no chemical name outside the case facts (a list of about 150 pesticide names in English and Hindi, plus name-ending patterns), no number outside the facts, no dose written in words, no crop or problem name outside the facts, a referral where needed, the right script for the language, not cut off, not too long. If any check fails, the farmer gets the template instead.
+- **Safety check on every answer** (`safety.py`): no chemical name outside the case facts (a list of about 150 pesticide names in English and Hindi, plus name-ending patterns), no number outside the facts, no number and unit pair (such as "4 kg") outside the facts, no dose written in words, no crop or problem name outside the facts, a referral where needed, the right script for the language, not cut off, not too long. If any check fails, the farmer gets the template instead.
 - **Phase 2 plan: LoRA fine-tune.** Fine-tuning is not possible on our CPU-only laptop. The plan is a LoRA fine-tune on a few thousand curated question and answer pairs written from ICAR, TNAU and state university material, in English and Hindi, checked by a person. The same safety checks would stay in place.
 
 ## Memory-aware mode
