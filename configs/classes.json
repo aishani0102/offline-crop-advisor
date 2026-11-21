@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "crops": ["tomato", "potato"],
+  "classes": [
+    {"id": 0, "label": "potato_early_blight",           "crop": "potato", "condition": "Early blight",            "type": "disease"},
+    {"id": 1, "label": "potato_healthy",                "crop": "potato", "condition": "Healthy",                 "type": "healthy"},
+    {"id": 2, "label": "potato_late_blight",            "crop": "potato", "condition": "Late blight",             "type": "disease"},
+    {"id": 3, "label": "tomato_early_blight",           "crop": "tomato", "condition": "Early blight",            "type": "disease"},
+    {"id": 4, "label": "tomato_healthy",                "crop": "tomato", "condition": "Healthy",                 "type": "healthy"},
+    {"id": 5, "label": "tomato_late_blight",            "crop": "tomato", "condition": "Late blight",             "type": "disease"},
+    {"id": 6, "label": "tomato_leaf_miner",             "crop": "tomato", "condition": "Leaf miner",              "type": "pest"},
+    {"id": 7, "label": "tomato_leaf_mold",              "crop": "tomato", "condition": "Leaf mold",               "type": "disease"},
+    {"id": 8, "label": "tomato_septoria_leaf_spot",     "crop": "tomato", "condition": "Septoria leaf spot",      "type": "disease"},
+    {"id": 9, "label": "tomato_yellow_leaf_curl_virus", "crop": "tomato", "condition": "Yellow leaf curl virus",  "type": "disease"}
+  ]
+}

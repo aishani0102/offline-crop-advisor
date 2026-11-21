@@ -1,0 +1,4 @@
+{
+  "uncertain_below_confidence": 0.6,
+  "severity_bands_pct": {"mild": [0, 10], "moderate": [10, 30], "severe": [30, 100]}
+}

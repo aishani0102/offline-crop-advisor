@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Data and model files (rebuilt by the scripts, too big or not ours to share)
+data/
+datasets/
+*.zip
+*.pte
+*.pth
+*.pt
+*.onnx
+*.bin
+*.safetensors
+tokenizer.model
+checkpoints/
+runs/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Local settings and secrets
+.env
+*.token
+.DS_Store
