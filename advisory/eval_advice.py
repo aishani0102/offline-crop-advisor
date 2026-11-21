@@ -31,7 +31,7 @@ UNCERTAIN = [
     ("tomato_late_blight", "severe", 38.0, 0.55),
     ("tomato_healthy", "none", None, 0.40),
 ]
-GROUNDING = ("chemical_not_in_kb", "number_not_in_kb", "dose_in_words")
+GROUNDING = ("chemical_not_in_kb", "number_not_in_kb", "dose_not_in_kb", "dose_in_words")
 
 
 def make_cases(langs):

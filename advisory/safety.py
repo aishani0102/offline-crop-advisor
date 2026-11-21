@@ -40,6 +40,9 @@ EXTRA_CHEMICALS_EN = [
     "pymetrozine", "aureofungin", "validamycin", "tricyclazole", "benomyl", "chlorothalonil",
     "captan", "mancozeb", "azoxystrobin", "cymoxanil", "cyazofamid", "dimethomorph", "imidacloprid",
     "thiamethoxam", "cyantraniliprole", "copper oxychloride", "urea", "dap", "potash",
+    # Common Indian brand names. Brands are never in the KB, so these always fail.
+    "bavistin", "blitox", "dithane", "indofil", "ridomil", "curzate", "confidor", "actara", "coragen",
+    "kavach", "saaf", "nativo", "amistar", "antracol", "kocide", "sulfex", "nuvan", "rogor",
 ]
 EXTRA_CHEMICALS_HI = [
     "क्लोरपायरीफॉस", "क्लोरपाइरीफॉस", "मोनोक्रोटोफॉस", "कार्बेन्डाजिम", "कार्बेंडाजिम", "कार्बोफ्यूरान",
@@ -125,6 +128,29 @@ def wrong_names(text, source):
     return bad
 
 
+UNIT_MAP = {"g": "g", "gm": "g", "gram": "g", "grams": "g", "ग्राम": "g", "kg": "kg", "kilo": "kg",
+            "kilogram": "kg", "kilograms": "kg", "किलो": "kg", "ml": "ml", "millilitre": "ml",
+            "millilitres": "ml", "मिली": "ml", "l": "l", "lit": "l", "litre": "l", "litres": "l",
+            "liter": "l", "liters": "l", "लीटर": "l", "%": "%", "percent": "%", "प्रतिशत": "%",
+            "days": "day", "day": "day", "दिन": "day"}
+DOSE_RE = re.compile(r"(\d+(?:\.\d+)?)(?:\s*(?:to|-|से)\s*(\d+(?:\.\d+)?))?\s*"
+                     r"(kilograms|kilogram|millilitres|millilitre|grams|gram|litres|litre|liters|liter|"
+                     r"percent|days|day|kilo|lit|gm|kg|ml|g|l|%|ग्राम|किलो|मिली|लीटर|प्रतिशत|दिन)(?![a-z])",
+                     re.IGNORECASE)
+
+
+def dose_pairs(text):
+    """Set of (number, unit) pairs, so "4 kg" and "4 g" are different doses."""
+    text = text.translate(DEVANAGARI_DIGITS)
+    pairs = set()
+    for a, b, unit in DOSE_RE.findall(text):
+        u = UNIT_MAP[unit.lower()]
+        pairs.add((a, u))
+        if b:
+            pairs.add((b, u))
+    return pairs
+
+
 def numbers(text):
     text = text.translate(DEVANAGARI_DIGITS)
     # Remove list markers like "1." or "2)" at the start of a line.
@@ -175,6 +201,9 @@ def check_output(text, case, kb=None, facts=None, truncated=False, limit_length=
     bad_nums = {n for n in numbers(text) if n not in allowed_nums}
     if bad_nums:
         fails.append("number_not_in_kb:" + ",".join(sorted(bad_nums)))
+    bad_pairs = dose_pairs(text) - dose_pairs(source)
+    if bad_pairs:
+        fails.append("dose_not_in_kb:" + ",".join(f"{a} {u}" for a, u in sorted(bad_pairs)))
     word_doses = [m.group(0) for m in WORD_DOSE.finditer(text) if m.group(0).lower() not in source.lower()]
     if word_doses:
         fails.append("dose_in_words:" + ",".join(word_doses))
