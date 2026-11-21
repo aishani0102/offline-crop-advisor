@@ -29,11 +29,20 @@ def to_speech(text, lang="en"):
     t = re.sub(r"[()\[\]{}\"'*_#/\\|<>:;]", " ", t)
     # Hyphens between words become spaces ("purple-brown"), but keep "1.8".
     t = re.sub(r"(?<=\S)-(?=\S)", " ", t)
-    # One sentence per line so the TTS engine pauses between them.
-    t = re.sub(r"\s*\n\s*", ". ", t.strip())
-    t = re.sub(r"([.!?।])(\s*[.।])+", r"\1", t)
-    t = re.sub(r"\s+", " ", t)
-    return t.strip()
+    # Each line becomes one sentence so the TTS engine pauses between them.
+    # Hindi uses the danda as the full stop.
+    stop = "।" if lang == "hi" else "."
+    sentences = []
+    for line in t.split("\n"):
+        line = re.sub(r"\s+", " ", line).strip()
+        line = re.sub(r"\s+([,.!?।])", r"\1", line)
+        if lang == "hi":
+            # A full stop that ends a sentence (not a decimal point) becomes a danda.
+            line = re.sub(r"(?<!\d)\.(?!\d)", "।", line)
+        line = line.rstrip(" ,.:।")
+        if line:
+            sentences.append(line + stop)
+    return " ".join(sentences)
 
 
 if __name__ == "__main__":
