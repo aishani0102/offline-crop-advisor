@@ -23,7 +23,10 @@
       "तुड़ाई से पहले प्रतीक्षा अवधि का पालन करें। तुड़ाई से 7 दिन पहले तक छिड़काव न करें।",
       "खाली डिब्बों को कुचल कर पानी के स्रोत से दूर ज़मीन में गाड़ दें। उन्हें कभी दोबारा इस्तेमाल न करें।"
     ],
-    "sources": ["niphm_tomato", "niphm_potato"]
+    "sources": [
+      "niphm_tomato",
+      "niphm_potato"
+    ]
   },
   "referral": {
     "en": "Please show the plant to your nearest KVK (Krishi Vigyan Kendra) or call the Kisan Call Centre on 1800-180-1551 (free call).",
@@ -78,7 +81,10 @@
           "name": "Mancozeb",
           "name_hi": "मैंकोज़ेब",
           "product": "Mancozeb 75% WP",
-          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 to 800 g in 300 litres of water per acre",
+            "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_potato"
         },
@@ -86,7 +92,10 @@
           "name": "Chlorothalonil",
           "name_hi": "क्लोरोथालोनिल",
           "product": "Chlorothalonil 75% WP",
-          "dose": {"en": "350 to 500 g in 240 to 320 litres of water per acre", "hi": "350 से 500 ग्राम, 240 से 320 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "350 to 500 g in 240 to 320 litres of water per acre",
+            "hi": "350 से 500 ग्राम, 240 से 320 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_potato"
         },
@@ -94,7 +103,10 @@
           "name": "Copper oxychloride",
           "name_hi": "कॉपर ऑक्सीक्लोराइड",
           "product": "Copper oxychloride 50% WP",
-          "dose": {"en": "1 kg in 300 to 400 litres of water per acre", "hi": "1 किलो, 300 से 400 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "1 kg in 300 to 400 litres of water per acre",
+            "hi": "1 किलो, 300 से 400 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 6,
           "source": "niphm_potato"
         }
@@ -121,8 +133,14 @@
         "en": "Call the KVK if spots keep spreading after a spray, or if tubers show sunken dark patches.",
         "hi": "अगर छिड़काव के बाद भी धब्बे फैलते रहें, या कंदों पर धंसे हुए काले धब्बे दिखें, तो KVK से संपर्क करें।"
       },
-      "sources": ["tnau_potato_early_blight", "niphm_potato"],
-      "hindi_reviewed": false
+      "sources": [
+        "tnau_potato_early_blight",
+        "niphm_potato"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "potato_healthy": {
       "crop": "potato",
@@ -133,7 +151,10 @@
         "en": "The leaf looks healthy. No sign of early blight or late blight.",
         "hi": "पत्ती स्वस्थ दिख रही है। अगेती झुलसा या पछेती झुलसा का कोई लक्षण नहीं है।"
       },
-      "recognise": {"en": [], "hi": []},
+      "recognise": {
+        "en": [],
+        "hi": []
+      },
       "cultural_ipm": {
         "en": [
           "Check the crop once a week, early in the morning.",
@@ -151,13 +172,19 @@
         ]
       },
       "chemicals": [],
-      "chemical_note": {"en": "No spray is needed for a healthy crop.", "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"},
+      "chemical_note": {
+        "en": "No spray is needed for a healthy crop.",
+        "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"
+      },
       "severity": {},
       "call_kvk": {
         "en": "Call the KVK if you see dark water-soaked patches or white growth under the leaves.",
         "hi": "अगर पत्तियों पर गहरे, पानी से भीगे जैसे धब्बे या पत्तियों के नीचे सफ़ेद फफूंद दिखे, तो KVK से संपर्क करें।"
       },
-      "sources": ["niphm_potato", "tnau_potato_late_blight"],
+      "sources": [
+        "niphm_potato",
+        "tnau_potato_late_blight"
+      ],
       "hindi_reviewed": false
     },
     "potato_late_blight": {
@@ -202,7 +229,10 @@
           "name": "Mancozeb",
           "name_hi": "मैंकोज़ेब",
           "product": "Mancozeb 75% WP",
-          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 to 800 g in 300 litres of water per acre",
+            "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_potato"
         },
@@ -210,7 +240,10 @@
           "name": "Dimethomorph",
           "name_hi": "डाइमेथोमॉर्फ",
           "product": "Dimethomorph 50% WP",
-          "dose": {"en": "400 g in 300 litres of water per acre", "hi": "400 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "400 g in 300 litres of water per acre",
+            "hi": "400 ग्राम, 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_potato"
         },
@@ -218,7 +251,10 @@
           "name": "Cymoxanil + Mancozeb",
           "name_hi": "साइमोक्सानिल + मैंकोज़ेब",
           "product": "Cymoxanil 8% + Mancozeb 64% WP",
-          "dose": {"en": "600 to 800 g in 200 to 300 litres of water per acre", "hi": "600 से 800 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 to 800 g in 200 to 300 litres of water per acre",
+            "hi": "600 से 800 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": null,
           "source": "niphm_potato"
         }
@@ -245,8 +281,14 @@
         "en": "Call the KVK at once if the disease is spreading over the field or reaching the tubers.",
         "hi": "अगर रोग पूरे खेत में फैल रहा है या कंदों तक पहुंच रहा है, तो तुरंत KVK से संपर्क करें।"
       },
-      "sources": ["tnau_potato_late_blight", "niphm_potato"],
-      "hindi_reviewed": false
+      "sources": [
+        "tnau_potato_late_blight",
+        "niphm_potato"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "tomato_early_blight": {
       "crop": "tomato",
@@ -286,7 +328,10 @@
           "name": "Mancozeb",
           "name_hi": "मैंकोज़ेब",
           "product": "Mancozeb 75% WG",
-          "dose": {"en": "400 g in 200 litres of water per acre", "hi": "400 ग्राम, 200 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "400 g in 200 litres of water per acre",
+            "hi": "400 ग्राम, 200 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_tomato"
         },
@@ -294,7 +339,10 @@
           "name": "Azoxystrobin",
           "name_hi": "एज़ोक्सीस्ट्रोबिन",
           "product": "Azoxystrobin 23% SC",
-          "dose": {"en": "200 ml in 200 litres of water per acre", "hi": "200 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "200 ml in 200 litres of water per acre",
+            "hi": "200 मिली, 200 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": null,
           "source": "niphm_tomato"
         },
@@ -302,7 +350,10 @@
           "name": "Captan",
           "name_hi": "कैप्टान",
           "product": "Captan 50% WP",
-          "dose": {"en": "1000 g in 300 to 400 litres of water per acre", "hi": "1000 ग्राम, 300 से 400 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "1000 g in 300 to 400 litres of water per acre",
+            "hi": "1000 ग्राम, 300 से 400 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 6,
           "source": "niphm_tomato"
         }
@@ -329,8 +380,14 @@
         "en": "Call the KVK if spots keep spreading after a spray or if many fruits rot.",
         "hi": "अगर छिड़काव के बाद भी धब्बे फैलते रहें या कई फल सड़ने लगें, तो KVK से संपर्क करें।"
       },
-      "sources": ["tnau_tomato_early_blight", "niphm_tomato"],
-      "hindi_reviewed": false
+      "sources": [
+        "tnau_tomato_early_blight",
+        "niphm_tomato"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "tomato_healthy": {
       "crop": "tomato",
@@ -341,7 +398,10 @@
         "en": "The leaf looks healthy. No sign of the diseases or pests this app knows.",
         "hi": "पत्ती स्वस्थ दिख रही है। इस ऐप को पता रोगों या कीटों का कोई लक्षण नहीं है।"
       },
-      "recognise": {"en": [], "hi": []},
+      "recognise": {
+        "en": [],
+        "hi": []
+      },
       "cultural_ipm": {
         "en": [
           "Check the crop once a week, early in the morning, on both sides of the leaves.",
@@ -359,13 +419,18 @@
         ]
       },
       "chemicals": [],
-      "chemical_note": {"en": "No spray is needed for a healthy crop.", "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"},
+      "chemical_note": {
+        "en": "No spray is needed for a healthy crop.",
+        "hi": "स्वस्थ फसल पर किसी छिड़काव की ज़रूरत नहीं है।"
+      },
       "severity": {},
       "call_kvk": {
         "en": "Call the KVK if you see spots, curling leaves or tunnels in the leaves that you cannot explain.",
         "hi": "अगर पत्तियों पर धब्बे, मुड़ी हुई पत्तियां या सुरंगें दिखें जिनका कारण समझ न आए, तो KVK से संपर्क करें।"
       },
-      "sources": ["niphm_tomato"],
+      "sources": [
+        "niphm_tomato"
+      ],
       "hindi_reviewed": false
     },
     "tomato_late_blight": {
@@ -408,7 +473,10 @@
           "name": "Mancozeb",
           "name_hi": "मैंकोज़ेब",
           "product": "Mancozeb 75% WP",
-          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 to 800 g in 300 litres of water per acre",
+            "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_tomato"
         },
@@ -416,7 +484,10 @@
           "name": "Cymoxanil + Mancozeb",
           "name_hi": "साइमोक्सानिल + मैंकोज़ेब",
           "product": "Cymoxanil 8% + Mancozeb 64% WP",
-          "dose": {"en": "600 g in 200 to 300 litres of water per acre", "hi": "600 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 g in 200 to 300 litres of water per acre",
+            "hi": "600 ग्राम, 200 से 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": null,
           "source": "niphm_tomato"
         },
@@ -424,7 +495,10 @@
           "name": "Cyazofamid",
           "name_hi": "साइज़ोफ़ामिड",
           "product": "Cyazofamid 34.5% SC",
-          "dose": {"en": "80 ml in 200 litres of water per acre", "hi": "80 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "80 ml in 200 litres of water per acre",
+            "hi": "80 मिली, 200 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": null,
           "source": "niphm_tomato"
         }
@@ -451,8 +525,14 @@
         "en": "Call the KVK at once if the disease is spreading across the field.",
         "hi": "अगर रोग पूरे खेत में फैल रहा है, तो तुरंत KVK से संपर्क करें।"
       },
-      "sources": ["tnau_tomato_late_blight", "niphm_tomato"],
-      "hindi_reviewed": false
+      "sources": [
+        "tnau_tomato_late_blight",
+        "niphm_tomato"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "tomato_leaf_miner": {
       "crop": "tomato",
@@ -498,7 +578,10 @@
           "name": "Neem seed kernel extract",
           "name_hi": "नीम बीज गिरी अर्क",
           "product": "Neem seed kernel extract (NSKE) 5%",
-          "dose": {"en": "spray as a 5% extract", "hi": "5% अर्क का छिड़काव"},
+          "dose": {
+            "en": "spray as a 5% extract",
+            "hi": "5% अर्क का छिड़काव"
+          },
           "waiting_days": null,
           "source": "tnau_tomato_leaf_miner"
         },
@@ -506,7 +589,10 @@
           "name": "Cyantraniliprole",
           "name_hi": "साइएन्ट्रानिलिप्रोल",
           "product": "Cyantraniliprole 10.26 OD",
-          "dose": {"en": "1.8 ml per litre of water", "hi": "1.8 मिली प्रति लीटर पानी"},
+          "dose": {
+            "en": "1.8 ml per litre of water",
+            "hi": "1.8 मिली प्रति लीटर पानी"
+          },
           "waiting_days": null,
           "source": "tnau_tomato_leaf_miner"
         }
@@ -533,7 +619,10 @@
         "en": "Call the KVK if tunnels keep increasing after neem sprays, or if you also see holes in the fruits.",
         "hi": "अगर नीम के छिड़काव के बाद भी सुरंगें बढ़ती रहें, या फलों में भी छेद दिखें, तो KVK से संपर्क करें।"
       },
-      "sources": ["tnau_tomato_leaf_miner", "niphm_tomato"],
+      "sources": [
+        "tnau_tomato_leaf_miner",
+        "niphm_tomato"
+      ],
       "hindi_reviewed": false
     },
     "tomato_leaf_mold": {
@@ -598,8 +687,14 @@
         "en": "Call the KVK if the mould keeps spreading after you improve ventilation.",
         "hi": "अगर हवा का आना-जाना बढ़ाने के बाद भी फफूंद फैलती रहे, तो KVK से संपर्क करें।"
       },
-      "sources": ["cornell_leaf_mold", "rhs_leaf_mould"],
-      "hindi_reviewed": false
+      "sources": [
+        "cornell_leaf_mold",
+        "rhs_leaf_mould"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "tomato_septoria_leaf_spot": {
       "crop": "tomato",
@@ -639,7 +734,10 @@
           "name": "Mancozeb",
           "name_hi": "मैंकोज़ेब",
           "product": "Mancozeb 75% WP",
-          "dose": {"en": "600 to 800 g in 300 litres of water per acre", "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "600 to 800 g in 300 litres of water per acre",
+            "hi": "600 से 800 ग्राम, 300 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 10,
           "source": "niphm_tomato"
         }
@@ -666,8 +764,14 @@
         "en": "Call the KVK if the plants keep losing leaves after a spray.",
         "hi": "अगर छिड़काव के बाद भी पौधों की पत्तियां गिरती रहें, तो KVK से संपर्क करें।"
       },
-      "sources": ["tnau_tomato_septoria", "niphm_tomato"],
-      "hindi_reviewed": false
+      "sources": [
+        "tnau_tomato_septoria",
+        "niphm_tomato"
+      ],
+      "hindi_reviewed": false,
+      "context": {
+        "rain_raises_risk": true
+      }
     },
     "tomato_yellow_leaf_curl_virus": {
       "crop": "tomato",
@@ -713,7 +817,10 @@
           "name": "Imidacloprid",
           "name_hi": "इमिडाक्लोप्रिड",
           "product": "Imidacloprid 17.8 SL",
-          "dose": {"en": "60 to 70 ml in 200 litres of water per acre", "hi": "60 से 70 मिली, 200 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "60 to 70 ml in 200 litres of water per acre",
+            "hi": "60 से 70 मिली, 200 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 3,
           "source": "niphm_tomato"
         },
@@ -721,7 +828,10 @@
           "name": "Thiamethoxam",
           "name_hi": "थायामेथोक्साम",
           "product": "Thiamethoxam 25 WG",
-          "dose": {"en": "80 g in 200 litres of water per acre", "hi": "80 ग्राम, 200 लीटर पानी में, प्रति एकड़"},
+          "dose": {
+            "en": "80 g in 200 litres of water per acre",
+            "hi": "80 ग्राम, 200 लीटर पानी में, प्रति एकड़"
+          },
           "waiting_days": 5,
           "source": "niphm_tomato"
         }
@@ -748,7 +858,10 @@
         "en": "Call the KVK if many plants are curling, since a virus cannot be cured with sprays.",
         "hi": "अगर कई पौधों की पत्तियां मुड़ रही हैं तो KVK से संपर्क करें, क्योंकि वायरस छिड़काव से ठीक नहीं होता।"
       },
-      "sources": ["tnau_tomato_leaf_curl", "niphm_tomato"],
+      "sources": [
+        "tnau_tomato_leaf_curl",
+        "niphm_tomato"
+      ],
       "hindi_reviewed": false
     }
   },
@@ -764,5 +877,24 @@
     "niphm_potato": "https://niphm.gov.in/IPMPackages/Potato.pdf",
     "cornell_leaf_mold": "https://vegetables.cornell.edu/crops/tomatoes/tomato-leaf-mold",
     "rhs_leaf_mould": "https://www.rhs.org.uk/disease/tomato-leaf-mould"
+  },
+  "context": {
+    "_note": "Added for the app. Copies of general_safety items, used only when the farmer's answers make them relevant.",
+    "label_dose": {
+      "en": "Read the label on the pack before you mix anything, and use only the dose on the label or the dose your KVK gives you.",
+      "hi": "कुछ भी घोलने से पहले पैकेट का लेबल पढ़ें, और केवल लेबल पर लिखी या KVK द्वारा बताई गई मात्रा ही इस्तेमाल करें।"
+    },
+    "before_rain": {
+      "en": "Do not spray on a hot sunny day, in strong wind, or just before rain. Do not spray against the wind.",
+      "hi": "तेज़ धूप, तेज़ हवा में या बारिश से ठीक पहले छिड़काव न करें। हवा की उल्टी दिशा में छिड़काव न करें।"
+    },
+    "no_mix": {
+      "en": "Do not mix different pesticides in one tank.",
+      "hi": "अलग-अलग दवाइयां एक ही टंकी में न मिलाएं।"
+    },
+    "harvest_wait": {
+      "en": "Keep the waiting period before harvest. Do not spray in the 7 days before harvest.",
+      "hi": "तुड़ाई से पहले प्रतीक्षा अवधि का पालन करें। तुड़ाई से 7 दिन पहले तक छिड़काव न करें।"
+    }
   }
 }

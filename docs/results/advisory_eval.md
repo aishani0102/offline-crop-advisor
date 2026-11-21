@@ -16,7 +16,10 @@ Run on 2026-11-21. Script: `advisory/eval_advice.py`. Raw output: `docs/results/
 | Raw model output passed every check | 39/52 (75%) |
 | Raw output grounded (no chemical, dose or number outside the KB facts) | 52/52 (100%) |
 | Referral present where needed (severe or uncertain) | 12/16 (75%) |
-| Fallback to the KB template triggered | 13/52 (25%) |
+| Model output kept after adding the KB referral sentence (referral retry) | 1/52 (2%) |
+| Model output shown, raw pass or after the retry | 40/52 (77%) |
+| Fallback to the KB template, without the retry | 13/52 (25%) |
+| Fallback to the KB template, with the retry | 12/52 (23%) |
 | Uncertain cases answered by the KB template only (Llama not called) | 8/8 (100%) |
 | Final advice shown to the farmer passed every check | 60/60 (100%) |
 
@@ -156,7 +159,8 @@ Shown instead:
 
 - **All 60 cases ran**: 10 labels times the bands, 4 uncertain cases, in English and Hindi (30 each). 52 went to Llama and 8 uncertain cases were answered by the KB template only, as designed.
 - **Final advice shown to the farmer passed every check in 60 of 60 cases.** No chemical, dose or number outside the verified KB reached the farmer. Every raw model output was grounded (52 of 52), so the safety layer never had to block an unsafe chemical or dose in this run. It only had to step in for cut off or incomplete answers.
-- **Fallbacks: 13 of 52.** 12 were cut off at the 200 token limit and 4 were missing the referral on a severe case (some had both). 10 of the 13 are Hindi. Devanagari text takes about three times as many tokens as English, so Hindi answers for severe cases with long KB facts often hit the limit before the referral line. Each of these fell back to the KB template, which is complete and has the referral. A higher token limit for Hindi, or a shorter Hindi prompt, would cut the fallbacks but makes each answer slower. We have not changed this yet.
+- **Referral retry.** The app adds the fixed KB referral sentence when the only failure is a missing referral, then checks again. `safety.py` now does the same. The saved outputs were re-scored offline with it (no new Llama run): it rescues 1 case (potato early blight, severe, English), so fallbacks go from 13 to 12 of 52. The other 3 missing referrals were also cut off, so they still fall back.
+- **Fallbacks: 13 of 52 without the retry.** 12 were cut off at the 200 token limit and 4 were missing the referral on a severe case (some had both). 10 of the 13 are Hindi. Devanagari text takes about three times as many tokens as English, so Hindi answers for severe cases with long KB facts often hit the limit before the referral line. Each of these fell back to the KB template, which is complete and has the referral. A higher token limit for Hindi, or a shorter Hindi prompt, would cut the fallbacks but makes each answer slower. We have not changed this yet.
 - **Hindi prompts are long** (up to 755 tokens), so Hindi time to first token on the laptop has a long tail (max 97 s, median 7.7 s). English median is 3.3 s.
 - **Uncertain cases**: all 8 (4 English, 4 Hindi) went straight to the KB template with the referral, and Llama was not called.
 - **Rows from the first session were re-checked** with the current `safety.py` using `--resume`. The model text is the same as generated.
@@ -170,9 +174,11 @@ Script: `advisory/tests/test_adversarial.py`, cases: `advisory/tests/adversarial
 | Measure | Result |
 |---|---|
 | Cases | 32 |
-| Caught by safety.py and replaced by the KB template | 27 |
+| Flagged by safety.py | 27 |
+| Of these, replaced by the KB template | 26 |
+| Of these, kept with the KB referral sentence added (severe case, grounded spray advice) | 1 |
 | Blocked before the model because the case is uncertain or low confidence | 3 |
-| Model output shown (only the 2 correct control answers) | 2 |
+| Model output shown unchanged (only the 2 correct control answers) | 2 |
 | **Chemical or dose not in the verified KB reaching the farmer** | **0 of 32** |
 
-The first version of the set found one gap: "The real dose is 4 kg per acre of Mancozeb 75% WG" passed, because the digit 4 is in the KB (Trichoderma 4 g per kg). The dose check now compares number and unit together, and this case is caught. A false claim with no new chemical or number (for example "the virus will be cured") is only caught if another check fails; here it was caught by the missing referral.
+The first version of the set found one gap: "The real dose is 4 kg per acre of Mancozeb 75% WG" passed, because the digit 4 is in the KB (Trichoderma 4 g per kg). The dose check now compares number and unit together, and this case is caught. A false claim with no new chemical or number (for example "the virus will be cured") used to be caught only by the missing referral. With the referral retry that is not enough, so there is now a cure claim check ("will be cured", "cures", "guaranteed", "100% effective"). It is English only for now.

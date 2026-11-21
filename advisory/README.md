@@ -77,8 +77,14 @@ We use `Llama-3.2-1B-Instruct-SpinQuant_INT4_EO8.pte` from `executorch-community
 
 - **Grounded prompting, no fine-tuning (Phase 1).** For each case `knowledge.py` picks a few KB facts (signs, two IPM steps, up to two chemicals with dose and waiting period, one safety line). Llama only sees those facts and is told to rewrite them for a farmer, in 120 words or less (80 for Hindi), with no new chemicals, doses or numbers. Severe cases must end with the KVK and Kisan Call Centre line.
 - **Uncertain cases never go to Llama.** If `uncertain` is true, or the confidence is below the threshold in `configs/thresholds.json`, the app shows the template: no diagnosis, a retake tip and the referral. In our first test Llama answered every uncertain case with "The crop is wheat. The problem is pest infestation."
-- **Safety check on every answer** (`safety.py`): no chemical name outside the case facts (a list of about 150 pesticide names in English and Hindi, plus name-ending patterns), no number outside the facts, no number and unit pair (such as "4 kg") outside the facts, no dose written in words, no crop or problem name outside the facts, a referral where needed, the right script for the language, not cut off, not too long. If any check fails, the farmer gets the template instead.
+- **Safety check on every answer** (`safety.py`): no chemical name outside the case facts (a list of about 150 pesticide names in English and Hindi, plus name-ending patterns), no number outside the facts, no number and unit pair (such as "4 kg") outside the facts, no dose written in words, no crop or problem name outside the facts, no promise of a cure or a guaranteed result (English only for now), a referral where needed, the right script for the language, not cut off, not too long. If the only failure is a missing referral, the fixed KB referral sentence is added and the text is checked again (the app does the same). If any check still fails, the farmer gets the template instead.
 - **Phase 2 plan: LoRA fine-tune.** Fine-tuning is not possible on our CPU-only laptop. The plan is a LoRA fine-tune on a few thousand curated question and answer pairs written from ICAR, TNAU and state university material, in English and Hindi, checked by a person. The same safety checks would stay in place.
+
+## One knowledge base for the scripts and the app
+
+`advisory/kb/kb.json` is the single source for the knowledge base. The Android app uses a copy of it at `app/advisor/src/main/assets/kb.json` (copied by hand, there is no build step for it yet). Any fix goes here first and is then copied to the app. Right now the two files are the same.
+
+Agreed extension for the app: the `context` sections. There is one at the top level (`context.label_dose`, `before_rain`, `no_mix`, `harvest_wait`, which are copies of `general_safety` lines in English and Hindi) and one in six disease entries (`"rain_raises_risk": true`). The app uses them to order the advice from the three farm questions. The Python scripts ignore them, and they add no new chemical, dose or number.
 
 ## Memory-aware mode
 

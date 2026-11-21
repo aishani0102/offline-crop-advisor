@@ -11,7 +11,10 @@ Checks:
    facts for this case (it once said "wheat, pest infestation").
 4. referral: severe and uncertain cases must mention the KVK or the
    Kisan Call Centre number.
-5. form: not empty, right script for the language, not cut off, not too long.
+5. claims: no promise that the plant will be cured or that a result is
+   guaranteed (the KB never promises this, and for the virus it says the
+   opposite). English only for now.
+6. form: not empty, right script for the language, not cut off, not too long.
 
 If any check fails we throw the model text away and use the template,
 which is written straight from the KB.
@@ -67,6 +70,13 @@ NUM_WORDS_EN = r"(?:one|two|three|four|five|six|seven|eight|nine|ten|twenty|fift
 NUM_WORDS_HI = r"(?:एक|दो|तीन|चार|पांच|पाँच|छह|सात|आठ|नौ|दस|बीस|पचास|सौ|आधा|आधी)"
 WORD_DOSE = re.compile(
     rf"\b{NUM_WORDS_EN}\s+{UNITS_EN}\b|(?<!\S){NUM_WORDS_HI}\s+{UNITS_HI}", re.IGNORECASE
+)
+
+# Promises the KB never makes. "cannot be cured" and "no cure" do not match.
+CURE_CLAIM = re.compile(
+    r"\b(?:will|can|could|would|should|to)\s+(?:be\s+)?(?:fully\s+|completely\s+)?cure[ds]?\b"
+    r"|\bcures\b|\bguarantee[ds]?\b|\b100\s*%\s*(?:cure|safe|effective|result)",
+    re.IGNORECASE,
 )
 
 # Crops and problems the output may only name if the case facts name them.
@@ -212,6 +222,9 @@ def check_output(text, case, kb=None, facts=None, truncated=False, limit_length=
     if mismatch:
         fails.append("crop_or_condition_mismatch:" + ",".join(mismatch))
 
+    if CURE_CLAIM.search(text):
+        fails.append("cure_claim")
+
     if needs_referral(case) and not _has_referral(text):
         fails.append("missing_referral")
 
@@ -225,9 +238,25 @@ def check_output(text, case, kb=None, facts=None, truncated=False, limit_length=
 
 
 def safe_advice(text, case, kb=None, truncated=False):
-    """Return (final_text, fails, used_fallback)."""
+    """Return (final_text, fails, used_fallback).
+
+    fails are the checks the raw model text failed. If the only failure is a
+    missing referral, the fixed KB referral sentence is added and the text is
+    checked again (the app does the same). If that passes, the model text is
+    kept and used_fallback is False.
+    """
     kb = kb or load_kb()
     fails = check_output(text, case, kb, truncated=truncated)
+    if fails == ["missing_referral"]:
+        referral = select_facts(case, kb).get("referral", "")
+        retried = text.strip() + "\n\n" + referral
+        if referral and not check_output(retried, case, kb):
+            return retried, fails, False
     if fails:
         return template_advice(case, kb), fails, True
     return text.strip(), fails, False
+
+
+def referral_retried(fails, used_fallback):
+    """True when the model text was kept only because the referral was added."""
+    return fails == ["missing_referral"] and not used_fallback
