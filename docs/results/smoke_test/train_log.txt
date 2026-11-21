@@ -1,0 +1,11 @@
+args: {'root': '<data_root>', 'out': '<data_root>/models/smoke', 'arch': 'large', 'size': 224, 'batch': 32, 'workers': 2, 'threads': 4, 'device': 'auto', 'no_amp': False, 'frozen_epochs': 1, 'full_epochs': 1, 'epochs': 2, 'limit': 300, 'head_lr': 0.002, 'full_lr': 0.0004, 'field_weight': 2.0, 'max_steps': 0, 'seed': 0}
+device cpu, amp False, train 300, val 300
+stage 1 (frozen backbone), lr 0.002
+  epoch 1 step 0/9 loss 2.367 26.30 s/step
+epoch 1/2: loss 2.054 val acc 0.4400 val macro F1 0.3796 val field macro F1 0.3277 (130 s)
+  saved best.pt (val macro F1 0.3796)
+stage 2 (full fine-tune), lr 0.0004
+  epoch 2 step 0/9 loss 2.165 35.15 s/step
+epoch 2/2: loss 1.994 val acc 0.4500 val macro F1 0.3760 val field macro F1 0.2867 (292 s)
+temperature 0.472 (val NLL 1.7792 -> 1.6102)
+done in 7.0 min, best epoch 1, val macro F1 0.3796

@@ -1,0 +1,52 @@
+{
+ "args": {
+  "root": "<data_root>",
+  "out": "<data_root>/models/smoke",
+  "arch": "large",
+  "size": 224,
+  "batch": 32,
+  "workers": 2,
+  "threads": 4,
+  "device": "auto",
+  "no_amp": false,
+  "frozen_epochs": 1,
+  "full_epochs": 1,
+  "epochs": 2,
+  "limit": 300,
+  "head_lr": 0.002,
+  "full_lr": 0.0004,
+  "field_weight": 2.0,
+  "max_steps": 0,
+  "seed": 0
+ },
+ "device": "cpu",
+ "train_images": 300,
+ "val_images": 300,
+ "best_epoch": 1,
+ "best_val_macro_f1": 0.3795821404087335,
+ "temperature": 0.472481906414032,
+ "total_train_seconds": 423.0,
+ "mean_epoch_seconds": 211.2,
+ "history": [
+  {
+   "epoch": 1,
+   "stage": 1,
+   "train_loss": 2.0538889831966824,
+   "val_acc": 0.44,
+   "val_macro_f1": 0.3795821404087335,
+   "val_field_macro_f1": 0.3277314708403351,
+   "train_seconds": 38.3,
+   "epoch_seconds": 130.0
+  },
+  {
+   "epoch": 2,
+   "stage": 2,
+   "train_loss": 1.994370116127862,
+   "val_acc": 0.45,
+   "val_macro_f1": 0.3759993764991874,
+   "val_field_macro_f1": 0.2866994148588077,
+   "train_seconds": 253.6,
+   "epoch_seconds": 292.3
+  }
+ ]
+}

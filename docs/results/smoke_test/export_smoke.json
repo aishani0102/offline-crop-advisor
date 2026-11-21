@@ -1,0 +1,44 @@
+{
+ "checkpoint": "best.pt",
+ "arch": "large",
+ "input": 224,
+ "calibration": {
+  "field": 32,
+  "lab": 16
+ },
+ "fp32": {
+  "file": "smoke_fp32.pte",
+  "size_mb": 16.88,
+  "max_abs_logit_diff_vs_pytorch_one_image": 0.0,
+  "latency_x86_laptop": {
+   "median_ms": 12.23,
+   "p90_ms": 14.28,
+   "mean_ms": 12.22,
+   "runs": 50
+  },
+  "test_field_macro_f1": 0.30933018291302605,
+  "test_field_accuracy": 0.48314606741573035,
+  "test_field_crop_known_accuracy": 0.5489566613162119
+ },
+ "int8": {
+  "file": "smoke_int8.pte",
+  "size_mb": 4.52,
+  "max_abs_logit_diff_vs_pytorch_one_image": 0.1493,
+  "latency_x86_laptop": {
+   "median_ms": 9.73,
+   "p90_ms": 10.98,
+   "mean_ms": 9.67,
+   "runs": 50
+  },
+  "test_field_macro_f1": 0.31679571993211675,
+  "test_field_accuracy": 0.48475120385232745,
+  "test_field_crop_known_accuracy": 0.5425361155698234
+ },
+ "pytorch_eager_latency_x86_laptop": {
+  "median_ms": 27.23,
+  "mean_ms": 27.7,
+  "runs": 50
+ },
+ "note": "Latency is batch 1 on an Intel i5-1135G7 laptop CPU with 4 threads through the ExecuTorch Python runtime. It is not phone latency.",
+ "int8_field_macro_f1_drop_points": -0.75
+}
