@@ -1,0 +1,15 @@
+# Detection track, Python 3.10. These are the versions we actually used on the laptop (CPU).
+# On Colab, keep its own CUDA torch and install the rest (the notebook does this).
+torch==2.14.1
+torchvision==0.29.2
+executorch==1.5.1
+torchao==0.18.0
+numpy==2.2.6
+pillow==12.3.0
+imagehash==4.3.2
+opencv-python-headless==5.1.0.95
+scikit-learn==1.7.2
+scipy==1.15.3
+pandas==2.3.3
+matplotlib==3.10.9
+tqdm==4.70.1
