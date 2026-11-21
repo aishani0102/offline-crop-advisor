@@ -1,0 +1,25 @@
+{
+  "label": "potato_late_blight",
+  "crop": "potato",
+  "condition": "Late blight",
+  "type": "disease",
+  "confidence": 0.91,
+  "top3": [
+    {
+      "label": "potato_late_blight",
+      "confidence": 0.91
+    },
+    {
+      "label": "potato_early_blight",
+      "confidence": 0.07
+    },
+    {
+      "label": "potato_healthy",
+      "confidence": 0.02
+    }
+  ],
+  "severity_pct": 42.0,
+  "severity_band": "severe",
+  "uncertain": false,
+  "language": "hi"
+}

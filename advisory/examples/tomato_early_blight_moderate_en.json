@@ -1,0 +1,25 @@
+{
+  "label": "tomato_early_blight",
+  "crop": "tomato",
+  "condition": "Early blight",
+  "type": "disease",
+  "confidence": 0.87,
+  "top3": [
+    {
+      "label": "tomato_early_blight",
+      "confidence": 0.87
+    },
+    {
+      "label": "tomato_septoria_leaf_spot",
+      "confidence": 0.08
+    },
+    {
+      "label": "tomato_late_blight",
+      "confidence": 0.03
+    }
+  ],
+  "severity_pct": 18.5,
+  "severity_band": "moderate",
+  "uncertain": false,
+  "language": "en"
+}

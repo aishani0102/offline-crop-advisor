@@ -1,0 +1,25 @@
+{
+  "label": "tomato_healthy",
+  "crop": "tomato",
+  "condition": "Healthy",
+  "type": "healthy",
+  "confidence": 0.95,
+  "top3": [
+    {
+      "label": "tomato_healthy",
+      "confidence": 0.95
+    },
+    {
+      "label": "tomato_leaf_mold",
+      "confidence": 0.03
+    },
+    {
+      "label": "tomato_early_blight",
+      "confidence": 0.01
+    }
+  ],
+  "severity_pct": null,
+  "severity_band": "none",
+  "uncertain": false,
+  "language": "en"
+}
