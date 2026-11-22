@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Leaf with a midrib, inside the 66dp safe zone of a 108dp adaptive icon -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M76,30C50,30 32,44 32,64c0,5 1.5,9.5 4,13c4,2.5 9,4 14,4C66,81 78,62 76,30z" />
+    <path android:strokeColor="#2E6B34" android:strokeWidth="3" android:strokeLineCap="round"
+        android:pathData="M36,77L70,38" />
+    <path android:strokeColor="#2E6B34" android:strokeWidth="2.5" android:strokeLineCap="round"
+        android:pathData="M48,63L47,52M56,54L56,44M48,63L59,64M56,54L66,55" />
+</vector>

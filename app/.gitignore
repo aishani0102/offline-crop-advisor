@@ -1,0 +1,19 @@
+# Build outputs and local settings
+build/
+.gradle/
+.kotlin/
+.idea/
+*.iml
+local.properties
+captures/
+
+# Models, tokenizers and signing keys stay off git
+*.pte
+*.pt
+*.pth
+*.bin
+tokenizer.model
+*.keystore
+*.jks
+*.apk
+*.aab

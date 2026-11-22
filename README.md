@@ -44,6 +44,38 @@ Each stage has its own README with the exact commands.
 
 Model weights are not in the repo. The vision model is rebuilt with the training scripts, and the Llama model is downloaded and exported with `advisory/export_llama.py` after you accept the Llama 3.2 licence on Hugging Face.
 
+## Run the app
+
+Needs JDK 17 or newer (set `JAVA_HOME`) and the Android SDK. Put the SDK path in `app/local.properties`, e.g. `sdk.dir=C\:\\Users\\you\\AppData\\Local\\Android\\Sdk`.
+
+```
+cd app
+gradlew :advisor:assembleDebug          (./gradlew on Linux/macOS)
+adb install -r advisor/build/outputs/apk/debug/advisor-debug.apk
+```
+
+The leaf model is bundled in the APK. For Llama advice, push the exported model and tokenizer:
+
+```
+adb push llama.pte tokenizer.model /sdcard/Android/data/app.cropadvisor/files/
+```
+
+Without them the app shows the template advice.
+
+Debug intent extras, for example `adb shell am start -S -n app.cropadvisor/.MainActivity --es classify test_015492.jpg --es crop tomato --es answers yes,growing,no`:
+
+| Extra | What it does |
+|---|---|
+| `--es classify <file>` | Classify a photo from the files folder |
+| `--es crop <name>` | Set the crop (tomato, potato, ...) |
+| `--es answers a,b,c` | Pre-fill the follow-up questions (`-` skips one) |
+| `--ez visiontest true` | Classify every `test_*.jpg` in the files folder and log the top 3 |
+| `--ez sevtest true` | Check severity against `golden.json` and the golden photos |
+| `--ez llmtest true` | Run the Llama test prompts |
+| `--ez stepshrink true` | Use the old step-by-step photo resize (default is one step) |
+
+Results go to logcat (tag `CropAdvisor`) and `timings.log` in the files folder.
+
 ## Datasets
 
 See `docs/DATASETS.md` for every source, what we took from it, its licence and its link.

@@ -1,0 +1,379 @@
+package app.cropadvisor
+
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import java.io.File
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import kotlin.concurrent.thread
+
+
+// Square corners everywhere.
+private val square = RectangleShape
+// Theme shapes need a corner based shape, so use zero radius corners there.
+private val zero = RoundedCornerShape(0.dp)
+val SquareShapes = Shapes(zero, zero, zero, zero, zero)
+
+class MainActivity : ComponentActivity() {
+    private var out by mutableStateOf("")
+    private var busy by mutableStateOf(false)
+
+    // The chosen language is kept in settings and applied to this activity, so
+    // string resources and the advice both follow it.
+    private val lang by lazy { getSharedPreferences("settings", MODE_PRIVATE).getString("lang", "en") ?: "en" }
+
+    override fun attachBaseContext(base: android.content.Context) {
+        val l = base.getSharedPreferences("settings", MODE_PRIVATE).getString("lang", "en") ?: "en"
+        val conf = android.content.res.Configuration(base.resources.configuration)
+        conf.setLocale(java.util.Locale.forLanguageTag(l))
+        super.attachBaseContext(base.createConfigurationContext(conf))
+    }
+
+    private fun setLanguage(l: String) {
+        if (l == lang) return
+        getSharedPreferences("settings", MODE_PRIVATE).edit().putString("lang", l).commit()
+        recreate()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        officer = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
+        state = getSharedPreferences("settings", MODE_PRIVATE).getString("state", "") ?: ""
+        theme = getSharedPreferences("settings", MODE_PRIVATE).getString("theme", "system") ?: "system"
+        setContent {
+            // Light or dark: "system" until the farmer taps the switch in the banner.
+            val dark = when (theme) {
+                "light" -> false
+                "dark" -> true
+                else -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            val pal = if (dark) DarkPalette else LightPalette
+            // Follows the phone until the switch in the banner is tapped, then the choice is kept.
+            val switch = ThemeSwitch(dark) {
+                theme = if (dark) "light" else "dark"
+                getSharedPreferences("settings", MODE_PRIVATE).edit().putString("theme", theme).apply()
+            }
+            androidx.compose.runtime.CompositionLocalProvider(LocalPalette provides pal, LocalThemeSwitch provides switch) {
+            MaterialTheme(
+                colorScheme = if (dark) darkColorScheme(primary = pal.accent, background = pal.bg, surface = pal.surface)
+                else androidx.compose.material3.lightColorScheme(primary = pal.accent, background = pal.bg, surface = pal.surface),
+                shapes = SquareShapes,
+            ) {
+                val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+                    if (ok) photoUri?.let { classifyUri(it) }
+                }
+                val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                    uri?.let { classifyUri(it) }
+                }
+                val d = diagnosis
+                val p = photo
+                if (d != null && p != null && asking) {
+                    BackHandler { diagnosis = null; asking = false }
+                    QuestionsScreen(d.crop) { r, s, sp -> asking = false; adviseWith(d, r, s, sp) }
+                } else if (d != null && p != null) {
+                    BackHandler { diagnosis = null }
+                    val c = case
+                    ResultScreen(
+                        p, d, advice, adviceNote, if (c?.needsReferral == true) ({ sendSms(c) }) else null,
+                        onAgain = { diagnosis = null }, scrollDown = intent.getBooleanExtra("scrolldown", false),
+                    )
+                } else {
+                    HomeScreen(
+                        crop, busy, officer, lang, error = error, onLang = { setLanguage(it) },
+                        onOfficer = {
+                            officer = it.filter { ch -> ch.isDigit() || ch == '+' }
+                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("officer", officer).apply()
+                        },
+                        state = state,
+                        onState = {
+                            state = it
+                            getSharedPreferences("settings", MODE_PRIVATE).edit().putString("state", it).apply()
+                        },
+                        onCrop = { crop = it },
+                        onCamera = { newPhotoUri().let { photoUri = it; camera.launch(it) } },
+                        onGallery = {
+                            gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                    )
+                }
+            }
+            }
+        }
+        // only on a fresh start, so a recreated activity does not run the test again
+        if (savedInstanceState == null) {
+            // debug: classify a file from the app folder without tapping, for screenshots
+            // debug: --ez stepshrink true uses the old step-by-step resize, to compare
+            Photo.stepShrink = intent.getBooleanExtra("stepshrink", false)
+            intent.getStringExtra("classify")?.let { name ->
+                intent.getStringExtra("crop")?.let { crop = it }
+                classifyUri(android.net.Uri.fromFile(java.io.File(getExternalFilesDir(null), name)))
+            }
+            if (intent.getBooleanExtra("llmtest", false)) runLlmTest()
+            if (intent.getBooleanExtra("visiontest", false)) runVisionTest()
+            if (intent.getBooleanExtra("sevtest", false)) runSeverityTest()
+        }
+    }
+
+    private var crop by mutableStateOf("tomato")
+    private var photo by mutableStateOf<Bitmap?>(null)
+    private var diagnosis by mutableStateOf<Diagnosis?>(null)
+    private var photoUri: Uri? = null
+    private var vision: Vision? = null
+
+    private var officer by mutableStateOf("")
+    private var state by mutableStateOf("")
+    private var theme by mutableStateOf("system")
+    private var asking by mutableStateOf(false)
+    private var error by mutableStateOf("")   // shown on the home screen
+
+    // Answers from the questions screen, plus month and state, then the advice.
+    private fun adviseWith(d: Diagnosis, rain: String?, stage: String?, sprayed: String?) {
+        val month = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH) + 1
+        val a = Answers(rain, stage, sprayed, month, state)
+        Perf.log(this, "answers rain=$rain stage=$stage sprayed=$sprayed month=$month state=$state")
+        thread { startAdvice(d, a) }
+    }
+    private var case by mutableStateOf<Case?>(null)
+    private var advice by mutableStateOf("")
+    private var adviceNote by mutableStateOf("")
+    private val advisor by lazy { Advisor(this) }
+    private var llm: Llm? = null
+
+    // Shows the template text at once, then tries the language model in the
+    // background and swaps its text in only if it passes the safety check.
+    // Called from the classify thread.
+    // Runs Severity.kt on the golden photos pushed into the files folder and compares with the
+    // values severity.py gave (golden.json from the detection branch).
+    private fun runSeverityTest() {
+        thread {
+            val dir = getExternalFilesDir(null) ?: return@thread
+            val g = org.json.JSONObject(File(dir, "golden.json").readText()).getJSONArray("images")
+            var pass = 0
+            for (i in 0 until g.length()) {
+                val e = g.getJSONObject(i)
+                val name = e.getString("image").replace('/', '_')
+                val opts = android.graphics.BitmapFactory.Options().apply {
+                    inPreferredConfig = Bitmap.Config.ARGB_8888; inScaled = false
+                }
+                val bmp = android.graphics.BitmapFactory.decodeFile(File(dir, name).path, opts)
+                val t0 = android.os.SystemClock.elapsedRealtime()
+                val r = Severity.estimate(bmp)
+                val ms = android.os.SystemClock.elapsedRealtime() - t0
+                val gold = e.optDouble("severity_pct", Double.NaN)
+                val ok = r.severityPct != null && Math.abs(r.severityPct - gold) <= 1.0
+                if (ok) pass++
+                Perf.log(this, "sevtest $name golden=$gold ${e.getString("severity_band")} phone=${r.severityPct} ${r.band} ok=$ok ms=$ms")
+            }
+            Perf.log(this, "sevtest passed $pass of ${g.length()}")
+        }
+    }
+
+    private fun startAdvice(d: Diagnosis, answers: Answers? = null) {
+        val c = Case.from(d, lang, answers)
+        val tmpl = advisor.template(c)
+        runOnUiThread { case = c; advice = tmpl; adviceNote = getString(R.string.src_guide) }
+        // Uncertain results never go to Llama, and Llama only writes en and hi.
+        if (c.uncertain || c.lang !in LLM_LANGUAGES) return
+        val mem = android.app.ActivityManager.MemoryInfo()
+        (getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager).getMemoryInfo(mem)
+        val freeMb = mem.availMem / (1024 * 1024)
+        val pte = ModelFiles.find(this, "llama.pte")
+        val tok = ModelFiles.find(this, "tokenizer.model")
+        if (freeMb < Advisor.LLAMA_NEEDS_MB || pte == null || tok == null) {
+            Perf.log(this, "advice mode=template free_mb=$freeMb model=${pte != null}")
+            return
+        }
+        runOnUiThread { adviceNote = getString(R.string.src_writing) }
+        try {
+            val m = llm ?: Llm(pte, tok).also { llm = it; it.load() }
+            val (sys, user) = advisor.prompt(c)
+            // seqLen counts prompt plus answer. Hindi needs about 3 times the tokens of
+            // English, and in the PC eval 12 of 13 fallbacks hit the 200 new token
+            // limit, so Hindi gets the whole 1024 context of the exported model.
+            val seqLen = if (c.lang == "hi") 1024 else 768
+            val r = m.generate(m.chatPrompt(sys, user), seqLen)
+            var text = advisor.cleanOutput(r.text)
+            val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("Ã Â¥Â¤") }
+            var fails = advisor.check(text, c, truncated)
+            // The 1B model often drops the last sentence. The referral line is
+            // fixed KB text, so add it ourselves and check again. Note: this retry
+            // is only in the app, the Python advisory code (safety.py) does not do it.
+            if (fails == listOf("missing_referral")) {
+                text += "\n\n" + advisor.facts(c).referral
+                fails = advisor.check(text, c, false)
+            }
+            Perf.log(this, "llm_text=" + text.replace("\n", " "))
+            Perf.log(this, "advice mode=llm lang=${c.lang} seq_len=$seqLen free_mb=$freeMb load_ms=${m.loadMs} ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} peak_rss_mb=${Perf.peakRssMb()} fails=$fails")
+            if (diagnosis !== d) return
+            runOnUiThread {
+                if (fails.isEmpty()) { advice = text; adviceNote = getString(R.string.src_llm) }
+                else adviceNote = getString(R.string.src_guide)
+            }
+        } catch (e: Throwable) {
+            Perf.log(this, "advice_error=$e")
+            runOnUiThread { adviceNote = getString(R.string.src_guide) }
+        }
+    }
+
+    private fun sendSms(c: Case) {
+        val number = getSharedPreferences("settings", MODE_PRIVATE).getString("officer", "") ?: ""
+        val i = android.content.Intent(android.content.Intent.ACTION_SENDTO, Uri.parse("smsto:$number"))
+        i.putExtra("sms_body", advisor.sms(c))
+        startActivity(i)
+    }
+
+    private fun newPhotoUri(): Uri {
+        val dir = File(cacheDir, "photos").apply { mkdirs() }
+        return FileProvider.getUriForFile(this, "app.cropadvisor.photos", File(dir, "leaf.jpg"))
+    }
+
+    // Decodes the photo upright (EXIF applied). Big camera photos are shrunk on
+    // decode, the model only needs 256 px.
+    private fun decodePhoto(uri: Uri): Bitmap =
+        ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri)) { dec, info, _ ->
+            dec.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            val s = minOf(info.size.width, info.size.height)
+            if (s > 1024) dec.setTargetSampleSize(s / 1024)
+        }
+
+    // Decodes the photo upright and runs the leaf model off the main thread.
+    private fun classifyUri(uri: Uri) {
+        if (busy) return
+        busy = true
+        val chosen = crop
+        thread {
+            try {
+                runOnUiThread { error = "" }
+                val bmp = try { decodePhoto(uri) } catch (e: Exception) {
+                    Perf.log(this, "decode_error=$e")
+                    runOnUiThread { error = getString(R.string.err_photo) }
+                    return@thread
+                }
+                val v = vision ?: try {
+                    Vision(ModelFiles.vision(this)?.path ?: error("vision.pte missing")).also { vision = it }
+                } catch (e: Throwable) {
+                    Perf.log(this, "model_error=$e")
+                    runOnUiThread { error = getString(R.string.err_model) }
+                    return@thread
+                }
+                // Quality gate first, like predict.py: anything but ok makes the result uncertain.
+                val quality = Quality.check(bmp)
+                var d = Diagnosis.from(chosen, v.classify(bmp)).copy(quality = quality)
+                if (quality == "no_leaf") d = d.copy(band = "no_leaf")
+                // Severity only for disease and pest labels. A healthy leaf scores high
+                // on this colour method (26% on the golden healthy photo), so skip it.
+                if (!d.label.endsWith("_healthy") && quality != "no_leaf") {
+                    val t0 = android.os.SystemClock.elapsedRealtime()
+                    val s = Severity.estimate(bmp.copy(Bitmap.Config.ARGB_8888, false))
+                    d = d.copy(sevPct = s.severityPct, band = s.band)
+                    Perf.log(this, "severity pct=${s.severityPct} band=${s.band} ms=${android.os.SystemClock.elapsedRealtime() - t0}")
+                }
+                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} mass=${"%.3f".format(d.cropMass)} quality=$quality ms=${d.ms}")
+                // Questions only for a confident disease or pest result with a leaf found.
+                val ask = !d.uncertain && !d.label.endsWith("_healthy") && d.band != "no_leaf"
+                // debug: --es answers rain,stage,sprayed (for example yes,harvest,no) answers without tapping
+                val preset = intent.getStringExtra("answers")?.split(",")?.map { it.takeIf { v -> v != "-" } }
+                runOnUiThread { advice = ""; photo = bmp; diagnosis = d; asking = ask && preset == null }
+                if (ask && preset != null) adviseWith(d, preset.getOrNull(0), preset.getOrNull(1), preset.getOrNull(2))
+                else if (!ask) startAdvice(d)
+            } catch (e: Throwable) {
+                Perf.log(this, "classify_error=$e")
+                runOnUiThread { error = getString(R.string.err_photo) }
+            } finally {
+                runOnUiThread { busy = false }
+            }
+        }
+    }
+
+    // Classifies every test_*.jpg in the app's files folder and logs top 3, decoded
+    // the same way as a real photo. With --es crop potato it also logs the
+    // crop-only ranking and quality the result screen would show.
+    private fun runVisionTest() {
+        val testCrop = intent.getStringExtra("crop")
+        thread {
+            try {
+                val dir = getExternalFilesDir(null) ?: return@thread
+                val pte = ModelFiles.vision(this) ?: error("vision.pte not found")
+                val t0 = System.currentTimeMillis()
+                val vision = Vision(pte.path)
+                Perf.log(this, "vision_load_ms=${System.currentTimeMillis() - t0}")
+                val images = dir.listFiles { f -> f.name.startsWith("test_") && f.name.endsWith(".jpg") }.orEmpty().sorted()
+                for (f in images) {
+                    val bmp = decodePhoto(Uri.fromFile(f))
+                    vision.classify(bmp) // warm up
+                    val r = vision.classify(bmp)
+                    val top = r.top(3).joinToString(" ") { "${Vision.LABELS[it]}:${"%.3f".format(r.probs[it])}" }
+                    val shown = testCrop?.let { c ->
+                        val d = Diagnosis.from(c, r)
+                        " $c=${d.label}:${"%.3f".format(d.confidence)} mass=${"%.3f".format(d.cropMass)} quality=${Quality.check(bmp)}"
+                    } ?: ""
+                    Perf.log(this, "vision ${f.name} ${bmp.width}x${bmp.height} shrink=${Photo.stepShrink} ms=${r.ms} top3=$top$shown")
+                }
+                Perf.log(this, "vision_done peak_rss_mb=${Perf.peakRssMb()}")
+                vision.close()
+            } catch (e: Throwable) {
+                Perf.log(this, "vision_error=$e")
+            }
+        }
+    }
+
+    private fun runLlmTest() {
+        if (busy) return
+        busy = true
+        out = "Loading model"
+        thread {
+            try {
+                val pte = ModelFiles.find(this, "llama.pte") ?: error("llama.pte not found")
+                val tok = ModelFiles.find(this, "tokenizer.model") ?: error("tokenizer.model not found")
+                val llm = Llm(pte, tok)
+                llm.load()
+                Perf.log(this, "llm_load_ms=${llm.loadMs} rss_mb=${Perf.peakRssMb()}")
+                val prompt = llm.chatPrompt(
+                    "You are a farm advisor. Answer in two short sentences.",
+                    "How do I stop early blight spreading on my tomato plants?",
+                )
+                val sb = StringBuilder()
+                val r = llm.generate(prompt, 256) { tok -> sb.append(tok); runOnUiThread { out = sb.toString() } }
+                val secs = (r.totalMs - r.ttftMs).coerceAtLeast(1) / 1000.0
+                val line = "llm ttft_ms=${r.ttftMs} total_ms=${r.totalMs} tokens=${r.tokens} " +
+                    "tok_per_s=${"%.2f".format((r.tokens - 1) / secs)} peak_rss_mb=${Perf.peakRssMb()} stats=${r.stats}"
+                Perf.log(this, line)
+                Perf.log(this, "llm_text=" + r.text.replace("\n", " "))
+                llm.close()
+            } catch (e: Throwable) {
+                Perf.log(this, "llm_error=$e")
+                runOnUiThread { out = "Error: $e" }
+            } finally {
+                runOnUiThread { busy = false }
+            }
+        }
+    }
+}
