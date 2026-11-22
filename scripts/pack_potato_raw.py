@@ -1,4 +1,4 @@
-"""Pack the two Mendeley potato datasets into one zip for Colab.
+"""Pack the two Mendeley potato datasets and PLD (Kaggle) into one zip for Colab.
 
 Mendeley sometimes refuses downloads from Colab. If that happens, run this on
 a machine where download.py already worked, upload the zip to the cache
@@ -10,7 +10,7 @@ import argparse
 import zipfile
 from pathlib import Path
 
-SOURCES = ["potato_indonesia", "potato_ethiopia"]
+SOURCES = ["potato_indonesia", "potato_ethiopia", "pld"]
 
 
 def main():
@@ -29,7 +29,10 @@ def main():
             for f in sorted(src.rglob("*")):
                 # skip half-finished downloads and the extracted Ethiopia copy,
                 # download.py re-extracts the rar on its own
-                if f.is_dir() or f.name.endswith(".part") or "extracted" in f.relative_to(src).parts:
+                if f.is_dir() or f.name.endswith(".part"):
+                    continue
+                # PLD comes from Kaggle (needs a token), so ship its extracted images, not the zip
+                if ("extracted" in f.relative_to(src).parts) != (name == "pld"):
                     continue
                 z.write(f, f.relative_to(raw).as_posix())
                 n += 1

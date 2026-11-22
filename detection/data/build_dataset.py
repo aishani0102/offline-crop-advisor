@@ -74,6 +74,9 @@ TOMATO_VILLAGE = {
 }
 INDONESIA = {"Phytophthora": "potato_late_blight", "Healthy": "potato_healthy"}
 ETHIOPIA = {"Healthy": "potato_healthy", "Late Blight": "potato_late_blight"}
+# PLD, Central Punjab, Pakistan (Kaggle rizwan123456789/potato-disease-leaf-datasetpld)
+PLD = {"Early_Blight": "potato_early_blight", "Healthy": "potato_healthy", "Late_Blight": "potato_late_blight"}
+PLD_SPLITS = {"Training": "train", "Validation": "val", "Testing": "test"}
 
 SPLIT_NAMES = {"train": "train", "training": "train", "val": "val", "validation": "val", "test": "test"}
 
@@ -128,6 +131,13 @@ def collect(raw):
     for d, label in ETHIOPIA.items():
         for p in images_in(eth / d):
             add(p, "potato_ethiopia", "field", label)
+
+    # added last so the image numbers of the older sources do not change
+    pld = raw / "pld" / "extracted" / "PLD_3_Classes_256"
+    for sd, split in PLD_SPLITS.items():
+        for d, label in PLD.items():
+            for p in images_in(pld / sd / d):
+                add(p, "pld", "field", label, split)
     return recs
 
 
@@ -193,7 +203,11 @@ def assign_splits(recs, rng):
     for r in recs:
         by[(r["source"], r["label"])].append(r)
     for (source, label), items in sorted(by.items()):
-        if source in ("plantdoc", "plantseg", "tomato_village"):
+        if source == "pld":
+            # published split, no random draw, so the other sources get the same splits as before
+            for r in items:
+                r["split"] = r["src_split"] if r["src_split"] in ("test", "val") else "pool"
+        elif source in ("plantdoc", "plantseg", "tomato_village"):
             # use the split the authors published; PlantDoc has no val, so 10 percent of its train
             rest = []
             for r in items:
@@ -232,16 +246,23 @@ def assign_splits(recs, rng):
             r["split"] = "test_field"
 
     # balance the train pool per class: field first, then lab to fill
-    pool = defaultdict(lambda: {"field": [], "lab": []})
+    pool = defaultdict(lambda: {"field": [], "lab": [], "pld": []})
     for r in recs:
         if r["split"] == "pool":
-            pool[r["label"]][r["domain"]].append(r)
+            pool[r["label"]]["pld" if r["source"] == "pld" else r["domain"]].append(r)
+    # PLD draws from its own generator, so the older sources keep the same draws
+    pld_rng = random.Random(SEED + 1)
     for label, d in pool.items():
         field, extra_f = take(d["field"], FIELD_CAP, rng)
         lab, extra_l = take(d["lab"], max(0, CLASS_TARGET - len(field)), rng)
-        for r in field + lab:
+        # PLD fills the field cap, then replaces lab photos (from the end) to stay at the target
+        pld, extra_p = take(d["pld"], max(0, FIELD_CAP - len(field)), pld_rng)
+        over = max(0, len(field) + len(lab) + len(pld) - CLASS_TARGET)
+        if over:
+            lab, extra_l = lab[:len(lab) - over], lab[len(lab) - over:] + extra_l
+        for r in field + lab + pld:
             r["split"] = "train"
-        for r in extra_f + extra_l:
+        for r in extra_f + extra_l + extra_p:
             r["split"] = "unused"
 
 
@@ -253,7 +274,7 @@ def md_table(header, rows):
 
 def write_counts(path, kept, stats, labels):
     splits = ["train", "val", "test_field", "test_lab", "unused"]
-    sources = ["plantvillage", "plantdoc", "plantseg", "tomato_village", "potato_indonesia", "potato_ethiopia"]
+    sources = ["plantvillage", "plantdoc", "plantseg", "tomato_village", "potato_indonesia", "potato_ethiopia", "pld"]
     c_split = Counter((r["label"], r["split"]) for r in kept)
     rows = []
     for lb in labels:
@@ -306,9 +327,24 @@ def main():
             ok.append(r)
     stats = {"images found": len(recs), "unreadable, skipped": len(recs) - len(ok)}
 
-    groups = near_duplicate_groups([r["phash"] for r in ok], HASH_DIST)
-    kept, dup_removed, conflict_removed, cross_source = [], 0, 0, 0
-    removed_from, conflict_from = Counter(), Counter()
+    # PLD was added later and holds copies of older photos (PlantVillage among them).
+    # Older sources are grouped on their own so their splits stay as before; a PLD
+    # photo close to any older photo is dropped, the rest of PLD is grouped by itself.
+    old = [r for r in ok if r["source"] != "pld"]
+    new = [r for r in ok if r["source"] == "pld"]
+    old_h = np.array([r["phash"] for r in old], dtype=np.uint64)
+    removed_from = Counter()
+    fresh = []
+    for r in new:
+        if (np.bitwise_count(old_h ^ np.uint64(r["phash"])) <= HASH_DIST).any():
+            removed_from["pld"] += 1
+        else:
+            fresh.append(r)
+    ok = old + fresh
+    groups = near_duplicate_groups([r["phash"] for r in old], HASH_DIST)
+    groups += [[len(old) + i for i in g] for g in near_duplicate_groups([r["phash"] for r in fresh], HASH_DIST)]
+    kept, dup_removed, conflict_removed, cross_source = [], removed_from["pld"], 0, 0
+    conflict_from = Counter()
     for g in groups:
         members = [ok[i] for i in g]
         if len({m["label"] for m in members}) > 1:

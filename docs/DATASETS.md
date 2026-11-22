@@ -14,6 +14,7 @@ None of the images live in this repo. `detection/data/download.py` fetches every
 | 4 | Tomato-Village | Field photos from Jodhpur and Jaipur, Rajasthan | Gehlot et al., Multimedia Systems, 2023 | No licence file in the repo. Cite the paper. | https://github.com/mamta-joshi-gehlot/Tomato-Village |
 | 5 | Potato Leaf Disease in Uncontrolled Environment | Field photos from farms in Central Java, Indonesia | Shabrina et al., Data in Brief, 2024 | CC BY 4.0 | https://data.mendeley.com/datasets/ptz377bwb8/1 |
 | 6 | Potato Leaf (Healthy and Late Blight) | Field photos from Holeta, Ethiopia | Mendeley Data | CC BY 4.0 | https://data.mendeley.com/datasets/v4w72bsts5/2 |
+| 7 | Potato Disease Leaf Dataset (PLD) | Field photos from Central Punjab, Pakistan, cropped to one leaf, 256 px, labelled with plant pathologists | Rashid et al., Electronics 10(17), 2064, 2021 | Kaggle lists ODbL for the database and DbCL for its contents. Credit the authors and keep the notice. | https://www.kaggle.com/datasets/rizwan123456789/potato-disease-leaf-datasetpld |
 
 PlantSeg is non-commercial only (its Metadata.csv marks 7,741 images CC BY-NC and 33 CC0). That is fine for the challenge, but it has to be dropped if this ever becomes a product. Tomato-Village still has no licence file (checked on 21 Nov 2026), so we only download it in our scripts and never re-host the images. PlantVillage has no licence file on GitHub, but the authors publish the same images on Hugging Face as CC BY-SA 3.0, so that is the licence we go by. We still do not re-host it.
 
@@ -21,18 +22,18 @@ PlantSeg is non-commercial only (its Metadata.csv marks 7,741 images CC BY-NC an
 
 Numbers are image counts as published by each source, before we remove duplicates. The final counts after cleaning are written to `docs/data_counts.md` when the build script runs.
 
-| Our class | PlantVillage (lab) | PlantDoc (field) | PlantSeg (field) | Tomato-Village (field) | Potato Indonesia (field) | Potato Ethiopia (field) | Field total |
-|---|---|---|---|---|---|---|---|
-| tomato_healthy | 1,591 (Tomato___healthy) | 63 (Tomato leaf) | | 216 (Healthy) | | | 279 |
-| tomato_early_blight | 1,000 (Tomato___Early_blight) | 88 (Tomato Early blight leaf) | 187 (tomato_early_blight) | 496 (Early_blight) | | | 771 |
-| tomato_late_blight | 1,909 (Tomato___Late_blight) | 111 (Tomato leaf late blight) | 163 (tomato_late_blight) | 904 (Late_blight) | | | 1,178 |
-| tomato_leaf_mold | 952 (Tomato___Leaf_Mold) | 91 (Tomato mold leaf) | 156 (tomato_leaf_mold) | | | | 247 |
-| tomato_septoria_leaf_spot | 1,771 (Tomato___Septoria_leaf_spot) | 151 (Tomato Septoria leaf spot) | 130 (tomato_septoria_leaf_spot) | | | | 281 |
-| tomato_yellow_leaf_curl_virus | 5,357 (Tomato___Tomato_Yellow_Leaf_Curl_Virus) | 76 (Tomato leaf yellow virus) | 93 (tomato_yellow_leaf_curl_virus) | | | | 169 |
-| tomato_leaf_miner (pest) | | | | 1,024 (Leaf Miner) | | | 1,024 |
-| potato_healthy | 152 (Potato___healthy) | | | | 201 (Healthy) | 363 (Healthy) | 564 |
-| potato_early_blight | 1,000 (Potato___Early_blight) | 117 (Potato leaf early blight) | 126 (potato_early_blight) | | | | 243 |
-| potato_late_blight | 1,000 (Potato___Late_blight) | 105 (Potato leaf late blight) | 117 (potato_late_blight) | | 347 (Phytophthora) | 63 (Late Blight) | 632 |
+| Our class | PlantVillage (lab) | PlantDoc (field) | PlantSeg (field) | Tomato-Village (field) | Potato Indonesia (field) | Potato Ethiopia (field) | PLD Punjab (field) | Field total |
+|---|---|---|---|---|---|---|---|---|
+| tomato_healthy | 1,591 (Tomato___healthy) | 63 (Tomato leaf) | | 216 (Healthy) | | |  | 279 |
+| tomato_early_blight | 1,000 (Tomato___Early_blight) | 88 (Tomato Early blight leaf) | 187 (tomato_early_blight) | 496 (Early_blight) | | |  | 771 |
+| tomato_late_blight | 1,909 (Tomato___Late_blight) | 111 (Tomato leaf late blight) | 163 (tomato_late_blight) | 904 (Late_blight) | | |  | 1,178 |
+| tomato_leaf_mold | 952 (Tomato___Leaf_Mold) | 91 (Tomato mold leaf) | 156 (tomato_leaf_mold) | | |  | | 247 |
+| tomato_septoria_leaf_spot | 1,771 (Tomato___Septoria_leaf_spot) | 151 (Tomato Septoria leaf spot) | 130 (tomato_septoria_leaf_spot) | | |  | | 281 |
+| tomato_yellow_leaf_curl_virus | 5,357 (Tomato___Tomato_Yellow_Leaf_Curl_Virus) | 76 (Tomato leaf yellow virus) | 93 (tomato_yellow_leaf_curl_virus) | | |  | | 169 |
+| tomato_leaf_miner (pest) | | | | 1,024 (Leaf Miner) | | |  | 1,024 |
+| potato_healthy | 152 (Potato___healthy) | | | | 201 (Healthy) | 363 (Healthy) | 1,020 (Healthy) | 1,584 |
+| potato_early_blight | 1,000 (Potato___Early_blight) | 117 (Potato leaf early blight) | 126 (potato_early_blight) | | | | 1,628 (Early_Blight) | 1,871 |
+| potato_late_blight | 1,000 (Potato___Late_blight) | 105 (Potato leaf late blight) | 117 (potato_late_blight) | | 347 (Phytophthora) | 63 (Late Blight) | 1,424 (Late_Blight) | 2,056 |
 
 PlantSeg counts include both its own field photos and the images its authors collected from web search (file names ending in `_google`).
 
@@ -44,6 +45,11 @@ Most numbers match the table above. These did not:
 - **Ethiopia late blight has 67 images, not 63.** The page text says 63, the archive has 67.
 - **PlantDoc potato early blight has 116, not 117.** One file fewer in the repo than the paper says.
 - **Tomato-Village repeats itself a lot.** Of its 2,640 images in our classes, 524 are near-duplicates of another Tomato-Village image (often the same photo cropped twice), and some cross its own train, val and test folders. De-duplication keeps the test copy, so those leaks are gone from our splits.
+
+**PLD was added on 22 Nov 2026** to give potato early blight and healthy potato field photos from a third place (South Asia, close to Indian conditions). Before adding it, the shipped model scored 101 of 102 on PLD's healthy test photos but only 111 of 162 on its early blight test photos (39 called healthy). Notes from the build:
+
+- 75 PLD images are near-copies of older images (some of PlantVillage) and are dropped; the older copy is kept. Another 60 are near-copies of each other with different labels inside PLD and are dropped.
+- PLD is added after the older sources and never uses their random draws, so `test_field`, `test_lab` and `val` for the older sources are exactly the same images as before. Only the potato train set changes: 816 PlantVillage lab blight photos make room for PLD field photos.
 
 The real counts after cleaning, per class, source and split, are in `docs/data_counts.md`.
 
@@ -60,14 +66,14 @@ The real counts after cleaning, per class, source and split, are in `docs/data_c
 1. **Remove duplicates first.** Every image gets a perceptual hash. Images within a small hash distance of each other count as one, across all sources. PlantDoc and the web half of PlantSeg were both scraped from search engines, so some overlap is expected.
 2. **Field photos go in first.** For each class we use every field photo in the training split, up to 700.
 3. **Lab photos fill the gap.** PlantVillage photos are added until the class reaches 1,000 training images. Leaf curl virus has 5,357 lab photos, so this cap is what stops it from swamping everything else.
-4. **Sampling evens out the rest.** Two classes cannot reach 1,000: potato_healthy (about 600 total) and tomato_leaf_miner (field only). Training uses a weighted sampler so each class is drawn about equally often per epoch, with field photos weighted higher than lab photos.
+4. **Sampling evens out the rest.** Two classes cannot reach 1,000: potato_healthy (822 with PLD) and tomato_leaf_miner (field only). Training uses a weighted sampler so each class is drawn about equally often per epoch, with field photos weighted higher than lab photos.
 5. **The augmentation is built for field conditions.** Random crops, rotation, colour and brightness changes, blur and partial occlusion, so lab photos look a bit more like phone photos taken outdoors.
 
 ## Splits
 
-- **Test (field only, never trained on):** the PlantDoc test split, the PlantSeg test split, the Tomato-Village test split, and a 20 percent stratified hold-out from the two potato field datasets. In the manifest this is `test_field`.
+- **Test (field only, never trained on):** the PlantDoc test split, the PlantSeg test split, the Tomato-Village test split, a 20 percent stratified hold-out from the Indonesia and Ethiopia potato sets, and the PLD Testing folder (358 after cleaning). In the manifest this is `test_field`. Report PLD separately as well: it is the only potato test set from a place not seen in the other potato sources.
 - **Lab test:** 10 percent of each PlantVillage class, at most 200 per class (`test_lab`). Only used to show the gap between lab and field.
-- **Validation:** the PlantSeg and Tomato-Village validation splits, plus 10 percent of PlantDoc train and of each potato field set, plus 10 percent of each PlantVillage class capped at 100. The cap is new: without it, validation would be mostly lab photos, and we pick the best checkpoint on validation.
+- **Validation:** the PlantSeg and Tomato-Village validation splits, plus 10 percent of PlantDoc train and of each potato field set, the PLD Validation folder, plus 10 percent of each PlantVillage class capped at 100. The cap is new: without it, validation would be mostly lab photos, and we pick the best checkpoint on validation.
 - **Train:** the rest, after the balancing above. What balancing leaves out is marked `unused`.
 
 If a near-duplicate of a test image shows up in train, the train copy is removed. Near-duplicate means a perceptual hash (pHash, 64 bits) within 4 bits. If the copies in a group have different labels (this happens between PlantDoc and PlantSeg, which were both scraped from the web), the whole group is dropped, because we cannot tell which label is right.
