@@ -222,8 +222,11 @@ fun ResultScreen(
                 }
             }
             Spacer(Modifier.height(4.dp))
-            Text(stringResource(R.string.top_matches), color = P.muted, fontSize = 13.sp)
-            d.ranked.take(3).forEach { (label, p) -> ScoreBar(condName(label), p) }
+            // No match list for a photo the quality gate rejected (dark, blurry, no leaf).
+            if (d.quality == "ok") {
+                Text(stringResource(R.string.top_matches), color = P.muted, fontSize = 13.sp)
+                d.ranked.take(3).forEach { (label, p) -> ScoreBar(condName(label), p) }
+            }
             Text(stringResource(R.string.checked_ms, d.ms.toInt()), color = P.muted, fontSize = 12.sp)
             if (advice.isNotEmpty()) {
                 Spacer(Modifier.height(4.dp))

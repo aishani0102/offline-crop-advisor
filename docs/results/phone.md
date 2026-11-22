@@ -63,3 +63,17 @@ Below the gate the app shows the template advice, which uses the same KB facts.
   from `assets/kb_<lang>.json`. Those files are marked `"reviewed": false` and only hold the text
   the phone template shows now; anything missing falls back to English. Hindi comes from `kb.json`,
   where `hindi_reviewed` is still false.
+
+## Healthy potato check (22 Nov 2026)
+
+20 healthy potato test photos (8 Indonesia full-size 1500x1500, 8 Ethiopia, 4 PlantVillage) were run
+through the app's real photo path with `--ez visiontest true --es crop potato`. The phone gave 20/20
+potato_healthy (confidence 0.967 to 0.999), the same as the PC INT8 model (20/20, 0.962 to 0.999).
+
+So the app pipeline is not why healthy potatoes are called late blight on real phone photos. The
+cause is the training data: the only healthy potato field photos come from Indonesia and Ethiopia.
+The PLD dataset (Punjab, Pakistan) was added on the `detection` branch and a retrain is pending.
+
+Top matches are now hidden when a photo fails the quality gate (too dark, too blurry, no leaf);
+see `app_screens/invalid_photo_no_matches.png`. Low-confidence (< 0.6) results on good photos still
+show them. The app also has its own launcher icon (`app_screens/launcher_icon.png`).

@@ -130,6 +130,8 @@ class MainActivity : ComponentActivity() {
         // only on a fresh start, so a recreated activity does not run the test again
         if (savedInstanceState == null) {
             // debug: classify a file from the app folder without tapping, for screenshots
+            // debug: --ez noshrink true resizes camera photos in one step, to compare
+            Photo.stepShrink = !intent.getBooleanExtra("noshrink", false)
             intent.getStringExtra("classify")?.let { name ->
                 intent.getStringExtra("crop")?.let { crop = it }
                 classifyUri(android.net.Uri.fromFile(java.io.File(getExternalFilesDir(null), name)))
@@ -251,6 +253,15 @@ class MainActivity : ComponentActivity() {
         return FileProvider.getUriForFile(this, "app.cropadvisor.photos", File(dir, "leaf.jpg"))
     }
 
+    // Decodes the photo upright (EXIF applied). Big camera photos are shrunk on
+    // decode, the model only needs 256 px.
+    private fun decodePhoto(uri: Uri): Bitmap =
+        ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri)) { dec, info, _ ->
+            dec.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            val s = minOf(info.size.width, info.size.height)
+            if (s > 1024) dec.setTargetSampleSize(s / 1024)
+        }
+
     // Decodes the photo upright and runs the leaf model off the main thread.
     private fun classifyUri(uri: Uri) {
         if (busy) return
@@ -259,13 +270,7 @@ class MainActivity : ComponentActivity() {
         thread {
             try {
                 runOnUiThread { error = "" }
-                val src = ImageDecoder.createSource(contentResolver, uri)
-                val bmp = try { ImageDecoder.decodeBitmap(src) { dec, info, _ ->
-                    dec.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                    // big camera photos are shrunk on decode, the model only needs 256 px
-                    val s = minOf(info.size.width, info.size.height)
-                    if (s > 1024) dec.setTargetSampleSize(s / 1024)
-                } } catch (e: Exception) {
+                val bmp = try { decodePhoto(uri) } catch (e: Exception) {
                     Perf.log(this, "decode_error=$e")
                     runOnUiThread { error = getString(R.string.err_photo) }
                     return@thread
@@ -306,8 +311,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Classifies every test_*.jpg in the app's files folder and logs top 3.
+    // Classifies every test_*.jpg in the app's files folder and logs top 3, decoded
+    // the same way as a real photo. With --es crop potato it also logs the
+    // crop-only ranking and quality the result screen would show.
     private fun runVisionTest() {
+        val testCrop = intent.getStringExtra("crop")
         thread {
             try {
                 val dir = getExternalFilesDir(null) ?: return@thread
@@ -317,11 +325,15 @@ class MainActivity : ComponentActivity() {
                 Perf.log(this, "vision_load_ms=${System.currentTimeMillis() - t0}")
                 val images = dir.listFiles { f -> f.name.startsWith("test_") && f.name.endsWith(".jpg") }.orEmpty().sorted()
                 for (f in images) {
-                    val bmp = android.graphics.BitmapFactory.decodeFile(f.path)
+                    val bmp = decodePhoto(Uri.fromFile(f))
                     vision.classify(bmp) // warm up
                     val r = vision.classify(bmp)
                     val top = r.top(3).joinToString(" ") { "${Vision.LABELS[it]}:${"%.3f".format(r.probs[it])}" }
-                    Perf.log(this, "vision ${f.name} ms=${r.ms} top3=$top")
+                    val shown = testCrop?.let { c ->
+                        val d = Diagnosis.from(c, r)
+                        " $c=${d.label}:${"%.3f".format(d.confidence)} quality=${Quality.check(bmp)}"
+                    } ?: ""
+                    Perf.log(this, "vision ${f.name} ${bmp.width}x${bmp.height} shrink=${Photo.stepShrink} ms=${r.ms} top3=$top$shown")
                 }
                 Perf.log(this, "vision_done peak_rss_mb=${Perf.peakRssMb()}")
                 vision.close()
