@@ -1,0 +1,70 @@
+{
+  "source": "detection/severity.py on built test_field images (paths relative to <data_root>/built)",
+  "tolerance_pct_points": 1.0,
+  "images": [
+    {
+      "image": "images/plantdoc/015467.jpg",
+      "label": "potato_early_blight",
+      "width": 341,
+      "height": 256,
+      "severity_pct": 25.9,
+      "severity_band": "moderate"
+    },
+    {
+      "image": "images/plantdoc/015476.jpg",
+      "label": "potato_late_blight",
+      "width": 352,
+      "height": 256,
+      "severity_pct": 12.1,
+      "severity_band": "moderate"
+    },
+    {
+      "image": "images/plantdoc/015483.jpg",
+      "label": "tomato_early_blight",
+      "width": 341,
+      "height": 256,
+      "severity_pct": 66.3,
+      "severity_band": "severe"
+    },
+    {
+      "image": "images/plantdoc/015492.jpg",
+      "label": "tomato_septoria_leaf_spot",
+      "width": 341,
+      "height": 256,
+      "severity_pct": 74.2,
+      "severity_band": "severe"
+    },
+    {
+      "image": "images/plantdoc/015503.jpg",
+      "label": "tomato_late_blight",
+      "width": 385,
+      "height": 256,
+      "severity_pct": 10.0,
+      "severity_band": "mild"
+    },
+    {
+      "image": "images/plantdoc/015513.jpg",
+      "label": "tomato_yellow_leaf_curl_virus",
+      "width": 400,
+      "height": 200,
+      "severity_pct": 3.5,
+      "severity_band": "mild"
+    },
+    {
+      "image": "images/plantdoc/015519.jpg",
+      "label": "tomato_healthy",
+      "width": 256,
+      "height": 287,
+      "severity_pct": 26.3,
+      "severity_band": "moderate"
+    },
+    {
+      "image": "images/plantdoc/015527.jpg",
+      "label": "tomato_leaf_mold",
+      "width": 252,
+      "height": 137,
+      "severity_pct": 31.9,
+      "severity_band": "severe"
+    }
+  ]
+}

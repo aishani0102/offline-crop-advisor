@@ -1,0 +1,100 @@
+args: {'root': '/content/aisoc_data', 'out': '/content/runs/mnv3_large', 'arch': 'large', 'size': 224, 'batch': 128, 'workers': 2, 'threads': 4, 'device': 'cuda', 'no_amp': False, 'frozen_epochs': 3, 'full_epochs': 22, 'epochs': 25, 'limit': 0, 'head_lr': 0.002, 'full_lr': 0.0004, 'field_weight': 2.0, 'max_steps': 0, 'seed': 0, 'resume': None}
+device cuda, amp True, train 9421, val 1800
+stage 1 (frozen backbone), lr 0.002
+  epoch 1 step 0/73 loss 2.322 5.43 s/step
+  epoch 1 step 50/73 loss 1.042 1.03 s/step
+epoch 1/25: loss 1.375 val acc 0.8244 val macro F1 0.8226 val field macro F1 0.7261 (80 s)
+  saved best.pt (val macro F1 0.8226)
+  epoch 2 step 0/73 loss 1.125 1.90 s/step
+  epoch 2 step 50/73 loss 0.943 1.04 s/step
+epoch 2/25: loss 0.971 val acc 0.8567 val macro F1 0.8564 val field macro F1 0.7519 (77 s)
+  saved best.pt (val macro F1 0.8564)
+  epoch 3 step 0/73 loss 0.890 1.99 s/step
+  epoch 3 step 50/73 loss 0.903 1.04 s/step
+epoch 3/25: loss 0.913 val acc 0.8594 val macro F1 0.8602 val field macro F1 0.7722 (77 s)
+  saved best.pt (val macro F1 0.8602)
+stage 2 (full fine-tune), lr 0.0004
+  epoch 4 step 0/73 loss 1.737 8.06 s/step
+  epoch 4 step 50/73 loss 0.942 1.14 s/step
+epoch 4/25: loss 1.251 val acc 0.7600 val macro F1 0.7545 val field macro F1 0.7050 (87 s)
+  epoch 5 step 0/73 loss 0.897 2.04 s/step
+  epoch 5 step 50/73 loss 0.826 1.13 s/step
+epoch 5/25: loss 0.878 val acc 0.8889 val macro F1 0.8869 val field macro F1 0.7887 (84 s)
+  saved best.pt (val macro F1 0.8869)
+  epoch 6 step 0/73 loss 0.909 2.57 s/step
+  epoch 6 step 50/73 loss 0.713 1.12 s/step
+epoch 6/25: loss 0.760 val acc 0.9128 val macro F1 0.9136 val field macro F1 0.8207 (85 s)
+  saved best.pt (val macro F1 0.9136)
+  epoch 7 step 0/73 loss 0.742 2.08 s/step
+  epoch 7 step 50/73 loss 0.715 1.08 s/step
+epoch 7/25: loss 0.699 val acc 0.9206 val macro F1 0.9177 val field macro F1 0.8080 (84 s)
+  saved best.pt (val macro F1 0.9177)
+  epoch 8 step 0/73 loss 0.744 2.02 s/step
+  epoch 8 step 50/73 loss 0.677 1.12 s/step
+epoch 8/25: loss 0.668 val acc 0.9283 val macro F1 0.9278 val field macro F1 0.8381 (84 s)
+  saved best.pt (val macro F1 0.9278)
+  epoch 9 step 0/73 loss 0.664 2.01 s/step
+  epoch 9 step 50/73 loss 0.638 1.07 s/step
+epoch 9/25: loss 0.629 val acc 0.9417 val macro F1 0.9401 val field macro F1 0.8171 (83 s)
+  saved best.pt (val macro F1 0.9401)
+  epoch 10 step 0/73 loss 0.664 2.12 s/step
+  epoch 10 step 50/73 loss 0.603 1.12 s/step
+epoch 10/25: loss 0.609 val acc 0.9489 val macro F1 0.9494 val field macro F1 0.8712 (83 s)
+  saved best.pt (val macro F1 0.9494)
+  epoch 11 step 0/73 loss 0.592 2.92 s/step
+  epoch 11 step 50/73 loss 0.595 1.11 s/step
+epoch 11/25: loss 0.599 val acc 0.9478 val macro F1 0.9485 val field macro F1 0.8690 (84 s)
+  epoch 12 step 0/73 loss 0.609 2.01 s/step
+  epoch 12 step 50/73 loss 0.600 1.15 s/step
+epoch 12/25: loss 0.584 val acc 0.9544 val macro F1 0.9544 val field macro F1 0.8769 (85 s)
+  saved best.pt (val macro F1 0.9544)
+  epoch 13 step 0/73 loss 0.572 3.35 s/step
+  epoch 13 step 50/73 loss 0.582 1.11 s/step
+epoch 13/25: loss 0.580 val acc 0.9567 val macro F1 0.9563 val field macro F1 0.8707 (84 s)
+  saved best.pt (val macro F1 0.9563)
+  epoch 14 step 0/73 loss 0.577 2.16 s/step
+  epoch 14 step 50/73 loss 0.545 1.11 s/step
+epoch 14/25: loss 0.567 val acc 0.9578 val macro F1 0.9569 val field macro F1 0.8715 (83 s)
+  saved best.pt (val macro F1 0.9569)
+  epoch 15 step 0/73 loss 0.576 2.59 s/step
+  epoch 15 step 50/73 loss 0.544 1.11 s/step
+epoch 15/25: loss 0.560 val acc 0.9572 val macro F1 0.9573 val field macro F1 0.8829 (84 s)
+  saved best.pt (val macro F1 0.9573)
+  epoch 16 step 0/73 loss 0.539 2.14 s/step
+  epoch 16 step 50/73 loss 0.605 1.07 s/step
+epoch 16/25: loss 0.554 val acc 0.9589 val macro F1 0.9587 val field macro F1 0.8806 (82 s)
+  saved best.pt (val macro F1 0.9587)
+  epoch 17 step 0/73 loss 0.560 2.16 s/step
+  epoch 17 step 50/73 loss 0.563 1.13 s/step
+epoch 17/25: loss 0.548 val acc 0.9561 val macro F1 0.9563 val field macro F1 0.8768 (85 s)
+  epoch 18 step 0/73 loss 0.547 1.97 s/step
+  epoch 18 step 50/73 loss 0.561 1.08 s/step
+epoch 18/25: loss 0.545 val acc 0.9594 val macro F1 0.9601 val field macro F1 0.8988 (83 s)
+  saved best.pt (val macro F1 0.9601)
+  epoch 19 step 0/73 loss 0.534 2.01 s/step
+  epoch 19 step 50/73 loss 0.538 1.13 s/step
+epoch 19/25: loss 0.541 val acc 0.9600 val macro F1 0.9604 val field macro F1 0.8875 (85 s)
+  saved best.pt (val macro F1 0.9604)
+  epoch 20 step 0/73 loss 0.530 2.01 s/step
+  epoch 20 step 50/73 loss 0.561 1.08 s/step
+epoch 20/25: loss 0.538 val acc 0.9617 val macro F1 0.9618 val field macro F1 0.8899 (83 s)
+  saved best.pt (val macro F1 0.9618)
+  epoch 21 step 0/73 loss 0.555 2.02 s/step
+  epoch 21 step 50/73 loss 0.533 1.10 s/step
+epoch 21/25: loss 0.539 val acc 0.9628 val macro F1 0.9630 val field macro F1 0.8928 (82 s)
+  saved best.pt (val macro F1 0.9630)
+  epoch 22 step 0/73 loss 0.548 3.07 s/step
+  epoch 22 step 50/73 loss 0.531 1.11 s/step
+epoch 22/25: loss 0.535 val acc 0.9622 val macro F1 0.9625 val field macro F1 0.8913 (84 s)
+  epoch 23 step 0/73 loss 0.546 2.00 s/step
+  epoch 23 step 50/73 loss 0.546 1.09 s/step
+epoch 23/25: loss 0.539 val acc 0.9628 val macro F1 0.9629 val field macro F1 0.8924 (83 s)
+  epoch 24 step 0/73 loss 0.543 2.17 s/step
+  epoch 24 step 50/73 loss 0.524 1.11 s/step
+epoch 24/25: loss 0.535 val acc 0.9628 val macro F1 0.9630 val field macro F1 0.8920 (84 s)
+  saved best.pt (val macro F1 0.9630)
+  epoch 25 step 0/73 loss 0.537 2.07 s/step
+  epoch 25 step 50/73 loss 0.525 1.07 s/step
+epoch 25/25: loss 0.535 val acc 0.9628 val macro F1 0.9630 val field macro F1 0.8920 (82 s)
+temperature 0.687 (val NLL 0.2111 -> 0.1541)
+done in 34.6 min, best epoch 24, val macro F1 0.9630

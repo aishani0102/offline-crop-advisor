@@ -1,4 +1,6 @@
 {
-  "uncertain_below_confidence": 0.6,
-  "severity_bands_pct": {"mild": [0, 10], "moderate": [10, 30], "severe": [30, 100]}
+  "uncertain_below_confidence": 0.56,
+  "ood": {"min_crop_mass": 0.8, "note": "crop mass = sum of softmax(logits / T) over the 10 classes, taken over the chosen crop's classes; below min_crop_mass the photo is called uncertain with reason not_crop"},
+  "severity_bands_pct": {"mild": [0, 10], "moderate": [10, 30], "severe": [30, 100]},
+  "quality_gate": {"min_brightness": 40, "min_laplacian_var": 15, "min_leaf_share": 0.05}
 }

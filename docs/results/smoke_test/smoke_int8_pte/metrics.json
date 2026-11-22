@@ -1,0 +1,200 @@
+{
+ "tag": "smoke_int8_pte",
+ "model": "smoke_int8.pte (ExecuTorch INT8, XNNPACK) through the Python runtime, temperature 0.472",
+ "sets": {
+  "test_field": {
+   "n": 623,
+   "accuracy": 0.48475120385232745,
+   "macro_f1": 0.31679571993211675,
+   "crop_known_accuracy": 0.5425361155698234,
+   "crop_known_macro_f1": 0.4092059621608546,
+   "crop_wrong_rate": 0.21508828250401285,
+   "mean_confidence": 0.4496077001094818,
+   "per_class": {
+    "potato_early_blight": {
+     "precision": 0.11764705882352941,
+     "recall": 0.5714285714285714,
+     "f1": 0.1951219512195122,
+     "support": 14
+    },
+    "potato_healthy": {
+     "precision": 0.8878504672897196,
+     "recall": 0.8715596330275229,
+     "f1": 0.8796296296296297,
+     "support": 109
+    },
+    "potato_late_blight": {
+     "precision": 0.4879518072289157,
+     "recall": 0.84375,
+     "f1": 0.6183206106870229,
+     "support": 96
+    },
+    "tomato_early_blight": {
+     "precision": 0.20535714285714285,
+     "recall": 0.27058823529411763,
+     "f1": 0.233502538071066,
+     "support": 85
+    },
+    "tomato_healthy": {
+     "precision": 0.3333333333333333,
+     "recall": 0.03333333333333333,
+     "f1": 0.06060606060606061,
+     "support": 30
+    },
+    "tomato_late_blight": {
+     "precision": 0.7647058823529411,
+     "recall": 0.11504424778761062,
+     "f1": 0.2,
+     "support": 113
+    },
+    "tomato_leaf_miner": {
+     "precision": 0.5887096774193549,
+     "recall": 0.7019230769230769,
+     "f1": 0.6403508771929824,
+     "support": 104
+    },
+    "tomato_leaf_mold": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 24
+    },
+    "tomato_septoria_leaf_spot": {
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0,
+     "support": 27
+    },
+    "tomato_yellow_leaf_curl_virus": {
+     "precision": 0.3076923076923077,
+     "recall": 0.38095238095238093,
+     "f1": 0.3404255319148936,
+     "support": 21
+    }
+   },
+   "confusion": [
+    [
+     8,
+     0,
+     6,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     95,
+     13,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     9,
+     1,
+     81,
+     2,
+     0,
+     0,
+     2,
+     0,
+     0,
+     1
+    ],
+    [
+     17,
+     2,
+     16,
+     23,
+     0,
+     3,
+     21,
+     0,
+     0,
+     3
+    ],
+    [
+     1,
+     1,
+     3,
+     2,
+     1,
+     0,
+     21,
+     0,
+     0,
+     1
+    ],
+    [
+     3,
+     0,
+     25,
+     62,
+     0,
+     13,
+     7,
+     0,
+     0,
+     3
+    ],
+    [
+     2,
+     0,
+     0,
+     22,
+     0,
+     1,
+     73,
+     0,
+     0,
+     6
+    ],
+    [
+     2,
+     5,
+     12,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4
+    ],
+    [
+     24,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     2,
+     3,
+     8,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     8
+    ]
+   ],
+   "seconds": 8.2
+  }
+ }
+}
