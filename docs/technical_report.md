@@ -285,7 +285,7 @@ The template advice appears at once; the Llama text replaces it only if it passe
 1. **Accuracy on photos from new farms is lower** than the headline: about 70 to 80% on the web-scraped sources. Our own phone photos from Indian fields would be the most valuable addition.
 2. **Close-up leaf photos work best.** The model sees the centre of the photo and gives one label. Whole-plant photos, or two problems in one photo, are not handled. A leaf or lesion detector is the next step.
 3. **Severity is a colour baseline**, not a trained segmenter.
-4. **Out-of-scope rejection is partial.** About one in five leaves of other crops still gets a confident answer, and non-plant photos were not tested.
+4. **Out-of-scope rejection is partial.** About one in five leaves of other crops still gets a confident answer. In a small extra check, 4 of 15 photos of everyday objects got a confident answer when tomato was chosen (none when potato was chosen), and 24 of 60 photos of tomato diseases outside our list (bacterial spot, target spot, mosaic virus, spider mites) were given one of our labels. The app's photo hint and the KVK referral reduce the risk, and adding these conditions as classes, or an "other" class, is planned.
 5. **Translations are not yet reviewed** by native speakers.
 6. **Energy is a software estimate**, not a meter reading, and excludes the screen.
 7. Some field classes have few test images (21 to 30 for four tomato classes), so their scores are noisy.
