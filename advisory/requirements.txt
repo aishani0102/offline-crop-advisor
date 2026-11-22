@@ -1,0 +1,11 @@
+# Advisory track, Python 3.10. These are the versions we ran with.
+# Torch CPU build comes from the PyTorch index.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0
+executorch==1.5.1
+torchao==0.18.0
+pytorch_tokenizers==1.5.0
+tiktoken==0.14.0
+psutil==7.2.2
+# Only for "export_llama.py export" (gated checkpoint download)
+huggingface_hub==2.4.0

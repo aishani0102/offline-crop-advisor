@@ -1,0 +1,25 @@
+{
+  "label": "tomato_leaf_mold",
+  "crop": "tomato",
+  "condition": "Leaf mold",
+  "type": "disease",
+  "confidence": 0.44,
+  "top3": [
+    {
+      "label": "tomato_leaf_mold",
+      "confidence": 0.44
+    },
+    {
+      "label": "tomato_septoria_leaf_spot",
+      "confidence": 0.31
+    },
+    {
+      "label": "tomato_early_blight",
+      "confidence": 0.2
+    }
+  ],
+  "severity_pct": 12.0,
+  "severity_band": "moderate",
+  "uncertain": true,
+  "language": "hi"
+}
