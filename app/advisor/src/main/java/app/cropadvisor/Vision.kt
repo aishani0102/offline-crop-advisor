@@ -27,7 +27,7 @@ class Vision(path: String) {
 
     companion object {
         const val SIZE = 224
-        const val TEMPERATURE = 0.7087f
+        const val TEMPERATURE = 0.6870f
         val LABELS = listOf(
             "potato_early_blight", "potato_healthy", "potato_late_blight",
             "tomato_early_blight", "tomato_healthy", "tomato_late_blight",

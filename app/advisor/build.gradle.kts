@@ -38,7 +38,7 @@ android {
 // copied into the build from the data folder. Override with -PvisionPte=<path>.
 val copyVisionModel by tasks.registering(Copy::class) {
     val src = providers.gradleProperty("visionPte")
-        .orElse("C:/Users/a_roy/aisoc_data/models/mnv3_large_cont/mnv3_large_int8.pte")
+        .orElse("C:/Users/a_roy/aisoc_data/models/mnv3_large_pld/mnv3_large_pld_int8.pte")
     from(src) { rename { "vision.pte" } }
     into(layout.buildDirectory.dir("generated/modelAssets"))
 }
