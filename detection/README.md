@@ -123,5 +123,7 @@ python -I detection/predict.py --image leaf.jpg --crop tomato --model <data_root
 ```
 
 Prints the JSON from `docs/INTERFACE.md`. Only classes of the given crop are
-considered, confidence is after temperature scaling, and `uncertain` is true below
-the threshold in `configs/thresholds.json`.
+considered, confidence is after temperature scaling, and `uncertain` is true when the
+photo fails the quality gate, the chosen crop's share of the 10-class probability is under
+`ood.min_crop_mass` (reason `not_crop`) or confidence is under `uncertain_below_confidence`
+(both in `configs/thresholds.json`, chosen in `docs/results/ood_and_threshold.md`).

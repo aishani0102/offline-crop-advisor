@@ -87,8 +87,11 @@ def predict(clf, image_path, crop, language="en", classes=None, thresholds=None)
     allowed = torch.tensor([info[lb]["crop"] == crop for lb in clf.labels])
     if not allowed.any():
         raise ValueError(f"unknown crop {crop!r}")
-    z = (logits / clf.temperature).masked_fill(~allowed, float("-inf"))
-    probs = torch.softmax(z, 0)
+    z = logits / clf.temperature
+    # share of the 10 class probability that falls on the chosen crop; low means the photo
+    # does not look like this crop at all (another plant, or not a plant)
+    crop_mass = float(torch.softmax(z, 0)[allowed].sum())
+    probs = torch.softmax(z.masked_fill(~allowed, float("-inf")), 0)
     order = torch.argsort(probs, descending=True)
     top = [i for i in order.tolist() if allowed[i]][:3]
     best = clf.labels[top[0]]
@@ -103,6 +106,15 @@ def predict(clf, image_path, crop, language="en", classes=None, thresholds=None)
         bgr = np.array(full)[:, :, ::-1].copy()
         sev = severity(bgr)
         sev_pct, band = sev["severity_pct"], sev["severity_band"]
+    min_mass = thresholds.get("ood", {}).get("min_crop_mass", 0.0)
+    if quality != "ok":
+        reason = quality
+    elif crop_mass < min_mass:
+        reason = "not_crop"
+    elif conf < thresholds["uncertain_below_confidence"]:
+        reason = "low_confidence"
+    else:
+        reason = None
     return {
         "label": best,
         "crop": c["crop"],
@@ -112,7 +124,9 @@ def predict(clf, image_path, crop, language="en", classes=None, thresholds=None)
         "top3": [{"label": clf.labels[i], "confidence": round(float(probs[i]), 4)} for i in top],
         "severity_pct": sev_pct,
         "severity_band": band,
-        "uncertain": conf < thresholds["uncertain_below_confidence"] or quality != "ok",
+        "uncertain": reason is not None,
+        "uncertain_reason": reason,
+        "crop_mass": round(crop_mass, 4),
         "quality": quality,
         "language": language,
     }
