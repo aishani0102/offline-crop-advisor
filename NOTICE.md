@@ -20,6 +20,7 @@ The detection model is trained on these datasets. We only download them in our s
 | Tomato-Village | No licence file in the repository. Cite the paper. | Gehlot, M., Saxena, R. K. and Gandhi, G. C. Tomato-Village: a dataset for end-to-end tomato disease detection in a real-world environment. Multimedia Systems, 2023. https://github.com/mamta-joshi-gehlot/Tomato-Village |
 | Potato Leaf Disease in Uncontrolled Environment | CC BY 4.0 | Shabrina, N. H. et al. A novel dataset of potato leaf disease in uncontrolled environment. Data in Brief 52, 109955, 2024. https://data.mendeley.com/datasets/ptz377bwb8/1 |
 | Potato Leaf (Healthy and Late Blight) | CC BY 4.0 | Mendeley Data. https://data.mendeley.com/datasets/v4w72bsts5/2 |
+| Potato Disease Leaf Dataset (PLD) | ODbL 1.0 (database), DbCL 1.0 (contents) | Rashid, J. et al. Multi-Level Deep Learning Model for Potato Leaf Disease Recognition. Electronics 10(17), 2064, 2021. https://www.kaggle.com/datasets/rizwan123456789/potato-disease-leaf-datasetpld |
 
 PlantSeg is non-commercial only. That is fine for the challenge, but it has to be dropped if this ever becomes a product.
 
