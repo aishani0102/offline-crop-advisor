@@ -5,7 +5,7 @@
     <string name="crop">फसल</string>
     <string name="tomato">टमाटर</string>
     <string name="potato">आलू</string>
-    <string name="photo_hint">दिन की रोशनी में एक पत्ती की पास से फोटो</string>
+    <string name="photo_hint">बीमार पत्ती से पूरी फ़ोटो भरें, दिन की रोशनी में</string>
     <string name="checking">जांच हो रही है</string>
     <string name="take_photo">फोटो लें</string>
     <string name="gallery">गैलरी से चुनें</string>

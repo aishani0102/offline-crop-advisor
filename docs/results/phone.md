@@ -38,7 +38,9 @@ keeps 768. The Hindi prompt is long, so most of the wait is prefill.
 | What | Value |
 |---|---|
 | Golden file, 8 field photos, phone vs `severity.py` | 8 of 8 within 1 point (all identical to 0.1, same band) |
-| Time per photo in the app | about 3 s on the first photo (test_015492.jpg, 74.2%, severe) |
+| Time per photo, old Severity.kt (sevtest) | 2613 ms first photo, then 113 to 266 ms |
+| Time per photo, faster Severity.kt (sevtest, 22 Nov) | 2148 ms first photo, then 12 to 42 ms; still 8 of 8 |
+| Time in the app flow, faster version | 570 to 836 ms (test_015492.jpg, 74.2%, severe) |
 
 Severity only runs for disease and pest labels; a healthy leaf scores 26% with this colour method.
 A `no_leaf` result counts as uncertain, like `check_case` in the advisory code, so no treatment is
@@ -62,7 +64,8 @@ Below the gate the app shows the template advice, which uses the same KB facts.
   writes English and Hindi. Bengali, Marathi, Tamil and Telugu always get the translated template
   from `assets/kb_<lang>.json`. Those files are marked `"reviewed": false` and only hold the text
   the phone template shows now; anything missing falls back to English. Hindi comes from `kb.json`,
-  where `hindi_reviewed` is still false.
+  where `hindi_reviewed` is still false. The photo hint ("Fill the photo with the sick leaf, in daylight") in Hindi,
+  Bengali, Marathi, Tamil and Telugu has not been reviewed by a native speaker yet.
 
 ## Healthy potato check (22 Nov 2026)
 
@@ -77,3 +80,48 @@ The PLD dataset (Punjab, Pakistan) was added on the `detection` branch and a ret
 Top matches are now hidden when a photo fails the quality gate (too dark, too blurry, no leaf);
 see `app_screens/invalid_photo_no_matches.png`. Low-confidence (< 0.6) results on good photos still
 show them. The app also has its own launcher icon (`app_screens/launcher_icon.png`).
+
+## Photo resize: one step is now the default (22 Nov 2026)
+
+Camera photos are now resized to the model input in one step (`Photo.stepShrink = false`). The old
+step-by-step halving is still there for comparison with `--ez stepshrink true`. In the earlier
+comparison on 5 large camera photos (big1-5.jpg), one-step matched the PC on 5 of 5 and
+step-by-step on 4 of 5. The re-run on 22 Nov (visiontest, no crop filter) gave:
+
+| Photo | Size | One step (default) | Step by step |
+|---|---|---|---|
+| big1 | 1424x1068 | potato_late_blight 0.984 | potato_late_blight 0.988 |
+| big2 | 1072x1072 | tomato_healthy 0.519 | tomato_yellow_leaf_curl_virus 0.365 |
+| big3 | 2000x1500 | tomato_early_blight 0.320 | tomato_early_blight 0.527 |
+| big4 | 2000x1333 | tomato_septoria_leaf_spot 0.959 | tomato_septoria_leaf_spot 0.936 |
+| big5 | 2000x1500 | tomato_late_blight 0.351 | potato_late_blight 0.435 |
+
+The two methods disagree on the top-1 label for big2 and big5. The PC reference labels are not
+stored in the repo, so this re-run was not scored against the PC again.
+
+## Offline check (airplane mode, 22 Nov 2026)
+
+Airplane mode on: `settings get global airplane_mode_on` = 1, no `NetworkAgentInfo` entries in
+`dumpsys connectivity` ("Active default network: none"), and `ping 8.8.8.8` failed with
+"Network is unreachable". The full flow (test_015492.jpg, tomato, answers yes,growing,no) ran
+10 times in a row: classify `tomato_septoria_leaf_spot` 0.885, severity 74.2% severe, then
+`advice mode=llm ... fails=[]` every time (load 2.6 to 4.1 s, first token 12.4 to 13.4 s,
+total 18.2 to 19.4 s, 69 tokens, peak 1547 to 1620 MB). Screenshot with the airplane icon:
+`app_screens/airplane_mode_flow.png`.
+
+## Battery (software estimate, 22 Nov 2026)
+
+This is Android's `batterystats` estimate, not a meter. The phone was on USB with
+`dumpsys battery unplug` and `batterystats --reset`, in airplane mode, running the 10 flows above
+(about 4.4 minutes). `dumpsys battery reset` was run afterwards.
+
+| What | Value |
+|---|---|
+| App estimated use, 10 diagnoses with Llama advice | 32.1 mAh (CPU only, about 4 min 46 s of CPU time) |
+| Per diagnosis | about 3.2 mAh |
+| Battery capacity (batterystats learned; design is 5000 mAh) | 4381 mAh |
+| Diagnoses per full charge, app CPU only | about 1360 |
+| Battery level before / after | 100% / 100% (full battery, so no visible drop) |
+
+The estimate covers the app's CPU only. The screen is not counted, so real use per diagnosis is
+higher. `charge_full_design` was not readable (permission denied).

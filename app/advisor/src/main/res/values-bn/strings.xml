@@ -5,7 +5,7 @@
     <string name="crop">ফসল</string>
     <string name="tomato">টমেটো</string>
     <string name="potato">আলু</string>
-    <string name="photo_hint">দিনের আলোয় একটি পাতার কাছ থেকে ছবি</string>
+    <string name="photo_hint">অসুস্থ পাতাটি দিয়ে পুরো ছবি ভরে তুলুন, দিনের আলোয়</string>
     <string name="checking">পরীক্ষা চলছে</string>
     <string name="take_photo">ছবি তুলুন</string>
     <string name="gallery">গ্যালারি থেকে বাছুন</string>

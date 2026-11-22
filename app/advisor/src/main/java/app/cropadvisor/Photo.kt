@@ -8,7 +8,7 @@ object Photo {
     // Shorter side to 256, like load_photo in detection/predict.py. A camera
     // photo is halved step by step first: one big bilinear jump skips most
     // pixels and gives a noisier picture than PIL's resize on the PC.
-    var stepShrink = true   // debug switch, to compare with a single resize
+    var stepShrink = false  // debug switch: true = old step-by-step resize
 
     fun shortSide256(src: Bitmap): Bitmap {
         var b = src

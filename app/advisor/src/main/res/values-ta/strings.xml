@@ -5,7 +5,7 @@
     <string name="crop">பயிர்</string>
     <string name="tomato">தக்காளி</string>
     <string name="potato">உருளைக்கிழங்கு</string>
-    <string name="photo_hint">பகல் வெளிச்சத்தில் ஒரு இலையின் அருகாமைப் படம்</string>
+    <string name="photo_hint">நோயுற்ற இலை படம் முழுவதும் தெரியும்படி, பகல் வெளிச்சத்தில் எடுக்கவும்</string>
     <string name="checking">சோதிக்கிறது</string>
     <string name="take_photo">படம் எடு</string>
     <string name="gallery">கேலரியிலிருந்து தேர்வு செய்</string>

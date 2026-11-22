@@ -130,8 +130,8 @@ class MainActivity : ComponentActivity() {
         // only on a fresh start, so a recreated activity does not run the test again
         if (savedInstanceState == null) {
             // debug: classify a file from the app folder without tapping, for screenshots
-            // debug: --ez noshrink true resizes camera photos in one step, to compare
-            Photo.stepShrink = !intent.getBooleanExtra("noshrink", false)
+            // debug: --ez stepshrink true uses the old step-by-step resize, to compare
+            Photo.stepShrink = intent.getBooleanExtra("stepshrink", false)
             intent.getStringExtra("classify")?.let { name ->
                 intent.getStringExtra("crop")?.let { crop = it }
                 classifyUri(android.net.Uri.fromFile(java.io.File(getExternalFilesDir(null), name)))
@@ -184,11 +184,13 @@ class MainActivity : ComponentActivity() {
                     inPreferredConfig = Bitmap.Config.ARGB_8888; inScaled = false
                 }
                 val bmp = android.graphics.BitmapFactory.decodeFile(File(dir, name).path, opts)
+                val t0 = android.os.SystemClock.elapsedRealtime()
                 val r = Severity.estimate(bmp)
+                val ms = android.os.SystemClock.elapsedRealtime() - t0
                 val gold = e.optDouble("severity_pct", Double.NaN)
                 val ok = r.severityPct != null && Math.abs(r.severityPct - gold) <= 1.0
                 if (ok) pass++
-                Perf.log(this, "sevtest $name golden=$gold ${e.getString("severity_band")} phone=${r.severityPct} ${r.band} ok=$ok")
+                Perf.log(this, "sevtest $name golden=$gold ${e.getString("severity_band")} phone=${r.severityPct} ${r.band} ok=$ok ms=$ms")
             }
             Perf.log(this, "sevtest passed $pass of ${g.length()}")
         }
@@ -219,7 +221,7 @@ class MainActivity : ComponentActivity() {
             val seqLen = if (c.lang == "hi") 1024 else 768
             val r = m.generate(m.chatPrompt(sys, user), seqLen)
             var text = advisor.cleanOutput(r.text)
-            val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("।") }
+            val truncated = !text.trimEnd().let { it.endsWith(".") || it.endsWith("!") || it.endsWith("?") || it.endsWith("Ã Â¥Â¤") }
             var fails = advisor.check(text, c, truncated)
             // The 1B model often drops the last sentence. The referral line is
             // fixed KB text, so add it ourselves and check again. Note: this retry
