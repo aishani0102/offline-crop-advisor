@@ -13,6 +13,7 @@
     <string name="officer">Extension officer phone number</string>
     <string name="not_sure">Not sure</string>
     <string name="not_sure_body">The photo does not match any condition clearly. Take a closer photo of a single leaf in daylight, or show it to your extension officer.</string>
+    <string name="not_crop">This does not look like a tomato or potato leaf we know. Check the crop you chose, or retake the photo.</string>
     <string name="confidence">%1$d%% confidence</string>
     <string name="top_matches">Top matches</string>
     <string name="checked_ms">Checked on this phone in %1$d ms, no internet used</string>

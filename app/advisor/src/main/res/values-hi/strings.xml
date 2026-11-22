@@ -12,6 +12,7 @@
     <string name="officer">कृषि अधिकारी का फोन नंबर</string>
     <string name="not_sure">पक्का नहीं</string>
     <string name="not_sure_body">फोटो किसी भी रोग से साफ मेल नहीं खाती। दिन की रोशनी में एक पत्ती की पास से फोटो लें, या इसे अपने कृषि अधिकारी को दिखाएं।</string>
+    <string name="not_crop">यह हमारी जानी-पहचानी टमाटर या आलू की पत्ती जैसी नहीं लगती। चुनी गई फसल जाँचें या फिर से फ़ोटो लें।</string>
     <string name="confidence">%1$d%% भरोसा</string>
     <string name="top_matches">सबसे करीबी मिलान</string>
     <string name="checked_ms">इस फोन पर %1$d ms में जांचा गया, इंटरनेट नहीं लगा</string>

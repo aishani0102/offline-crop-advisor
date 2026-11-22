@@ -12,6 +12,7 @@
     <string name="officer">వ్యవసాయ అధికారి ఫోన్ నంబర్</string>
     <string name="not_sure">ఖచ్చితంగా తెలియదు</string>
     <string name="not_sure_body">ఫోటో ఏ వ్యాధితోనూ స్పష్టంగా సరిపోలడం లేదు. పగటి వెలుగులో ఒక ఆకును దగ్గరగా ఫోటో తీయండి, లేదా వ్యవసాయ అధికారికి చూపించండి.</string>
+    <string name="not_crop">ఇది మాకు తెలిసిన టమాటా లేదా బంగాళాదుంప ఆకులా కనిపించడం లేదు. ఎంచుకున్న పంటను సరిచూడండి, లేదా మళ్ళీ ఫోటో తీయండి.</string>
     <string name="confidence">%1$d%% నమ్మకం</string>
     <string name="top_matches">దగ్గరి పోలికలు</string>
     <string name="checked_ms">ఈ ఫోన్‌లో %1$d ms లో పరీక్షించబడింది, ఇంటర్నెట్ అవసరం లేదు</string>

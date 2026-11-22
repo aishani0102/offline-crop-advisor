@@ -12,6 +12,7 @@
     <string name="officer">कृषी अधिकाऱ्याचा फोन नंबर</string>
     <string name="not_sure">खात्री नाही</string>
     <string name="not_sure_body">फोटो कोणत्याही रोगाशी स्पष्टपणे जुळत नाही. दिवसाच्या उजेडात एका पानाचा जवळून फोटो घ्या, किंवा कृषी अधिकाऱ्याला दाखवा.</string>
+    <string name="not_crop">हे आमच्या ओळखीच्या टोमॅटो किंवा बटाट्याच्या पानासारखे दिसत नाही. निवडलेले पीक तपासा किंवा पुन्हा फोटो घ्या.</string>
     <string name="confidence">%1$d%% खात्री</string>
     <string name="top_matches">सर्वात जवळचे जुळणारे</string>
     <string name="checked_ms">या फोनवर %1$d ms मध्ये तपासले, इंटरनेट लागले नाही</string>

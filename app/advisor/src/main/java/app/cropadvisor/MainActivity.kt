@@ -296,7 +296,7 @@ class MainActivity : ComponentActivity() {
                     d = d.copy(sevPct = s.severityPct, band = s.band)
                     Perf.log(this, "severity pct=${s.severityPct} band=${s.band} ms=${android.os.SystemClock.elapsedRealtime() - t0}")
                 }
-                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} quality=$quality ms=${d.ms}")
+                Perf.log(this, "classify crop=$chosen label=${d.label} conf=${"%.3f".format(d.confidence)} mass=${"%.3f".format(d.cropMass)} quality=$quality ms=${d.ms}")
                 // Questions only for a confident disease or pest result with a leaf found.
                 val ask = !d.uncertain && !d.label.endsWith("_healthy") && d.band != "no_leaf"
                 // debug: --es answers rain,stage,sprayed (for example yes,harvest,no) answers without tapping
@@ -333,7 +333,7 @@ class MainActivity : ComponentActivity() {
                     val top = r.top(3).joinToString(" ") { "${Vision.LABELS[it]}:${"%.3f".format(r.probs[it])}" }
                     val shown = testCrop?.let { c ->
                         val d = Diagnosis.from(c, r)
-                        " $c=${d.label}:${"%.3f".format(d.confidence)} quality=${Quality.check(bmp)}"
+                        " $c=${d.label}:${"%.3f".format(d.confidence)} mass=${"%.3f".format(d.cropMass)} quality=${Quality.check(bmp)}"
                     } ?: ""
                     Perf.log(this, "vision ${f.name} ${bmp.width}x${bmp.height} shrink=${Photo.stepShrink} ms=${r.ms} top3=$top$shown")
                 }

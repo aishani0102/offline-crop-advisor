@@ -19,7 +19,7 @@ object ModelFiles {
     fun vision(ctx: Context): File? {
         val out = File(ctx.filesDir, "vision.pte")
         try {
-            // Re-copy when the APK changes, not only when the size changes: a retrained
+            // Re-copy when the APK changes, not only when the size changes: a new
             // model of the same architecture has exactly the same file size.
             val stamp = File(ctx.filesDir, "vision.pte.stamp")
             val apkTime = ctx.packageManager.getPackageInfo(ctx.packageName, 0).lastUpdateTime.toString()

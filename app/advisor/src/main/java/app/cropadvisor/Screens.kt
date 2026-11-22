@@ -55,19 +55,23 @@ data class Diagnosis(
     val crop: String, val ranked: List<Pair<String, Float>>, val ms: Long,
     val sevPct: Double? = null, val band: String? = null,
     val quality: String = "ok",   // photo quality gate: ok, too_dark, too_blurry, no_leaf
+    val cropMass: Float = 1f,     // share of the 10-class probability on the chosen crop's classes
 ) {
     val label get() = ranked[0].first
     val confidence get() = ranked[0].second
-    val uncertain get() = confidence < UNCERTAIN_BELOW || quality != "ok"
+    val notCrop get() = cropMass < MIN_CROP_MASS
+    val uncertain get() = quality != "ok" || notCrop || confidence < UNCERTAIN_BELOW
 
     companion object {
-        const val UNCERTAIN_BELOW = 0.6f
+        // From configs/thresholds.json on the detection branch.
+        const val UNCERTAIN_BELOW = 0.56f
+        const val MIN_CROP_MASS = 0.80f
 
         fun from(crop: String, r: Vision.Result): Diagnosis {
             val idx = Vision.LABELS.indices.filter { Vision.LABELS[it].startsWith(crop + "_") }
             val sum = idx.sumOf { r.probs[it].toDouble() }.toFloat()
             val ranked = idx.map { Vision.LABELS[it] to r.probs[it] / sum }.sortedByDescending { it.second }
-            return Diagnosis(crop, ranked, r.ms)
+            return Diagnosis(crop, ranked, r.ms, cropMass = sum)
         }
     }
 }
@@ -205,7 +209,7 @@ fun ResultScreen(
                             "too_dark" -> R.string.q_too_dark
                             "too_blurry" -> R.string.q_too_blurry
                             "no_leaf" -> R.string.no_leaf_retake
-                            else -> R.string.not_sure_body
+                            else -> if (d.notCrop) R.string.not_crop else R.string.not_sure_body
                         },
                     ),
                     color = P.muted, fontSize = 14.sp,
@@ -222,8 +226,9 @@ fun ResultScreen(
                 }
             }
             Spacer(Modifier.height(4.dp))
-            // No match list for a photo the quality gate rejected (dark, blurry, no leaf).
-            if (d.quality == "ok") {
+            // No match list for a photo the quality gate rejected (dark, blurry, no leaf)
+            // or one that does not look like the chosen crop.
+            if (d.quality == "ok" && !d.notCrop) {
                 Text(stringResource(R.string.top_matches), color = P.muted, fontSize = 13.sp)
                 d.ranked.take(3).forEach { (label, p) -> ScoreBar(condName(label), p) }
             }
