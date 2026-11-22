@@ -1,6 +1,6 @@
 """Grad-CAM pictures for a few field test photos, to see where the model looks.
 
-    python -I detection/gradcam.py --root <data_root> --model <data_root>/models/mnv3_large_cont/best.pt --out docs/results/gradcam
+    python -I detection/gradcam.py --root <data_root> --model <data_root>/models/mnv3_large_pld/best.pt --out docs/results/gradcam
 
 Picks, for each class in --classes, one photo the model gets right and one it
 gets wrong (first in manifest order), and saves photo | heat map side by side.

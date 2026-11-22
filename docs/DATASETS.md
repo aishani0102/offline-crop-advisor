@@ -46,7 +46,7 @@ Most numbers match the table above. These did not:
 - **PlantDoc potato early blight has 116, not 117.** One file fewer in the repo than the paper says.
 - **Tomato-Village repeats itself a lot.** Of its 2,640 images in our classes, 524 are near-duplicates of another Tomato-Village image (often the same photo cropped twice), and some cross its own train, val and test folders. De-duplication keeps the test copy, so those leaks are gone from our splits.
 
-**PLD was added on 22 Nov 2026** to give potato early blight and healthy potato field photos from a third place (South Asia, close to Indian conditions). Before adding it, the shipped model scored 101 of 102 on PLD's healthy test photos but only 111 of 162 on its early blight test photos (39 called healthy). Notes from the build:
+**PLD was added on 22 Nov 2026** to give potato early blight and healthy potato field photos from a third place (South Asia, close to Indian conditions). Notes from the build:
 
 - 75 PLD images are near-copies of older images (some of PlantVillage) and are dropped; the older copy is kept. Another 60 are near-copies of each other with different labels inside PLD and are dropped.
 - PLD is added after the older sources and never uses their random draws, so `test_field`, `test_lab` and `val` for the older sources are exactly the same images as before. Only the potato train set changes: 816 PlantVillage lab blight photos make room for PLD field photos.

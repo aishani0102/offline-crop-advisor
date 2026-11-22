@@ -1,6 +1,6 @@
 # Grad-CAM on field test photos
 
-Made with `detection/gradcam.py` on the final model (`mnv3_large_cont/best.pt`), Grad-CAM on
+Made with `detection/gradcam.py` on the final model (`mnv3_large_pld/best.pt`, the shipped weights), Grad-CAM on
 the last conv block. Left is the photo as the model sees it (224 center crop), right is the
 heat map (red = parts that pushed the predicted class up most, blue = little effect).
 
@@ -22,7 +22,7 @@ What we see:
   large dry brown patch, which does look like late blight. Several small target spots on
   other leaves are ignored. A close photo of one leaf would likely help.
 - Tomato healthy wrong: a pile of cut leaves on a table with strong blue/cyan colour cast.
-  The heat is weak and mostly on the wooden table in the corner, not on a leaf. Colour cast
+  The heat is weak and spread over the table at the top right and the edge of one leaf. Colour cast
   plus background is enough to confuse it, so the quality gate does not catch this case
   (the photo is bright, sharp and has green).
 - Tomato early blight wrong: the heat is on the brown spots, so it looks at the right

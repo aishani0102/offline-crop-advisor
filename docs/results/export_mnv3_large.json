@@ -11,40 +11,40 @@
   "size_mb": 16.88,
   "max_abs_logit_diff_vs_pytorch_one_image": 0.0,
   "latency_x86_laptop": {
-   "median_ms": 18.96,
-   "p90_ms": 21.26,
-   "mean_ms": 18.93,
+   "median_ms": 12.92,
+   "p90_ms": 14.2,
+   "mean_ms": 12.72,
    "runs": 50
   },
-  "test_lab_macro_f1": 0.991107664363218,
-  "test_field_macro_f1": 0.8651382681680007,
-  "test_lab_accuracy": 0.9903083700440528,
-  "test_field_accuracy": 0.9213483146067416,
-  "test_lab_crop_known_accuracy": 0.9938325991189427,
-  "test_field_crop_known_accuracy": 0.9341894060995185
+  "test_lab_macro_f1": 0.9951077288633426,
+  "test_field_macro_f1": 0.9191303144367563,
+  "test_lab_accuracy": 0.9947136563876652,
+  "test_field_accuracy": 0.9529411764705882,
+  "test_lab_crop_known_accuracy": 0.9964757709251101,
+  "test_field_crop_known_accuracy": 0.9588235294117647
  },
  "int8": {
   "file": "mnv3_large_int8.pte",
   "size_mb": 4.52,
-  "max_abs_logit_diff_vs_pytorch_one_image": 1.425,
+  "max_abs_logit_diff_vs_pytorch_one_image": 0.5528,
   "latency_x86_laptop": {
-   "median_ms": 11.24,
-   "p90_ms": 13.39,
-   "mean_ms": 11.17,
+   "median_ms": 9.62,
+   "p90_ms": 11.62,
+   "mean_ms": 9.45,
    "runs": 50
   },
-  "test_lab_macro_f1": 0.9862439160093894,
-  "test_field_macro_f1": 0.8447994569940963,
-  "test_lab_accuracy": 0.9859030837004406,
-  "test_field_accuracy": 0.9052969502407705,
-  "test_lab_crop_known_accuracy": 0.9894273127753304,
-  "test_field_crop_known_accuracy": 0.9261637239165329
+  "test_lab_macro_f1": 0.9860257726541268,
+  "test_field_macro_f1": 0.8927521485077573,
+  "test_lab_accuracy": 0.9850220264317181,
+  "test_field_accuracy": 0.9323529411764706,
+  "test_lab_crop_known_accuracy": 0.9885462555066079,
+  "test_field_crop_known_accuracy": 0.942156862745098
  },
  "pytorch_eager_latency_x86_laptop": {
-  "median_ms": 37.27,
-  "mean_ms": 63.2,
+  "median_ms": 37.43,
+  "mean_ms": 42.51,
   "runs": 50
  },
  "note": "Latency is batch 1 on an Intel i5-1135G7 laptop CPU with 4 threads through the ExecuTorch Python runtime. It is not phone latency.",
- "int8_field_macro_f1_drop_points": 2.03
+ "int8_field_macro_f1_drop_points": 2.64
 }

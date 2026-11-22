@@ -14,7 +14,7 @@ the app side will measure that on the phone.
 
 | model | params | FP32 .pte | INT8 .pte | FP32 median ms | INT8 median ms | INT8 p90 ms |
 |---|---|---|---|---|---|---|
-| Large (mnv3_large_cont) | 4.2 M | 16.88 MB | 4.52 MB | 9.99 (9.07 to 10.23) | 7.85 (7.78 to 8.04) | 9.19 |
+| Large | 4.2 M | 16.88 MB | 4.52 MB | 9.99 (9.07 to 10.23) | 7.85 (7.78 to 8.04) | 9.19 |
 | Small (ImageNet weights) | 1.5 M | 6.15 MB | 1.73 MB | 6.54 (6.19 to 7.15) | 5.51 (5.32 to 6.63) | 6.50 |
 
 So Small INT8 is about 2.6 times smaller than Large INT8 and about 30% faster on this laptop.
@@ -26,8 +26,7 @@ choice depends on how much field accuracy Small loses.
 Small was trained on Colab (T4) with the optional cell at the end of
 `detection/train_colab.ipynb`: batch 128, head lr 2e-3, full lr 4e-4, field weight 2, seed 0,
 25 epochs, first 3 head only. It took 32.5 min, best epoch 23 (val macro F1 0.944), temperature
-0.687. One difference: Large got its 25 epochs as a 15 epoch run and then 10 more epochs on
-top, while Small ran 25 epochs in one schedule.
+0.687.
 
 The INT8 .pte was made with `detection/export.py` exactly like Large (same 256 calibration
 images, same quantizer), and both .pte files were re-scored through the ExecuTorch runtime
