@@ -34,3 +34,13 @@ Short list of what the numbers do not show, for the report.
 
 6. **Laptop timings are not phone timings.** All latency numbers in these docs are from a
    laptop CPU. Phone numbers come from the app side.
+
+7. **Works on leaf close-ups, not whole plants.** The model sees only the centre square of
+   the photo (shorter side to 256, centre crop 224) and gives one label per photo. If the
+   sick leaf is small or off centre, it mostly sees soil, sky or healthy leaves, and busy
+   photos with many leaves are where it already goes wrong (potato early blight against late
+   blight, see `gradcam/`). Severity is the share of one leaf that is diseased, so it also
+   assumes one leaf. It cannot say where on the plant the disease is or report two problems
+   in one photo. The app asks for a photo filled with the sick leaf. Next step: a leaf or
+   lesion detector (YOLO style, trained on the PlantDoc and PlantSeg boxes and masks) that
+   finds the sick leaves in a whole-plant photo and classifies each one.
