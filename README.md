@@ -1,6 +1,6 @@
 # Offline Crop Advisor
 
-An offline field assistant for tomato and potato farmers, built for **PS1 of the Bharat AI-SoC Challenge 2026-27**. The farmer picks the crop, takes a photo of a sick leaf and answers three short questions. The phone says what is wrong, how much of the leaf is affected and what to do next, in English, Hindi, Bengali, Marathi, Tamil or Telugu. Everything runs on an Arm Android phone, with no internet at any point.
+An offline field assistant for tomato and potato farmers, built for **PS1 of the Bharat AI-SoC Challenge 2026-27**. The farmer picks the crop, takes a photo of a sick leaf and answers three short questions. The phone says what is wrong, how much of the leaf is affected and what to do next, in English, Hindi, Bengali, Marathi, Tamil or Telugu. Everything runs on an ARM Android phone, with no internet at any point.
 
 **Download the app:** [CropAdvisor-v1.0-phase1.apk](https://github.com/aishani0102/offline-crop-advisor/releases/tag/v1.0-phase1) · **Technical report:** [docs/technical_report.md](docs/technical_report.md) (also [Word](docs/Technical_Report.docx)) · **Dataset study:** [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf)
 
@@ -33,12 +33,12 @@ Photo
 ```
 
 - Llama only rewrites verified facts. A rule-based check rejects any chemical, dose or number that is not in the knowledge base, any banned chemical, and answers that drop the KVK referral; the farmer then sees the knowledge base text instead.
-- If the photo is unclear, does not look like the chosen crop, or the model is unsure, no disease or treatment is named and the farmer is pointed to the nearest KVK or the Kisan Call Centre (1800-180-1551).
-- Llama writes English and Hindi. Bengali, Marathi, Tamil and Telugu use translated knowledge base text.
+- If the photo is unclear, does not look like the chosen crop, or the model is unsure, no disease or treatment is named, and the farmer is pointed to the nearest KVK or the Kisan Call Centre (1800-180-1551).
+- Llama writes in English and Hindi. Bengali, Marathi, Tamil and Telugu use translated knowledge base text.
 
 ## Classes
 
-Tomato: healthy, early blight, late blight, leaf mold, Septoria leaf spot, yellow leaf curl virus, leaf miner (pest).
+Tomato: healthy, early blight, late blight, leaf mould, Septoria leaf spot, yellow leaf curl virus, leaf miner (pest).
 Potato: healthy, early blight, late blight.
 
 The list is in `configs/classes.json`; thresholds are in `configs/thresholds.json`. Both stages read them from there.
@@ -78,13 +78,13 @@ gradlew :advisor:assembleDebug          (./gradlew on Linux/macOS)
 adb install -r advisor/build/outputs/apk/debug/advisor-debug.apk
 ```
 
-The leaf model is bundled in the APK. For Llama advice, push the exported model and tokenizer:
+The leaf model is bundled in the APK. For Llama advice, push the exported model and tokeniser:
 
 ```
 adb push llama.pte tokenizer.model /sdcard/Android/data/app.cropadvisor/files/
 ```
 
-Without them the app shows the template advice.
+Without them, the app shows the template advice.
 
 Debug intent extras, for example `adb shell am start -S -n app.cropadvisor/.MainActivity --es classify test_015492.jpg --es crop tomato --es answers yes,growing,no`:
 
