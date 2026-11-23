@@ -3,6 +3,8 @@
 Bharat AI-SoC Challenge 2026-27, PS1: offline crop disease and pest detection and advisory for farmers.
 Phase 1 (Open Qualifying) submission, 23 November 2026.
 
+Team: Aishani Roy, Vijoya Guha Thakurta.
+
 Source code: https://github.com/aishani0102/offline-crop-advisor
 
 ---
@@ -292,21 +294,11 @@ The template advice appears at once; the Llama text replaces it only if it passe
 
 ---
 
-## 10. Next steps (Phase 2)
-
-- Collect a field test set of our own photos from Indian farms with a KVK.
-- Train a lesion segmentation model on PlantSeg masks for real severity.
-- Add a leaf detector for whole-plant photos.
-- Native-speaker review of all six languages; voice output (TTS) for farmers who do not read.
-- Raspberry Pi 5 build, and measured energy with a USB power meter.
-
----
-
-## 11. How to run
+## 10. How to run
 
 See the README: build the APK with Gradle, install with `adb install`, and push `llama.pte` and `tokenizer.model` to the app's files folder. The leaf model is bundled in the APK.
 
-## 12. References
+## 11. References
 
 ### Datasets
 
