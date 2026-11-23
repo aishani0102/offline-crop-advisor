@@ -1,0 +1,622 @@
+% Offline Crop Advisor: Technical Report
+% Bharat AI-SoC Challenge 2026-27, PS1
+% Build:  pdflatex technical_report.tex   (run twice for the table of contents)
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{float}         % [H]: keep tables exactly where they are written
+\usepackage{caption}
+\usepackage{xurl}          % let long URLs break anywhere
+\usepackage[hidelinks,breaklinks=true]{hyperref}
+\usepackage{bookmark}      % stable PDF outlines in one extra run
+
+% ---------------------------------------------------------------- styling ---
+\definecolor{accent}{RGB}{27,94,32}
+
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection.}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4\baselineskip}{0.5\baselineskip}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{1.0\baselineskip}{0.35\baselineskip}
+
+\setlist[itemize]{leftmargin=1.3em,topsep=0.3em,itemsep=0.25em}
+\setlist[enumerate]{leftmargin=1.6em,topsep=0.3em,itemsep=0.25em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\lhead{\small Offline Crop Advisor --- Technical Report}
+\rhead{\small\thepage}
+
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcommand{\hdr}[1]{\textbf{#1}}
+
+% Narrow helper for numeric columns
+\newcolumntype{N}{>{\raggedleft\arraybackslash}p{1.45cm}}
+
+\begin{document}
+
+% ------------------------------------------------------------------ title ---
+\begin{center}
+  {\LARGE\bfseries Offline Crop Advisor: Technical Report}\\[0.9em]
+  {\large Bharat AI-SoC Challenge 2026--27, PS1}\\[0.35em]
+  {\normalsize Offline crop disease and pest detection and advisory for farmers}\\[0.9em]
+  {\normalsize Phase 1 (Open Qualifying) submission, 23 November 2026}\\[0.5em]
+  {\normalsize\bfseries Team: Aishani Roy, Vijoya Guha Thakurta}\\[0.6em]
+  {\small Source code: \url{https://github.com/aishani0102/offline-crop-advisor}}
+\end{center}
+
+\vspace{0.6em}
+\hrule
+\vspace{1.2em}
+
+% ---------------------------------------------------------------- summary ---
+\section{Summary}
+
+Offline Crop Advisor is an Android app that tells a farmer what is wrong with a
+tomato or potato leaf and what to do about it, with no internet connection at any
+point. The farmer picks the crop, takes a photo, answers three short questions,
+and gets:
+
+\begin{itemize}
+  \item the disease or pest (10 classes, including one pest), with a confidence score,
+  \item how much of the leaf is affected (mild, moderate or severe),
+  \item advice in their language (English, Hindi, Bengali, Marathi, Tamil or
+        Telugu), written by \textbf{Llama 3.2 1B running on the phone with
+        ExecuTorch}, grounded in a knowledge base of Indian extension guidance,
+        with doses, a pre-harvest interval and a KVK / Kisan Call Centre referral.
+\end{itemize}
+
+Everything runs on an Arm phone (Redmi 12 5G, Snapdragon 4 Gen 2). Tested in
+airplane mode: 10 of 10 full runs, from photo to Llama advice, finished offline
+and passed every safety check.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}L L@{}}
+\toprule
+\hdr{Headline} & \hdr{Result} \\
+\midrule
+Leaf classifier (MobileNetV3-Large, INT8, 4.5\,MB) & Field test: 93.2\% accuracy, macro F1 0.893 (1,020 field photos). Lab test: 98.5\% \\
+Classifier time on the phone & 70 to 300\,ms per photo \\
+Llama 3.2 1B (SpinQuant INT4, 1.1\,GB) on the phone & about 12 tokens/s; first token 1.3\,s (short prompt) to 8\,s (full grounded prompt) \\
+Advice shown to the farmer that passed every safety check & 60 of 60 test cases \\
+Peak app memory with Llama loaded & about 1.55\,GB \\
+Energy (Android estimate, CPU only) & about 3.2\,mAh per diagnosis, about 1,360 diagnoses per charge \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------------- problem & scope ---
+\section{Problem and scope}
+
+Small farmers lose a large share of tomato and potato yield to a handful of
+diseases, mostly blights. Expert help (KVKs, extension officers) is far away and
+mobile data is patchy in fields. The challenge asks for detection, severity,
+treatment advice, regional relevance and local languages, all on-device.
+
+Scope decisions made up front:
+
+\begin{itemize}
+  \item \textbf{Two crops, ten classes.} Tomato: healthy, early blight, late
+        blight, leaf mold, Septoria leaf spot, yellow leaf curl virus, leaf miner
+        (pest). Potato: healthy, early blight, late blight. These cover the most
+        common problems in Indian fields while keeping enough field photos per class.
+  \item \textbf{Android phone as the target.} Farmers already own Arm Android
+        phones. The same models run on a Raspberry Pi 5, but the phone is the
+        realistic device.
+  \item \textbf{The farmer chooses the crop.} This removes tomato and potato
+        confusion and halves the classes the model has to pick from.
+  \item \textbf{Advice must never invent chemicals or doses.} The language model
+        rewrites facts from a knowledge base; a rule-based checker rejects
+        anything not in it.
+\end{itemize}
+
+% -------------------------------------------------------- system overview ---
+\section{System overview}
+
+\begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=6pt,rulecolor=\color{gray}]
+Photo
+  -> Quality gate        too dark / too blurry / no leaf  -> ask for a retake
+  -> Leaf classifier     MobileNetV3-Large INT8 (ExecuTorch), chosen crop only
+                         not this crop / confidence < 0.56 -> "not sure", refer to KVK
+  -> Severity            colour segmentation -> mild / moderate / severe
+  -> 3 questions         rain, crop stage, already sprayed (+ month, state)
+  -> KB facts            doses, pre-harvest interval, referral
+  -> Llama 3.2 1B        rewrites the facts in the farmer's language (on device)
+  -> Safety check        pass -> Llama text    fail -> KB template text
+\end{Verbatim}
+
+\begin{enumerate}
+  \item \textbf{Quality gate.} Rejects photos that are too dark, too blurry, or
+        have almost no leaf-coloured pixels, and asks for a retake. No diagnosis
+        is shown for a rejected photo.
+  \item \textbf{Leaf classifier.} MobileNetV3-Large, INT8, run with ExecuTorch
+        (XNNPACK). Probabilities are temperature-calibrated and restricted to the
+        chosen crop. If the photo does not look like the chosen crop, or
+        confidence is below 0.56, the app says ``not sure'' and refers the farmer
+        to the KVK instead of naming a treatment (section~5).
+  \item \textbf{Severity.} Share of the leaf that is diseased, from a colour
+        segmentation of leaf and lesion pixels, banded as mild ($<10\%$),
+        moderate (10 to 30\%) or severe ($>30\%$). Only run for disease and pest labels.
+  \item \textbf{Three questions.} Recent rain, crop stage and whether the crop was
+        already sprayed. With the month and state, they order the advice (for
+        example, no spraying close to harvest).
+  \item \textbf{Advice.} The knowledge base gives the facts for the case. Llama
+        3.2 1B rewrites them in plain language. A safety checker verifies the
+        output; if it fails, the farmer sees the knowledge base template text,
+        which is always safe.
+\end{enumerate}
+
+Only one model is in memory at a time apart from the small classifier, which
+keeps the app within a 2\,GB free-RAM budget.
+
+% ------------------------------------------------------------------- data ---
+\section{Data}
+
+Lab photos teach a model what a disease looks like; field photos teach it what a
+real phone photo looks like. We combined one large lab dataset with six field
+datasets so that every class has field photos, and we report accuracy only on
+field photos the model never saw. More detail, figures and sample images are in
+the separate Dataset Study (\texttt{Dataset\_Study.pdf}). Every number here comes
+from the build manifest and is reproduced by
+\texttt{detection/data/build\_dataset.py} with a fixed seed (split fingerprint
+\texttt{09129439436a1ece}).
+
+\subsection{Sources}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{}l L L l@{}}
+\toprule
+\hdr{Source} & \hdr{Photos} & \hdr{Origin} & \hdr{Licence} \\
+\midrule
+PlantVillage & Lab, single leaf on a plain background & Penn State; Hughes and Salathe 2015 [1] & CC BY-SA 3.0 \\
+PlantDoc & Field and web photos, cluttered backgrounds & IIT Gandhinagar; Singh et al.\ 2020 [2] & CC BY 4.0 \\
+PlantSeg & Field and web photos, with lesion masks & Univ.\ of Queensland; Wei et al.\ 2024 [3] & CC BY-NC 4.0 \\
+Tomato-Village & Field photos, Jodhpur and Jaipur, Rajasthan, India & Gehlot et al.\ 2023 [4] & No licence file \\
+Potato, Indonesia & Field photos, Central Java & Shabrina et al.\ 2024 [5] & CC BY 4.0 \\
+Potato, Ethiopia & Field photos, Holeta & Mendeley Data [6] & CC BY 4.0 \\
+Potato, Punjab (PLD) & Field photos, Central Punjab, Pakistan, labelled with plant pathologists & Rashid et al.\ 2021 [7] & ODbL / DbCL \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tomato-Village has no licence file; it is downloaded by script and never
+re-hosted. Left out on purpose: the Indonesia ``Fungi'' folder (several fungal
+diseases under one label), classes outside our list, the other PlantVillage
+tomato classes, and Kaggle re-uploads that are augmented copies of PlantVillage
+(they would leak near-identical images into the test set).
+
+\subsection{Cleaning}
+
+Every image gets a perceptual hash; two images within 4 bits (out of 64) count as
+the same photo, across all sources. When copies are found, the test copy is kept
+and the training copy removed, so no test photo has a near-copy in training.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+\hdr{Step} & \hdr{Images} \\
+\midrule
+Found in our 10 classes & 23,903 \\
+Unreadable files & 0 \\
+Near-duplicates removed & 795 \\
+Removed because copies had different labels & 175 \\
+\midrule
+Left after cleaning & \textbf{22,933} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Of the 795 near-duplicates, 524 were inside Tomato-Village.
+
+\subsection{Balancing}
+
+PlantVillage alone is badly skewed (5,357 lab photos of yellow leaf curl virus
+against 152 of healthy potato). We balanced in three steps:
+
+\begin{itemize}
+  \item \textbf{Field photos first:} every field photo of a class goes into
+        training, up to 700.
+  \item \textbf{Lab photos fill the gap} up to 1,000 per class, which stops the
+        large lab classes from swamping the rest.
+  \item \textbf{The sampler evens out the rest:} each class is drawn about equally
+        often per epoch, and a field photo is twice as likely to be drawn as a lab photo.
+\end{itemize}
+
+Training augmentation is built for field conditions: random crops, rotation,
+colour and brightness changes, blur and blanked-out patches.
+
+\subsection{Splits}
+
+\begin{itemize}
+  \item \textbf{Test, field only (1,020):} the official test folders of PlantDoc,
+        PlantSeg, Tomato-Village and PLD, plus a 20\% hold-out of the Indonesia
+        and Ethiopia sets. Never used in training. This is the headline accuracy.
+  \item \textbf{Test, lab only (1,135):} PlantVillage photos held out from
+        training, to show the gap between lab and field.
+  \item \textbf{Validation (1,800):} used to pick the best epoch, calibrate
+        confidence and choose the confidence threshold. Lab photos are capped at
+        100 per class so field photos dominate.
+  \item \textbf{Train (9,421):} everything else, after balancing; 46\% field photos.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\small
+\caption*{\textbf{Images per source and split}}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\hdr{Source} & \hdr{Found} & \hdr{Train} & \hdr{Val.} & \hdr{Test (field)} & \hdr{Test (lab)} & \hdr{Kept} \\
+\midrule
+PlantVillage & 14,732 & 5,115 & 810 & 0 & 1,135 & 7,060 \\
+PlantDoc & 801 & 588 & 65 & 61 & 0 & 714 \\
+PlantSeg & 680 & 392 & 64 & 122 & 0 & 578 \\
+Tomato-Village & 2,640 & 1,458 & 382 & 257 & 0 & 2,097 \\
+Potato, Indonesia & 548 & 354 & 50 & 101 & 0 & 505 \\
+Potato, Ethiopia & 430 & 288 & 41 & 82 & 0 & 411 \\
+Potato, Punjab (PLD) & 4,072 & 1,226 & 388 & 397 & 0 & 2,011 \\
+\midrule
+\textbf{Total} & \textbf{23,903} & \textbf{9,421} & \textbf{1,800} & \textbf{1,020} & \textbf{1,135} & \textbf{13,376} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption*{\textbf{Images per class and split}}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\hdr{Class} & \hdr{Train} & \hdr{of which field} & \hdr{Val.} & \hdr{Test (field)} & \hdr{Test (lab)} \\
+\midrule
+Tomato, healthy & 1,000 & 198 (20\%) & 148 & 30 & 158 \\
+Tomato, early blight & 1,000 & 348 (35\%) & 172 & 85 & 100 \\
+Tomato, late blight & 1,000 & 555 (56\%) & 207 & 113 & 190 \\
+Tomato, leaf mold & 899 & 138 (15\%) & 115 & 24 & 95 \\
+Tomato, Septoria leaf spot & 1,000 & 169 (17\%) & 125 & 27 & 177 \\
+Tomato, yellow leaf curl virus & 1,000 & 98 (10\%) & 109 & 21 & 200 \\
+Tomato, leaf miner (pest) & 700 & 700 (100\%) & 202 & 104 & 0 \\
+Potato, healthy & 822 & 700 (85\%) & 169 & 209 & 15 \\
+Potato, early blight & 1,000 & 700 (70\%) & 261 & 172 & 100 \\
+Potato, late blight & 1,000 & 700 (70\%) & 292 & 235 & 100 \\
+\midrule
+\textbf{Total} & \textbf{9,421} & \textbf{4,306 (46\%)} & \textbf{1,800} & \textbf{1,020} & \textbf{1,135} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The four tomato classes with 21 to 30 field test images (leaf mold, Septoria,
+leaf curl virus, healthy) give noisy per-class scores and are reported with that
+caveat.
+
+% -------------------------------------------------------- detection model ---
+\section{Detection model}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\hdr{Item} & \hdr{Choice} \\
+\midrule
+Architecture & MobileNetV3-Large, ImageNet pre-trained \\
+Input & Shorter side resized to 256, centre crop 224, ImageNet normalisation \\
+Training & 3 epochs head only, then 22 epochs full network; AdamW; class-balanced sampler with field photos weighted $2\times$; field-style augmentation (crops, rotation, colour, blur, occlusion) \\
+Calibration & Temperature scaling on validation ($T = 0.687$) \\
+Export & ExecuTorch \texttt{.pte}, XNNPACK; INT8 post-training quantisation calibrated on field and lab photos \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Results (INT8, the model in the app)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\hdr{Test set} & \hdr{Images} & \hdr{Accuracy} & \hdr{Macro F1} \\
+\midrule
+Field photos (6 sources) & 1,020 & 0.932 & 0.893 \\
+Lab photos (PlantVillage) & 1,135 & 0.985 & 0.986 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+FP32 before quantisation: field accuracy 0.953, macro F1 0.919. INT8 costs 2.6
+points of field macro F1 and makes the model $4\times$ smaller (4.5\,MB).
+
+\textbf{Per source (field test, INT8).}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\hdr{Source} & \hdr{Images} & \hdr{Accuracy} & \hdr{Macro F1} \\
+\midrule
+PlantDoc (web) & 61 & 0.705 & 0.679 \\
+PlantSeg (field and web) & 122 & 0.795 & 0.799 \\
+Tomato-Village (Rajasthan) & 257 & 0.938 & 0.929 \\
+Potato, Indonesia & 101 & 0.980 & 0.979 \\
+Potato, Ethiopia & 82 & 0.988 & 0.978 \\
+Potato, Punjab (PLD) & 397 & 0.982 & 0.984 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Single-site sets, where every photo was taken by one team in one place, score 94
+to 99\%. The web-scraped sets, which mix many cameras and places, score 70 to
+80\%; that is the better guess for photos from a new farm.
+
+\textbf{Phone vs PC.} The app's preprocessing was checked against the Python
+pipeline: on 20 healthy potato photos and 12 PLD photos the phone gave the same
+labels as the PC, with confidences within 0.01.
+
+\subsection{Why MobileNetV3-Large and not MobileNetV3-Small}
+
+We also trained MobileNetV3-Small and exported it the same way (same quantiser,
+same 256 calibration images).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\hdr{Model} & \hdr{Parameters} & \hdr{INT8 file} & \hdr{INT8 latency (laptop CPU, median)} \\
+\midrule
+MobileNetV3-Large & 4.2\,M & 4.5\,MB & 7.9\,ms \\
+MobileNetV3-Small & 1.5\,M & 1.7\,MB & 5.5\,ms \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Small is $2.6\times$ smaller and about 30\% faster, but it does not survive
+post-training INT8 quantisation: its field macro F1 fell from 0.834 (FP32) to
+0.201 (INT8), a 63-point drop, while Large loses only 2.6 points. Large INT8
+already runs in 70 to 300\,ms on the phone, so the speed gain does not justify the
+accuracy loss. Quantisation-aware training could rescue Small; it is a Phase 2 option.
+
+\subsection{Confidence threshold and out-of-scope photos}
+
+A diagnosis is shown only when the model is confident and the photo looks like the
+chosen crop. With temperature $T = 0.687$ and
+$p = \mathrm{softmax}(\mathrm{logits}/T)$ over all 10 classes:
+
+\begin{itemize}
+  \item \textbf{crop mass} $=$ sum of $p$ over the chosen crop's classes. If it is
+        below \textbf{0.80}, the photo does not look like a leaf of that crop
+        (``not sure, check the crop you chose'').
+  \item \textbf{confidence} $=$ top class of the chosen crop, divided by the crop
+        mass. If it is below \textbf{0.56}, the app says ``not sure''.
+  \item Either case, or a failed quality gate, means no disease is named, no
+        treatment is given, and the farmer is referred to the KVK.
+\end{itemize}
+
+Both values were chosen on the validation set with a stated rule: at least 97\% of
+answered photos correct and at least 94\% of photos answered, then as few
+out-of-scope answers as possible. Out-of-scope photos were 325 leaves of other
+crops (each scored as tomato and as potato).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\hdr{Set} & \hdr{Answered} & \hdr{Answered and correct} & \hdr{Other-crop leaves answered} \\
+\midrule
+Validation & 94.4\% & 97.5\% & 19.7\% \\
+Field test & 93.6\% & 95.8\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A plain confidence cut-off of 0.52 would answer more photos but would give a
+confident answer to 61\% of the other-crop leaves; the crop-mass check is what
+removes most of them. About one in five other-crop leaves still gets an answer
+(29\% when tomato is chosen, 11\% for potato), so the ``not tomato or potato''
+rejection is a safeguard, not a guarantee.
+
+% --------------------------------------------------------------- severity ---
+\section{Severity}
+
+The leaf and the lesions are segmented by colour (HSV thresholds with
+morphological clean-up), and severity is lesion area divided by leaf area. It is a
+transparent baseline, not a trained segmenter: on PlantSeg's expert masks the
+lesion IoU is low (mean 0.19), and virus classes, which show as yellowing rather
+than spots, are the weakest. The bands should be read as a hint, and the advice
+says so. The Kotlin port matches the Python reference on all 8 golden photos to
+0.1 points and takes 12 to 42\,ms per photo on the phone after the first.
+
+A trained lesion segmenter on PlantSeg's masks is the planned upgrade.
+
+% --------------------------------------------------------------- advisory ---
+\section{Advisory}
+
+\subsection{Knowledge base}
+
+For each class: cause, conditions that favour it, symptoms, cultural control, and
+approved chemical options with dose per acre, water volume and pre-harvest
+interval. Sources: NIPHM / Directorate of PPQS AESA-based IPM packages for tomato
+and potato, and the TNAU Agritech portal. Chemicals banned or restricted in India
+are on a deny list.
+
+\subsection{Language model}
+
+Llama 3.2 1B Instruct, SpinQuant INT4 (1.1\,GB), run with ExecuTorch on the phone.
+The prompt carries fixed rules plus only the KB facts for this case and the
+farmer's answers. Greedy decoding. English uses a 768-token context; Hindi uses
+1,024 because Hindi needs about $3\times$ the tokens.
+
+\subsection{Safety check (every answer)}
+
+\begin{itemize}
+  \item No chemical, dose or number that is not in the KB facts for this case.
+  \item No banned chemical.
+  \item KVK / Kisan Call Centre referral present for severe or uncertain cases.
+  \item Answer not cut off, and in the right script for the language.
+\end{itemize}
+
+If the only failure is a missing referral, the app adds the fixed referral
+sentence and checks again. Otherwise the KB template is shown. Uncertain results
+never go to Llama.
+
+\subsection{Evaluation (60 cases: 10 classes $\times$ severities $\times$ English and Hindi)}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}L l@{}}
+\toprule
+\hdr{Measure} & \hdr{Result} \\
+\midrule
+Llama output grounded (no chemical, dose or number outside the KB) & 52/52 (100\%) \\
+Llama output passed every check & 39/52 (75\%); English 88\%, Hindi 62\% \\
+Llama text shown after the referral retry & 40/52 (77\%) \\
+Advice shown to the farmer that passed every check & \textbf{60/60 (100\%)} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Most failures are answers cut off at the token limit, mainly in Hindi. The
+fallback to the template means the farmer never sees a failed answer.
+
+\subsection{Languages}
+
+English and Hindi are written by Llama (Hindi KB text pending review by a native
+speaker). Bengali, Marathi, Tamil and Telugu use translated KB templates, marked
+as not yet reviewed.
+
+% ----------------------------------------------------- on-device results ----
+\section{On-device performance (Redmi 12 5G)}
+
+Snapdragon 4 Gen 2 (Arm Cortex-A78 and A55), Android 15, about 1.8 to 2.3\,GB free
+RAM. ExecuTorch 1.5.1.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}L l@{}}
+\toprule
+\hdr{Stage} & \hdr{Time} \\
+\midrule
+Leaf classifier & 70 to 300\,ms (first run slowest) \\
+Quality gate & included above \\
+Severity & 12 to 42\,ms per photo after the first (about 2\,s on the first photo) \\
+Llama load & 2.4 to 7.4\,s \\
+Llama first token, full grounded prompt & about 8\,s English (230 prompt tokens), about 19\,s Hindi \\
+Llama decode & 10 to 14 tokens/s \\
+Full flow, photo to Llama advice (airplane mode, 10 runs) & 18 to 19\,s \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{@{}L l@{}}
+\toprule
+\hdr{Memory and energy} & \hdr{Value} \\
+\midrule
+Peak app RSS with Llama loaded & 1.51 to 1.62\,GB \\
+Llama only started if free RAM $\geq$ 1,900\,MB; otherwise template advice & --- \\
+Energy per diagnosis (Android batterystats, CPU only, screen excluded) & about 3.2\,mAh \\
+Diagnoses per full charge (4,381\,mAh) & about 1,360 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The template advice appears at once; the Llama text replaces it only if it passes
+the safety check, so the farmer is never waiting on a blank screen.
+
+\textbf{Offline proof.} Airplane mode on, no active network, ping fails; 10 of 10
+full flows completed with Llama advice (\texttt{fails=[]}). Shown in the demo video.
+
+% ------------------------------------------------------------ limitations ---
+\section{Limitations}
+
+\begin{enumerate}
+  \item \textbf{Accuracy on photos from new farms is lower} than the headline:
+        about 70 to 80\% on the web-scraped sources. Our own phone photos from
+        Indian fields would be the most valuable addition.
+  \item \textbf{Close-up leaf photos work best.} The model sees the centre of the
+        photo and gives one label. Whole-plant photos, or two problems in one
+        photo, are not handled. A leaf or lesion detector is the next step.
+  \item \textbf{Severity is a colour baseline}, not a trained segmenter.
+  \item \textbf{Out-of-scope rejection is partial.} About one in five leaves of
+        other crops still gets a confident answer. In a small extra check, 4 of 15
+        photos of everyday objects got a confident answer when tomato was chosen
+        (none when potato was chosen), and 24 of 60 photos of tomato diseases
+        outside our list (bacterial spot, target spot, mosaic virus, spider mites)
+        were given one of our labels. The app's photo hint and the KVK referral
+        reduce the risk, and adding these conditions as classes, or an ``other''
+        class, is planned.
+  \item \textbf{Translations are not yet reviewed} by native speakers.
+  \item \textbf{Energy is a software estimate}, not a meter reading, and excludes
+        the screen.
+  \item Some field classes have few test images (21 to 30 for four tomato
+        classes), so their scores are noisy.
+\end{enumerate}
+
+% --------------------------------------------------------------- how to run ---
+\section{How to run}
+
+See the README: build the APK with Gradle, install with \texttt{adb install}, and
+push \texttt{llama.pte} and \texttt{tokenizer.model} to the app's files folder.
+The leaf model is bundled in the APK.
+
+% ------------------------------------------------------------- references ---
+\section{References}
+
+\subsection*{Datasets}
+
+\begin{itemize}[label={},leftmargin=2.4em,labelsep=0.45em,itemsep=0.3em]
+  \item[{[1]}] Hughes, D.\,P.\ and Salathe, M. ``An open access repository of images on plant health to enable the development of mobile disease diagnostics.'' arXiv:1511.08060, 2015. \url{https://github.com/spMohanty/PlantVillage-Dataset}
+  \item[{[2]}] Singh, D.\ et al.\ ``PlantDoc: A Dataset for Visual Plant Disease Detection.'' CoDS-COMAD 2020. \url{https://github.com/pratikkayal/PlantDoc-Dataset}
+  \item[{[3]}] Wei, T.\ et al.\ ``PlantSeg: A Large-Scale In-the-wild Dataset for Plant Disease Segmentation.'' arXiv:2409.04038, 2024. \url{https://zenodo.org/records/17719108}
+  \item[{[4]}] Gehlot, M., Saxena, R.\,K.\ and Gandhi, G.\,C.\ ``Tomato-Village: a dataset for end-to-end tomato disease detection in a real-world environment.'' Multimedia Systems, 2023. \url{https://github.com/mamta-joshi-gehlot/Tomato-Village}
+  \item[{[5]}] Shabrina, N.\,H.\ et al.\ ``A novel dataset of potato leaf disease in uncontrolled environment.'' Data in Brief 52, 109955, 2024. \url{https://data.mendeley.com/datasets/ptz377bwb8/1}
+  \item[{[6]}] ``Potato Leaf (Healthy and Late Blight).'' Mendeley Data, doi:10.17632/v4w72bsts5.2. \url{https://data.mendeley.com/datasets/v4w72bsts5/2}
+  \item[{[7]}] Rashid, J.\ et al.\ ``Multi-Level Deep Learning Model for Potato Leaf Disease Recognition.'' Electronics 10(17), 2064, 2021. \url{https://www.kaggle.com/datasets/rizwan123456789/potato-disease-leaf-datasetpld}
+\end{itemize}
+
+\subsection*{Models and software}
+
+\begin{itemize}[label={},leftmargin=2.4em,labelsep=0.45em,itemsep=0.3em]
+  \item[{[8]}] Howard, A.\ et al.\ ``Searching for MobileNetV3.'' ICCV 2019. \url{https://arxiv.org/abs/1905.02244}
+  \item[{[9]}] Meta. Llama 3.2 1B Instruct, SpinQuant INT4 ExecuTorch build. \url{https://huggingface.co/executorch-community/Llama-3.2-1B-Instruct-SpinQuant_INT4_EO8-ET} (Llama 3.2 Community License; Acceptable Use Policy: \url{https://www.llama.com/llama3_2/use-policy})
+  \item[{[10]}] Liu, Z.\ et al.\ ``SpinQuant: LLM Quantization with Learned Rotations.'' arXiv:2405.16406, 2024. \url{https://arxiv.org/abs/2405.16406}
+  \item[{[11]}] PyTorch ExecuTorch, on-device inference runtime. \url{https://github.com/pytorch/executorch}
+  \item[{[12]}] Guo, C.\ et al.\ ``On Calibration of Modern Neural Networks'' (temperature scaling). ICML 2017. \url{https://arxiv.org/abs/1706.04599}
+\end{itemize}
+
+\subsection*{Crop protection knowledge}
+
+\begin{itemize}[label={},leftmargin=2.4em,labelsep=0.45em,itemsep=0.3em]
+  \item[{[13]}] NIPHM and Directorate of PPQS, Ministry of Agriculture and Farmers Welfare. ``AESA based IPM Package: Tomato.'' \url{https://niphm.gov.in/IPMPackages/Tomato.pdf}
+  \item[{[14]}] NIPHM and Directorate of PPQS, Ministry of Agriculture and Farmers Welfare. ``AESA based IPM Package: Potato.'' \url{https://niphm.gov.in/IPMPackages/Potato.pdf}
+  \item[{[15]}] TNAU Agritech Portal, crop protection pages for tomato and potato. \url{https://agritech.tnau.ac.in}
+  \item[{[16]}] Cornell Vegetables, ``Tomato Leaf Mold.'' \url{https://vegetables.cornell.edu/crops/tomatoes/tomato-leaf-mold}
+  \item[{[17]}] Royal Horticultural Society, ``Tomato leaf mould.'' \url{https://www.rhs.org.uk/disease/tomato-leaf-mould}
+\end{itemize}
+
+\subsection*{Challenge}
+
+\begin{itemize}[label={},leftmargin=2.4em,labelsep=0.45em,itemsep=0.3em]
+  \item[{[18]}] Arm Education. ``Bharat AI-SoC Challenge 2026--27.'' \url{https://arm-education.github.io/Arm-Developer-Labs/Bharat_AI_SoC_2026_27.html}
+\end{itemize}
+
+\vspace{0.8em}
+\noindent\small Licences for every source are listed in \texttt{NOTICE.md} in the repository.
+
+\end{document}

@@ -26,3 +26,12 @@ runs/
 .env
 *.token
 .DS_Store
+
+# LaTeX build artefacts (the built PDF itself is committed)
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk

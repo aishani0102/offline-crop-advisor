@@ -2,7 +2,7 @@
 
 An offline field assistant for tomato and potato farmers, built for **PS1 of the Bharat AI-SoC Challenge 2026-27**. The farmer picks the crop, takes a photo of a sick leaf and answers three short questions. The phone says what is wrong, how much of the leaf is affected and what to do next, in English, Hindi, Bengali, Marathi, Tamil or Telugu. Everything runs on an ARM Android phone, with no internet at any point.
 
-**Download the app:** [CropAdvisor-v1.0-phase1.apk](https://github.com/aishani0102/offline-crop-advisor/releases/tag/v1.0-phase1) · **Technical report:** [docs/technical_report.md](docs/technical_report.md) (also [Word](docs/Technical_Report.docx)) · **Dataset study:** [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf)
+**Download the app:** [CropAdvisor-v1.0-phase1.apk](https://github.com/aishani0102/offline-crop-advisor/releases/tag/v1.0-phase1) · **Technical report:** [PDF](docs/Technical_Report.pdf) (also [Markdown](docs/technical_report.md), [Word](docs/Technical_Report.docx)) · **Dataset study:** [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf)
 
 ## Results at a glance
 
@@ -104,7 +104,7 @@ Results go to logcat (tag `CropAdvisor`) and `timings.log` in the files folder.
 
 | Document | What it covers |
 |---|---|
-| [docs/technical_report.md](docs/technical_report.md) | Full technical report |
+| [docs/Technical_Report.pdf](docs/Technical_Report.pdf) ([Markdown](docs/technical_report.md), [Word](docs/Technical_Report.docx), [LaTeX](docs/technical_report.tex)) | Full technical report |
 | [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf), [docs/DATASETS.md](docs/DATASETS.md) | Data sources, cleaning, balancing and splits |
 | [docs/results/training.md](docs/results/training.md), [export.md](docs/results/export.md) | Training run, FP32 and INT8 results |
 | [docs/results/shortcut_check.md](docs/results/shortcut_check.md) | Accuracy per data source |
