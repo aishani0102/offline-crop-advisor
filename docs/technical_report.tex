@@ -20,7 +20,9 @@
 \usepackage{float}         % [H]: keep tables exactly where they are written
 \usepackage{caption}
 \usepackage{xurl}          % let long URLs break anywhere
-\usepackage[hidelinks,breaklinks=true]{hyperref}
+\definecolor{linkblue}{RGB}{13,71,161}
+\usepackage[colorlinks=true,urlcolor=linkblue,linkcolor=linkblue,
+            citecolor=linkblue,breaklinks=true]{hyperref}
 \usepackage{bookmark}      % stable PDF outlines in one extra run
 
 % ---------------------------------------------------------------- styling ---
@@ -57,7 +59,8 @@
   {\normalsize Offline crop disease and pest detection and advisory for farmers}\\[0.9em]
   {\normalsize Phase 1 (Open Qualifying) submission, 23 November 2026}\\[0.5em]
   {\normalsize\bfseries Team: Aishani Roy, Vijoya Guha Thakurta}\\[0.6em]
-  {\small Source code: \url{https://github.com/aishani0102/offline-crop-advisor}}
+  {\small Source code: \url{https://github.com/aishani0102/offline-crop-advisor}}\\[0.3em]
+  {\small Demo video: \url{https://drive.google.com/file/d/1YLU4_h4lRAjxv5cIshW1-GhEhf6i896o/view?usp=drive_link}}
 \end{center}
 
 \vspace{0.6em}
@@ -540,7 +543,8 @@ The template advice appears at once; the Llama text replaces it only if it passe
 the safety check, so the farmer is never waiting on a blank screen.
 
 \textbf{Offline proof.} Airplane mode on, no active network, ping fails; 10 of 10
-full flows completed with Llama advice (\texttt{fails=[]}). Shown in the demo video.
+full flows completed with Llama advice (\texttt{fails=[]}). Shown in the
+\href{https://drive.google.com/file/d/1YLU4_h4lRAjxv5cIshW1-GhEhf6i896o/view?usp=drive_link}{demo video}.
 
 % ------------------------------------------------------------ limitations ---
 \section{Limitations}

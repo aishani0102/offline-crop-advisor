@@ -7,6 +7,8 @@ Team: Aishani Roy, Vijoya Guha Thakurta.
 
 Source code: https://github.com/aishani0102/offline-crop-advisor
 
+Demo video: https://drive.google.com/file/d/1YLU4_h4lRAjxv5cIshW1-GhEhf6i896o/view?usp=drive_link
+
 ---
 
 ## 1. Summary
@@ -278,7 +280,7 @@ Snapdragon 4 Gen 2 (Arm Cortex-A78 and A55), Android 15, about 1.8 to 2.3 GB fre
 
 The template advice appears at once; the Llama text replaces it only if it passes the safety check, so the farmer is never waiting on a blank screen.
 
-**Offline proof.** Airplane mode on, no active network, ping fails; 10 of 10 full flows completed with Llama advice (`fails=[]`). Shown in the demo video.
+**Offline proof.** Airplane mode on, no active network, ping fails; 10 of 10 full flows completed with Llama advice (`fails=[]`). Shown in the [demo video](https://drive.google.com/file/d/1YLU4_h4lRAjxv5cIshW1-GhEhf6i896o/view?usp=drive_link).
 
 ---
 

@@ -2,7 +2,7 @@
 
 An offline field assistant for tomato and potato farmers, built for **PS1 of the Bharat AI-SoC Challenge 2026-27**. The farmer picks the crop, takes a photo of a sick leaf and answers three short questions. The phone says what is wrong, how much of the leaf is affected and what to do next, in English, Hindi, Bengali, Marathi, Tamil or Telugu. Everything runs on an ARM Android phone, with no internet at any point.
 
-**Download the app:** [CropAdvisor-v1.0-phase1.apk](https://github.com/aishani0102/offline-crop-advisor/releases/tag/v1.0-phase1) · **Technical report:** [PDF](docs/Technical_Report.pdf) (also [Markdown](docs/technical_report.md), [Word](docs/Technical_Report.docx)) · **Dataset study:** [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf)
+**Demo video:** [watch on Google Drive](https://drive.google.com/file/d/1YLU4_h4lRAjxv5cIshW1-GhEhf6i896o/view?usp=drive_link) · **Download the app:** [CropAdvisor-v1.0-phase1.apk](https://github.com/aishani0102/offline-crop-advisor/releases/tag/v1.0-phase1) · **Technical report:** [PDF](docs/Technical_Report.pdf) (also [Markdown](docs/technical_report.md), [Word](docs/Technical_Report.docx)) · **Dataset study:** [docs/Dataset_Study.pdf](docs/Dataset_Study.pdf)
 
 ## Results at a glance
 
